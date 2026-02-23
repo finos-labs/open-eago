@@ -1,6 +1,6 @@
 SPDXVersion: SPDX-2.0
 DataLicense: CC0-1.0
-Creator: Jan Rock
+Creator: Jan Rock, Denis Urusov, Paul Groves
 PackageName: open-emcp
 PackageOriginator: Citi
 PackageHomePage: https://github.com/finos-labs/open-emcp
