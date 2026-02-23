@@ -1,0 +1,485 @@
+{
+  "$schema": "https://raw.githubusercontent.com/finos-labs/open-emcp/spec/spec.json",
+  "spec_version": "0.1.0",
+  
+  "metadata": {
+    "name": "OpenEMCP",
+    "description": "Enterprise Multi-Agent Communication & Orchestration Protocol - Core specification for secure, scalable, and compliant multi-agent collaboration across enterprise environments",
+    "version": "0.1.0",
+    "authors": [
+      "Jan Rock <jan.rock@citi.com>",
+      "Denis Urusov <denis.urusov@citi.com>",
+      "Paul Groves <paul.groves@citi.com>"
+    ],
+    "license": "Apache-2.0",
+    "created": "2026-02-18T00:00:00Z",
+    "organization": "FINOS Labs",
+    "tags": ["enterprise", "multi-agent", "orchestration", "compliance", "security", "blockchain"],
+    "emcp_phases": ["contract", "planning", "validation", "execution", "context", "communication"]
+  },
+
+  "components": [
+    {
+      "id": "contract-agent",
+      "component_type": "Agent",
+      "properties": {
+        "phase": "contract",
+        "pattern": "generator-evaluator-optimizer",
+        "llm": "$ref:enterprise-llm",
+        "system_prompt": "You are an enterprise contract management agent responsible for validating and processing incoming workflow requests according to EMCP standards.",
+        "capabilities": ["input_validation", "security_check", "compliance_validation", "oasf_enrichment"],
+        "security_level": "enterprise"
+      },
+      "inputs": [
+        {
+          "title": "raw_request",
+          "type": ["object", "string"],
+          "description": "Business request in any format (structured JSON, API calls, or natural language)"
+        }
+      ],
+      "outputs": [
+        {
+          "title": "validated_contract",
+          "type": "object",
+          "properties": {
+            "contract_id": {"type": "string"},
+            "tasks": {"type": "array"},
+            "requirements": {"type": "object"},
+            "compliance_flags": {"type": "array"},
+            "oasf_enriched": {"type": "boolean"}
+          }
+        }
+      ]
+    },
+    {
+      "id": "planning-agent",
+      "component_type": "Agent",
+      "properties": {
+        "phase": "planning",
+        "llm": "$ref:enterprise-llm",
+        "system_prompt": "You are an intelligent workflow orchestration agent responsible for agent discovery, selection, and execution planning.",
+        "capabilities": ["agent_discovery", "capability_matching", "execution_planning", "constraint_enforcement"],
+        "discovery_algorithm": "capability-compliance-residency-performance",
+        "planning_strategies": ["sequential", "parallel", "mixed"]
+      },
+      "inputs": [
+        {
+          "title": "validated_contract",
+          "type": "object",
+          "description": "Validated contract from contract phase"
+        }
+      ],
+      "outputs": [
+        {
+          "title": "execution_plan",
+          "type": "object",
+          "properties": {
+            "plan_id": {"type": "string"},
+            "selected_agents": {"type": "array"},
+            "execution_pattern": {"type": "string", "enum": ["sequential", "parallel", "mixed"]},
+            "task_assignments": {"type": "array"},
+            "fallback_options": {"type": "array"}
+          }
+        }
+      ]
+    },
+    {
+      "id": "validation-agent",
+      "component_type": "Agent",
+      "properties": {
+        "phase": "validation",
+        "llm": "$ref:enterprise-llm",
+        "system_prompt": "You are a human-in-the-loop validation agent responsible for plan review, risk assessment, and compliance checking.",
+        "capabilities": ["plan_review", "risk_assessment", "policy_validation", "approval_workflow"],
+        "review_criteria": ["cost_analysis", "compliance_validation", "risk_assessment", "sla_feasibility"]
+      },
+      "inputs": [
+        {
+          "title": "execution_plan",
+          "type": "object",
+          "description": "Execution plan from planning phase"
+        }
+      ],
+      "outputs": [
+        {
+          "title": "validation_result",
+          "type": "object",
+          "properties": {
+            "status": {"type": "string", "enum": ["approved", "rejected", "modified"]},
+            "feedback": {"type": "string"},
+            "modifications": {"type": "array"},
+            "risk_score": {"type": "number"}
+          }
+        }
+      ]
+    },
+    {
+      "id": "orchestration-agent",
+      "component_type": "Agent",
+      "properties": {
+        "phase": "execution",
+        "llm": "$ref:enterprise-llm",
+        "system_prompt": "You are a workflow orchestration agent responsible for coordinating multi-agent task execution with resilience and recovery management.",
+        "capabilities": ["task_coordination", "failure_handling", "result_validation", "contract_fulfillment"],
+        "execution_patterns": ["sequential", "parallel", "mixed"],
+        "resilience_features": ["circuit_breakers", "fallback_routing", "compensating_transactions"]
+      },
+      "inputs": [
+        {
+          "title": "approved_plan",
+          "type": "object",
+          "description": "Validated and approved execution plan"
+        }
+      ],
+      "outputs": [
+        {
+          "title": "execution_result",
+          "type": "object",
+          "properties": {
+            "execution_id": {"type": "string"},
+            "status": {"type": "string"},
+            "results": {"type": "array"},
+            "context_updates": {"type": "object"},
+            "audit_trail": {"type": "array"}
+          }
+        }
+      ]
+    },
+    {
+      "id": "context-manager",
+      "component_type": "Agent",
+      "properties": {
+        "phase": "context",
+        "capabilities": ["hierarchical_context", "session_management", "data_lineage", "context_propagation"],
+        "context_hierarchy": ["session", "conversation", "agent", "task"],
+        "persistence_options": ["memory", "database", "blockchain"]
+      },
+      "inputs": [
+        {
+          "title": "context_operation",
+          "type": "object",
+          "properties": {
+            "operation": {"type": "string", "enum": ["create", "read", "update", "archive", "persist"]},
+            "context_type": {"type": "string", "enum": ["session", "conversation", "agent", "task"]},
+            "data": {"type": "object"}
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "title": "context_result",
+          "type": "object",
+          "properties": {
+            "context_id": {"type": "string"},
+            "hierarchy_path": {"type": "string"},
+            "data": {"type": "object"},
+            "lineage": {"type": "array"}
+          }
+        }
+      ]
+    },
+    {
+      "id": "communication-gateway",
+      "component_type": "Agent",
+      "properties": {
+        "phase": "communication",
+        "capabilities": ["message_routing", "security_enforcement", "compliance_monitoring", "audit_anchoring"],
+        "communication_patterns": ["resource_discovery", "invocation", "context_propagation", "audit_anchoring"],
+        "security_features": ["mtls", "encryption", "authentication", "authorization"]
+      },
+      "inputs": [
+        {
+          "title": "message",
+          "type": "object",
+          "properties": {
+            "id": {"type": "string"},
+            "method": {"type": "string"},
+            "params": {"type": "object"},
+            "sender": {"type": "string"},
+            "recipient": {"type": "string"},
+            "timestamp": {"type": "string", "format": "date-time"}
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "title": "routed_message",
+          "type": "object",
+          "properties": {
+            "message_id": {"type": "string"},
+            "routing_status": {"type": "string"},
+            "security_validation": {"type": "boolean"},
+            "compliance_check": {"type": "boolean"},
+            "blockchain_hash": {"type": "string"}
+          }
+        }
+      ]
+    },
+    {
+      "id": "enterprise-llm",
+      "component_type": "LLM",
+      "properties": {
+        "provider": "configurable",
+        "model": "gpt-4o",
+        "temperature": 0.3,
+        "max_tokens": 4096,
+        "security_level": "enterprise",
+        "compliance_validated": true
+      }
+    },
+    {
+      "id": "agent-registry",
+      "component_type": "Tool",
+      "properties": {
+        "type": "registry",
+        "capabilities": ["agent_discovery", "capability_matching", "health_monitoring", "load_balancing"],
+        "authentication": "spire_spiffe",
+        "data_residency_aware": true
+      }
+    }
+  ],
+
+  "flows": [
+    {
+      "id": "emcp-six-phase-workflow",
+      "description": "Complete OpenEMCP six-phase workflow execution",
+      "nodes": [
+        {"id": "contract", "ref": "$ref:contract-agent"},
+        {"id": "planning", "ref": "$ref:planning-agent"},
+        {"id": "validation", "ref": "$ref:validation-agent"},
+        {"id": "execution", "ref": "$ref:orchestration-agent"},
+        {"id": "context", "ref": "$ref:context-manager"},
+        {"id": "communication", "ref": "$ref:communication-gateway"}
+      ],
+      "control_flow_connections": [
+        {"from": "contract", "to": "planning", "condition": "contract.status == 'validated'"},
+        {"from": "planning", "to": "validation", "condition": "plan.generated == true"},
+        {"from": "validation", "to": "execution", "condition": "validation.status == 'approved'"},
+        {"from": "validation", "to": "planning", "condition": "validation.status == 'modified'"},
+        {"from": "execution", "to": "context", "condition": "always"},
+        {"from": "execution", "to": "communication", "condition": "always"}
+      ],
+      "data_flow_connections": [
+        {"from": "contract.validated_contract", "to": "planning.validated_contract"},
+        {"from": "planning.execution_plan", "to": "validation.execution_plan"},
+        {"from": "validation.validation_result", "to": "execution.approved_plan"},
+        {"from": "execution.execution_result", "to": "context.context_operation"},
+        {"from": "execution.execution_result", "to": "communication.message"}
+      ]
+    }
+  ],
+
+  "orchestration": {
+    "type": "emcp_six_phase_graph",
+    "phases": [
+      {"id": "contract", "ref": "$ref:contract-agent", "required": true},
+      {"id": "planning", "ref": "$ref:planning-agent", "required": true},
+      {"id": "validation", "ref": "$ref:validation-agent", "required": true},
+      {"id": "execution", "ref": "$ref:orchestration-agent", "required": true},
+      {"id": "context", "ref": "$ref:context-manager", "required": true},
+      {"id": "communication", "ref": "$ref:communication-gateway", "required": true}
+    ],
+    "phase_transitions": [
+      {"from": "contract", "to": "planning", "trigger": "contract_validated"},
+      {"from": "planning", "to": "validation", "trigger": "plan_generated"},
+      {"from": "validation", "to": "execution", "trigger": "plan_approved"},
+      {"from": "validation", "to": "planning", "trigger": "plan_modified"},
+      {"from": "execution", "to": "context", "trigger": "context_update_required"},
+      {"from": "execution", "to": "communication", "trigger": "communication_required"}
+    ],
+    "entry_point": "contract",
+    "exit_points": ["execution.final_result", "communication.audit_complete"],
+    "context_propagation": {
+      "hierarchy": ["session", "conversation", "agent", "task"],
+      "inheritance": "read_only_parent_context",
+      "accumulation": "upward_result_flow"
+    }
+  },
+
+  "protocol": {
+    "version": "0.1.0",
+    "name": "OpenEMCP",
+    "description": "Enterprise Multi-Agent Communication & Orchestration Protocol",
+    "transport": ["http", "grpc", "nats"],
+    "security": {
+      "authentication": ["mtls", "spire_spiffe", "oauth2"],
+      "encryption": "aes_256_gcm",
+      "certificate_ttl": "48h"
+    },
+    "message_schema": {
+      "type": "object",
+      "required": ["id", "method", "sender", "recipient", "timestamp"],
+      "properties": {
+        "id": {"type": "string", "format": "uuid"},
+        "method": {"type": "string"},
+        "params": {"type": "object"},
+        "sender": {"type": "string", "description": "SPIFFE ID of sender"},
+        "recipient": {"type": "string", "description": "SPIFFE ID of recipient"},
+        "timestamp": {"type": "string", "format": "date-time"},
+        "session_id": {"type": "string", "format": "uuid"},
+        "conversation_id": {"type": "string", "format": "uuid"},
+        "phase": {"type": "string", "enum": ["contract", "planning", "validation", "execution", "context", "communication"]},
+        "security_context": {"type": "object"},
+        "compliance_metadata": {"type": "object"}
+      }
+    },
+    "handoff_rules": [
+      {"from_phase": "contract", "to_phase": "planning", "trigger": "contract_validation_complete"},
+      {"from_phase": "planning", "to_phase": "validation", "trigger": "execution_plan_ready"},
+      {"from_phase": "validation", "to_phase": "execution", "trigger": "plan_approved"},
+      {"from_phase": "execution", "to_phase": "context", "trigger": "context_update_needed"},
+      {"from_phase": "execution", "to_phase": "communication", "trigger": "communication_required"}
+    ]
+  },
+
+  "tools": [
+    {
+      "id": "agent-registry-service",
+      "type": "RemoteTool",
+      "name": "OpenEMCP Agent Registry",
+      "description": "Central registry for agent discovery and capability matching",
+      "openapi_spec": {
+        "paths": {
+          "/agents/discover": {
+            "post": {
+              "summary": "Discover agents by capability requirements",
+              "parameters": {
+                "capabilities": {"type": "array"},
+                "compliance_requirements": {"type": "array"},
+                "data_residency": {"type": "string"}
+              }
+            }
+          },
+          "/agents/register": {
+            "post": {
+              "summary": "Register new agent with capabilities",
+              "security": ["spiffe_mtls"]
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "blockchain-anchor-service",
+      "type": "RemoteTool",
+      "name": "Blockchain Audit Anchor",
+      "description": "Immutable audit trail anchoring to blockchain",
+      "openapi_spec": {
+        "paths": {
+          "/audit/anchor": {
+            "post": {
+              "summary": "Anchor audit event to blockchain",
+              "parameters": {
+                "event_data": {"type": "object"},
+                "blockchain_type": {"type": "string", "enum": ["hyperledger", "ethereum", "corda"]}
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+
+  "policies": [
+    {
+      "id": "enterprise-data-governance",
+      "effect": "enforce",
+      "scope": "data_handling",
+      "rules": [
+        {
+          "condition": "data.classification == 'confidential'",
+          "action": "require_encryption",
+          "parameters": {"algorithm": "aes_256_gcm"}
+        },
+        {
+          "condition": "data.jurisdiction != 'home_country'",
+          "action": "validate_cross_border_compliance",
+          "parameters": {"regulations": ["gdpr", "ccpa"]}
+        }
+      ]
+    },
+    {
+      "id": "agent-authentication-policy",
+      "effect": "enforce",
+      "scope": "agent_communication",
+      "rules": [
+        {
+          "condition": "communication.type == 'agent_to_agent'",
+          "action": "require_mtls",
+          "parameters": {"certificate_source": "spire_spiffe"}
+        },
+        {
+          "condition": "agent.registration_status != 'verified'",
+          "action": "deny_communication",
+          "parameters": {"reason": "unverified_agent"}
+        }
+      ]
+    },
+    {
+      "id": "regulatory-compliance-policy",
+      "effect": "enforce",
+      "scope": "workflow_execution",
+      "rules": [
+        {
+          "condition": "workflow.involves_pii == true",
+          "action": "require_human_validation",
+          "parameters": {"validation_phase": "before_execution"}
+        },
+        {
+          "condition": "workflow.financial_impact > threshold",
+          "action": "require_additional_approval",
+          "parameters": {"approval_level": "senior_management"}
+        }
+      ]
+    }
+  ],
+
+  "runtime": {
+    "target": "emcp_compliant",
+    "supported_frameworks": ["langgraph", "autogen", "crewai", "custom"],
+    "adapters": ["oracle-agent-spec", "json-agents-pam", "emcp-native"],
+    "scaling": {
+      "min_replicas": 1,
+      "max_replicas": 100,
+      "auto_scaling": true,
+      "scaling_metrics": ["cpu", "memory", "request_rate", "agent_queue_depth"]
+    },
+    "observability": {
+      "tracing": "opentelemetry",
+      "metrics": "prometheus",
+      "logging": "structured_json",
+      "audit": "blockchain_anchored"
+    },
+    "deployment": {
+      "container_runtime": "kubernetes",
+      "service_mesh": "istio",
+      "certificate_management": "spire",
+      "secret_management": "vault"
+    }
+  },
+
+  "extensions": {
+    "emcp_specific": {
+      "six_phase_workflow": true,
+      "blockchain_audit": true,
+      "spire_spiffe_identity": true,
+      "hierarchical_context": true,
+      "enterprise_compliance": true,
+      "cross_border_governance": true
+    },
+    "compatibility": {
+      "oracle_agent_spec": "1.0.0",
+      "json_agents_pam": "1.0.0",
+      "oasf_schema": "compatible"
+    },
+    "regulatory_frameworks": [
+      "gdpr",
+      "hipaa",
+      "pci_dss",
+      "ccpa",
+      "sox",
+      "eu_ai_act",
+      "nist_ai_rmf"
+    ]
+  }
+}
