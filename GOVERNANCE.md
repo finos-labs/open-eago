@@ -1,167 +1,111 @@
 # OpenEMCP Governance
 
-This document describes the governance structure for the OpenEMCP project under FINOS foundation.
+This document defines project governance for OpenEMCP in alignment with standard FINOS project governance practices.
 
-## Project Structure
+## 1. Scope
 
-OpenEMCP is proposed as a FINOS (Fintech Open Source Foundation) project. The governance structure follows FINOS guidelines while accommodating the specific needs of a protocol specification project.
+OpenEMCP is an open specification and related artifacts for enterprise multi-agent communication and orchestration. This governance covers technical direction, release management, contribution process, and project operations.
 
-## Roles and Responsibilities
+## 2. Project Roles
 
-### Technical Steering Committee (TSC)
+### 2.1 Technical Steering Committee (TSC)
 
-The Technical Steering Committee provides technical leadership for the project. Responsibilities include:
+The TSC is the project's primary technical decision-making body.
 
-- Setting technical direction and priorities
-- Reviewing and approving specification changes
-- Resolving technical disputes
-- Ensuring alignment with FINOS and AI Governance standards
-- Coordinating with other FINOS & Linux Foundation projects (AI Governance, FDC3, Agentic AI Foundation - AAIF)
+**Responsibilities**
 
-TSC membership is open to active contributors who demonstrate sustained commitment to the project.
+- Set and maintain technical direction and roadmap priorities.
+- Approve normative specification changes and major architectural decisions.
+- Oversee release quality, compatibility, and versioning policy.
+- Resolve technical disputes not resolved in normal maintainer workflow.
+- Coordinate with relevant FINOS and Linux Foundation initiatives.
 
-### Maintainers
+**Composition and Membership**
 
-Maintainers are responsible for day-to-day project operations:
+- TSC members are active contributors with sustained, material contributions.
+- New TSC members are nominated by an existing TSC member and approved by TSC vote.
+- Members are expected to participate regularly in meetings and asynchronous reviews.
+- Members may step down voluntarily or be removed by a two-thirds TSC vote for prolonged inactivity or conduct concerns.
 
-- Reviewing and merging pull requests
-- Triaging issues and feature requests
-- Ensuring documentation quality
-- Managing releases and versioning
-- Enforcing code of conduct
+**Chair**
 
-### Contributors
+- The TSC elects a Chair from current TSC members.
+- The Chair manages agenda, meeting cadence, and decision records.
+- Chair term is 12 months; re-election is allowed.
 
-Contributors are individuals who contribute to the project through:
+### 2.2 Maintainers
 
-- Specification improvements and clarifications
-- Documentation and examples
-- Reference implementations
-- Conformance test development
-- Issue reporting and discussion
+Maintainers manage day-to-day repository operations.
 
-### Working Groups
+- Review and merge pull requests.
+- Triage issues and label priorities.
+- Maintain documentation and release notes.
+- Enforce contribution and code of conduct policies.
 
-Working groups focus on specific areas of the specification:
+Maintainers are appointed by TSC vote.
 
-- **Core Protocol Working Group** - Responsible for the core protocol specification including message formats, phases, and abstract operations.
+### 2.3 Contributors
 
-(starting later in the project)
+Contributors participate through issues, pull requests, documentation, testing, implementations, and design discussions.
 
-- **Security Working Group** - Responsible for security architecture, authentication, authorization, and encryption requirements.
-- **Compliance Working Group** - Responsible for regulatory profiles, data governance, and cross-border compliance mechanisms.
-- **AI Governance Working Group** - Responsible for AI risk management, human oversight, and alignment with AI regulations.
-- **Interoperability Working Group** - Responsible for integration patterns, SDK guidelines, and conformance testing.
+### 2.4 Working Groups
 
-## Decision Making
+The TSC may charter working groups for focused areas (for example: core protocol, security, compliance, interoperability). Each working group reports decisions and recommendations to the TSC.
 
-### Consensus-Based Decisions
+## 3. Decision-Making and Voting
 
-Most decisions are made through consensus among active participants. Consensus is reached when:
+### 3.1 Default: Lazy Consensus
 
-- A proposal is made via GitHub issue or pull request
-- Sufficient time is allowed for review and comment (minimum 7 days for significant changes)
-- No substantive objections remain unresolved
-- At least two maintainers approve the change
+The project operates by lazy consensus whenever possible:
 
-### Voting
+- Proposals are made in GitHub issues or pull requests.
+- Significant changes should remain open for review for at least 7 days.
+- If no unresolved substantive objections remain, maintainers may merge.
 
-When consensus cannot be reached, decisions may be made by vote:
+### 3.2 TSC Voting Rules
 
-- TSC members have voting rights on technical matters
-- Simple majority required for most decisions
-- Two-thirds majority required for specification-breaking changes
-- Voting period is 7 days unless extended
+When consensus is not reached, the TSC votes.
 
-### Specification Changes
+- **Quorum:** More than 50% of current TSC members.
+- **Simple majority:** Default for routine decisions.
+- **Two-thirds majority:** Required for governance changes, breaking normative spec changes, and TSC member removal.
+- **Voting window:** 7 calendar days by default unless extended by Chair announcement.
+- **Abstentions:** Count toward quorum, not toward yes/no totals.
 
-Changes to the normative specification require:
+### 3.3 Appeals
 
-1. **Proposal** - GitHub issue describing the change and rationale
-2. **Discussion** - Community discussion period (minimum 14 days)
-3. **Pull Request** - Detailed specification change with examples
-4. **Review** - Review by at least two TSC members
-5. **Approval** - Consensus or vote as described above
-6. **Release** - Inclusion in next specification version
+Maintainer decisions may be appealed to the TSC by opening a documented issue. The TSC decision is final for project technical governance.
 
-## Versioning
+## 4. Releases and Versioning
 
-### Semantic Versioning
+- OpenEMCP uses Semantic Versioning (`MAJOR.MINOR.PATCH`).
+- Breaking normative protocol changes require explicit migration guidance.
+- Release candidates may be published for community review before final release.
 
-OpenEMCP follows semantic versioning (MAJOR.MINOR.PATCH):
+## 5. Intellectual Property, Licensing, and Compliance
 
-- **MAJOR** - Breaking changes to the protocol
-- **MINOR** - Backward-compatible additions
-- **PATCH** - Backward-compatible fixes and clarifications
+- Project source and documentation are licensed under Apache-2.0 unless otherwise noted.
+- All contributors must comply with FINOS contribution requirements, including applicable CLA/DCO process.
+- Contributions must be original or properly licensed and must not knowingly infringe third-party rights.
+- The project follows FINOS IP policy and applicable patent commitments.
 
-### Release Process
+## 6. Conduct and Community Standards
 
-1. **Release Candidate** - RC version published for community review
-2. **Review Period** - Minimum 30 days for major releases
-3. **Final Release** - Published after addressing feedback
-4. **Announcement** - Communicated via FINOS channels
+- All participants must follow the FINOS Code of Conduct and [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
+- Reports of misconduct may be sent to maintainers and/or FINOS staff through standard FINOS reporting channels.
 
-## Intellectual Property
+## 7. Meetings and Transparency
 
-### Licensing
+- TSC meetings are held regularly (target: monthly) and are open to observers when practical.
+- Agendas, notes, and decision outcomes are recorded in project channels.
+- Major governance and technical decisions are documented in the repository.
 
-All contributions are licensed under Apache License 2.0. Contributors must:
+## 8. Changes to This Governance
 
-- Sign the FINOS Contributor License Agreement (CLA)
-- Ensure contributions do not infringe third-party IP
-- Clearly mark any content with different licensing
+Changes to this document require:
 
-### Patent Policy
+1. A pull request with rationale.
+2. At least 14 days of public review.
+3. TSC approval by two-thirds majority.
 
-OpenEMCP follows the FINOS IP Policy:
-
-- Contributors grant patent licenses for contributions
-- Patent claims against the specification are discouraged
-- Defensive termination provisions apply
-
-## Code of Conduct
-
-All participants must adhere to the [FINOS Code of Conduct](https://www.finos.org/code-of-conduct) and the project's [Code of Conduct](CODE_OF_CONDUCT.md).
-
-Violations should be reported to the project maintainers or FINOS staff.
-
-## Communication
-
-### Official Channels
-
-- **GitHub** - Issues, pull requests, and discussions
-- **FINOS Slack** - Real-time community discussion
-- **Mailing List** - Announcements and formal communications
-- **TSC Meetings** - Monthly video calls (recorded and published)
-
-### Meeting Schedule
-
-- TSC meetings: First Tuesday of each month, 10:00 AM ET
-- Working group meetings: As scheduled by each group
-- Community calls: Quarterly, open to all participants
-
-## FINOS Integration
-
-### Project Status
-
-OpenEMCP aims to progress through FINOS project lifecycle:
-
-1. **Incubating** - Initial contribution and community building **< Project is currently in FINOS LABS**
-2. **Active** - Mature specification with multiple implementations
-3. **Released** - Stable specification with broad adoption
-
-### Related FINOS Projects
-
-OpenEMCP coordinates with:
-
-- **FINOS AI Governance** - AI risk management frameworks
-- **FDC3** - Financial desktop interoperability
-
-## Amendment Process
-
-This governance document may be amended by:
-
-1. Proposal via GitHub pull request
-2. Discussion period of 14 days
-3. TSC approval by two-thirds majority
-4. Publication of updated document
+Adopted changes take effect upon merge.
