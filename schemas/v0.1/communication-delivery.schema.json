@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://finos-labs.github.io/open-emcp/schemas/v0.1/communication-delivery.schema.json",
+  "title": "OpenEMCP Communication and Delivery",
+  "type": "object",
+  "required": ["message_id", "sender", "recipient", "delivery_status", "security"],
+  "properties": {
+    "message_id": {
+      "type": "string"
+    },
+    "sender": {
+      "type": "string"
+    },
+    "recipient": {
+      "type": "string"
+    },
+    "method": {
+      "type": "string"
+    },
+    "delivery_status": {
+      "type": "string",
+      "enum": ["queued", "delivered", "failed", "expired"]
+    },
+    "security": {
+      "type": "object",
+      "required": ["mtls", "auth_level"],
+      "properties": {
+        "mtls": {"type": "boolean"},
+        "auth_level": {"type": "integer", "minimum": 1, "maximum": 4}
+      },
+      "additionalProperties": false
+    },
+    "audit_ref": {
+      "type": "string"
+    }
+  },
+  "additionalProperties": false
+}

@@ -7,6 +7,7 @@
 - **[Security Framework](./overview/security.md)** - Comprehensive security architecture, three-level authentication system, and threat protection mechanisms
 - **[Identity Framework](./overview/identity.md)** - Agent identity standards, three-level authentication architecture, and SPIRE/SPIFFE integration for secure multi-agent systems
 - **[Read the OpenEMCP Proposal](./overview/openemcp_proposal.md)** - Start here for a comprehensive understanding of regulatory challenges in AI systems and how OpenEMCP addresses them. This foundational document maps 35+ banking and financial services regulatory challenges to specific protocol solutions.
+- **[Reference Materials](./overview/reference_materials.md)** - Curated list of key references, standards, and resources relevant to OpenEMCP design and implementation
 
 ## Core Protocol Capabilities
 

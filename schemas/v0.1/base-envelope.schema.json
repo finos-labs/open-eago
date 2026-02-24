@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://finos-labs.github.io/open-emcp/schemas/v0.1/base-envelope.schema.json",
+  "title": "OpenEMCP Base Envelope",
+  "type": "object",
+  "required": ["message_id", "phase", "timestamp", "payload"],
+  "properties": {
+    "message_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "phase": {
+      "type": "string",
+      "enum": [
+        "contract_management",
+        "planning_negotiation",
+        "validation_compliance",
+        "execution_resilience",
+        "context_state_management",
+        "communication_delivery"
+      ]
+    },
+    "correlation_id": {
+      "type": "string"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "payload": {
+      "type": "object"
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": false
+}
