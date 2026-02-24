@@ -181,61 +181,26 @@ Session Context (Global)
 
 ## Security & Governance Layer
 
-The OpenEMCP framework implements enterprise-grade security through a comprehensive multi-layered approach. This section provides an overview of security components - for detailed implementation flows, certificate structures, and technical specifications, see [security.md](security.md).
+The architecture depends on a shared security and governance baseline; detailed controls are intentionally maintained outside this document to avoid drift.
 
-**Components**:
+**Security control planes (summary):**
 
-- **Identity & Authentication**: SPIRE/SPIFFE-based zero-trust identity verification with automatic X.509 certificate management, mTLS for all service-to-service communication, and multi-factor authentication for human users
-- **Authorization & Access Control**: Role-based permissions (RBAC), attribute-based access control (ABAC), fine-grained task permissions with execution tokens, and capability-based authorization for agent interactions
-- **Data Protection**: Data classification and labeling, encryption at rest and in transit using AES-256-GCM, data residency controls with jurisdiction-specific routing, and cross-border data governance
-- **Regulatory Compliance**: Automated adherence validation against SOX/GDPR/HIPAA requirements, jurisdiction-specific compliance checking, data sovereignty enforcement, and immutable audit trails
-- **AI Risk Management**: AI governance policy enforcement, mandatory human oversight controls for sensitive operations, algorithmic bias monitoring and detection, and alignment with emerging AI regulations
-- **Audit & Traceability**: Blockchain-anchored immutable audit trails, comprehensive compliance reporting, distributed logging with tamper-proof guarantees, and complete data lineage tracking
-- **Agent Interoperability**: Framework-agnostic agent integration with standardized security interfaces, conformance testing for security protocols, and unified authentication across diverse agent implementations
+- **Identity & Authentication**: SPIRE/SPIFFE identities, mTLS, and workload trust.
+- **Authorization**: RBAC/ABAC and task-scoped authorization policies.
+- **Data Governance**: Classification, encryption, residency, and transfer controls.
+- **Auditability**: End-to-end traceability and immutable audit records.
 
-**Security Architecture Overview**:
+**Authentication levels (summary):**
 
-The security model operates on three distinct authentication levels to provide comprehensive protection against different threat vectors:
+1. Agent-to-Registry authentication.
+2. User/Application-to-Framework authentication.
+3. Task-to-Contract/Planner authorization.
 
-1. **Level 1: Agent-to-Registry Authentication** - Eliminates malicious agents through SPIRE-based certificate validation, behavioral monitoring, and continuous threat assessment before agents can register in the system
+**Canonical references:**
 
-2. **Level 2: User/Application-to-Framework Authentication** - Prevents malicious applications and unauthorized users through OAuth2/OIDC authentication, client certificate validation, and application integrity verification
-
-3. **Level 3: Task-to-Contract/Planner Authorization** - Enforces fine-grained permissions for specific task execution through capability-based authorization, resource constraints, and execution token validation
-
-**Security Model Flow**:
-
-```text
-Request → Authentication → Authorization → Data Classification → Processing → Audit → Response
-```
-
-**Key Security Features**:
-
-- **SPIRE/SPIFFE Identity Framework**: Production-ready implementation providing automatic X.509 certificate issuance, rotation, and management for all workloads. Certificates have 48-hour TTL for enhanced security and include SPIFFE IDs in Subject Alternative Names for cryptographic identity verification.
-
-- **Mutual TLS (mTLS) Communication**: All inter-service communication uses mTLS where both client and server prove their identities cryptographically, eliminating reliance on network perimeter security and enabling true zero-trust architecture.
-
-- **Multi-Tier Context Security**: Hierarchical context management with session-level encryption, conversation-specific access controls, agent-level isolation, and task-specific permission enforcement throughout the execution pipeline.
-
-- **Blockchain Audit Anchoring**: Critical security events and audit trails are anchored to blockchain infrastructure providing tamper-proof logging, immutable compliance records, and cryptographic proof of system integrity.
-
-- **Automated Certificate Management**: Short-lived certificates (48-hour default TTL) with automatic rotation eliminate manual certificate management overhead while reducing the blast radius of potential compromises.
-
-- **Compliance-Aware Routing**: Intelligent message routing based on data classification, jurisdiction requirements, and regulatory constraints ensures compliance with data sovereignty laws and industry regulations.
-
-**Security Benefits**:
-
-- **Zero-Trust Architecture**: Services authenticate based on cryptographic identity rather than network location, providing security across hybrid and multi-cloud deployments
-- **Defense in Depth**: Multiple security layers ensure that compromise at one level doesn't compromise the entire system
-- **Automatic Threat Mitigation**: Short certificate lifetimes and continuous monitoring provide automatic remediation of compromised credentials
-- **Regulatory Compliance**: Built-in compliance validation and audit trails meet strict enterprise and regulatory requirements
-- **Scalable Security**: Framework-agnostic security model scales across diverse agent implementations and deployment environments
-
-**Threat Model Coverage**:
-
-The security architecture addresses comprehensive threat scenarios including malicious agents attempting system infiltration, compromised applications trying to access unauthorized resources, privilege escalation attacks, data exfiltration attempts, resource abuse, and insider threats. Each security layer provides specific protections while the combined system offers overlapping defensive measures.
-
-For detailed security flows including SPIRE certificate issuance sequences, mTLS handshake processes, three-level authentication workflows, certificate structure specifications, and complete end-to-end security validation procedures, refer to the comprehensive [Security Documentation](security.md).
+- Security implementation: [security.md](security.md)
+- Identity standard and flows: [identity.md](identity.md)
+- Normative requirements: [../../SPECIFICATION.md](../../SPECIFICATION.md)
 
 ## Agent Ecosystem Architecture
 
