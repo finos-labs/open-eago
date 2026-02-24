@@ -5,6 +5,7 @@
 The Communication capability receives **context state** from the Context Agent, generates intelligent responses, manages multi-channel communication delivery, handles notifications and alerts, and provides comprehensive audit trails. It acts as the final phase that transforms executed workflows into user-friendly responses while maintaining compliance, personalization, and communication preferences.
 
 **Intelligent Response Delivery**:
+
 1. **Response Generation** - Create intelligent, context-aware responses from execution results
 2. **Multi-Channel Delivery** - Support various communication channels (API, email, webhooks)
 3. **Personalization** - Tailor responses based on user preferences and communication styles
@@ -13,6 +14,7 @@ The Communication capability receives **context state** from the Context Agent, 
 6. **Communication Analytics** - Track delivery success, user engagement, and satisfaction
 
 ## What is Communication?
+
 Communication is the final orchestration phase that transforms complex execution results into clear, actionable, and personalized user experiences. It involves intelligent response generation, multi-channel delivery optimization, proactive notification management, and comprehensive analytics to ensure effective information delivery while maintaining compliance and user satisfaction.
 
 ## What is Multi-Channel Delivery?
@@ -38,6 +40,7 @@ The Communication Agent provides advanced intelligence and analytics to optimize
 ## Core Functionality
 
 ### 1. **Intelligent Response Generation**
+
 - **Context-Aware Content**: Generate responses based on comprehensive execution context and user history
 - **Template-Based Generation**: Utilize optimized response templates for different scenarios and outcomes
 - **Personalization Engine**: Adapt content style, detail level, and format based on user preferences
@@ -45,6 +48,7 @@ The Communication Agent provides advanced intelligence and analytics to optimize
 - **Multi-Format Support**: Generate content optimized for different communication channels
 
 ### 2. **Multi-Channel Delivery Orchestration**
+
 - **Channel Adaptation**: Automatically format content for optimal delivery across different platforms
 - **Delivery Coordination**: Orchestrate simultaneous or sequential delivery across multiple channels
 - **Failure Handling**: Intelligent fallback and retry mechanisms for delivery issues
@@ -52,6 +56,7 @@ The Communication Agent provides advanced intelligence and analytics to optimize
 - **Delivery Tracking**: Comprehensive monitoring of message delivery and user engagement
 
 ### 3. **Advanced Personalization**
+
 - **User Profile Integration**: Leverage user experience level, communication style, and preferences
 - **Historical Pattern Analysis**: Apply insights from past communication effectiveness
 - **Role-Based Customization**: Adapt communications based on user groups and organizational roles
@@ -59,6 +64,7 @@ The Communication Agent provides advanced intelligence and analytics to optimize
 - **Dynamic Adjustment**: Real-time personalization based on user feedback and engagement
 
 ### 4. **Proactive Notification Management**
+
 - **Smart Alerting**: Intelligent notification generation based on execution outcomes and thresholds
 - **Escalation Handling**: Automated escalation of critical issues to appropriate stakeholders
 - **Follow-up Orchestration**: Proactive scheduling and delivery of follow-up communications
@@ -68,6 +74,7 @@ The Communication Agent provides advanced intelligence and analytics to optimize
 ### 5. **Advanced Communication Algorithms**
 
 #### **Response Generation Engine**
+
 ```python
 class ResponseGenerator:
     """Generate intelligent, context-aware responses from execution results."""
@@ -100,6 +107,7 @@ class ResponseGenerator:
 ```
 
 #### **Multi-Channel Delivery Engine**
+
 ```python
 class MultiChannelDelivery:
     """Manage delivery across multiple communication channels."""
@@ -130,6 +138,7 @@ class MultiChannelDelivery:
 ```
 
 ### 6. **Communication Analytics & Optimization**
+
 - **Engagement Tracking**: Monitor user interaction and engagement with delivered communications
 - **Effectiveness Measurement**: Analyze communication success rates and user satisfaction metrics
 - **Channel Performance Analysis**: Compare effectiveness across different communication channels
@@ -139,10 +148,12 @@ class MultiChannelDelivery:
 ## Components
 
 ### [Communication](communication.md)
+
 **Purpose**: Response Generation & Multi-Channel Delivery  
 **Input**: Context state from Context Agent  
 **Output**: Multi-channel communications to users and systems  
 **Key Features**:
+
 - Intelligent response generation with context-aware personalization
 - Multi-channel delivery orchestration with adaptive content formatting
 - Proactive notification management with smart alerting and escalation
@@ -153,7 +164,9 @@ class MultiChannelDelivery:
 ## Integration with External Systems and Users
 
 ### From Context Agent
+
 The Communication Agent receives context state containing:
+
 - **Session Context** - User authentication, preferences, and activity history
 - **Conversation Context** - Topic, objective, workflow history, and completion status
 - **Response Context** - User expectations, personalization data, and continuity information
@@ -162,7 +175,9 @@ The Communication Agent receives context state containing:
 - **Intelligence Data** - Learning insights, satisfaction prediction, and behavioral analysis
 
 ### To Users and External Systems
+
 The Communication Agent delivers comprehensive communications including:
+
 - **API Responses** - Structured JSON with execution results for system integration
 - **Email Communications** - Formatted summaries with detailed execution information
 - **Webhook Notifications** - Event-driven payloads for automated system responses
@@ -174,6 +189,7 @@ This provides **complete workflow closure** with personalized, multi-channel com
 ## Advanced Features
 
 ### Communication Intelligence Benefits
+
 1. **Personalized Experience**: Tailored communications based on user preferences and behavior patterns
 2. **Multi-Channel Optimization**: Intelligent channel selection and content adaptation for maximum effectiveness
 3. **Proactive Engagement**: Smart notification management with predictive user engagement
@@ -181,6 +197,7 @@ This provides **complete workflow closure** with personalized, multi-channel com
 5. **Continuous Optimization**: Adaptive improvement of communication strategies based on user feedback
 
 ### Delivery Optimization
+
 1. **Channel Selection Intelligence**: Optimal communication channel selection based on user preferences and effectiveness
 2. **Timing Optimization**: Delivery at optimal times for maximum user engagement and response
 3. **Content Adaptation**: Dynamic content formatting and style adaptation for different channels and audiences
@@ -188,6 +205,7 @@ This provides **complete workflow closure** with personalized, multi-channel com
 5. **Performance Monitoring**: Real-time tracking of delivery success rates and user engagement metrics
 
 ### Analytics & Learning
+
 1. **Engagement Analysis**: Comprehensive tracking of user interaction patterns and communication effectiveness
 2. **Satisfaction Modeling**: Advanced prediction of user satisfaction based on communication patterns
 3. **Channel Performance**: Detailed analysis of communication channel effectiveness and optimization opportunities

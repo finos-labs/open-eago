@@ -18,21 +18,25 @@ The Contract Agent implements **Phase 1 (Contract Management)** of the six-phase
 6. Communication ← Secure message exchange and audit
 
 **Architecture Flow**:
-```
+
+```text
 External Request → Contract Agent → [Phase 1 Complete] → Planning Agent → [Phases 2-6] → Response
 ```
 
-**Security Integration**: 
+**Security Integration**:
+
 - Implements Level 2 authentication (User/Application-to-Framework)
 - Validates SPIRE/SPIFFE certificates and mTLS connections
 - Enforces OpenEMCP security policies before contract enrichment
 
 **Context Integration**:
+
 - Initializes Session Context with global identifiers
 - Creates Conversation Context for topic-specific workflows  
 - Prepares hierarchical context structure for downstream phases
 
 **Universal Processing**:
+
 1. **Accept Any Input** - Structured JSON, API calls, or natural language text
 2. **Parse & Validate** - Extract entities and validate input quality
 3. **Security & Compliance** - Review security context and compliance requirements
@@ -84,7 +88,7 @@ External Request → Contract Agent → [Phase 1 Complete] → Planning Agent �
     
     // Optional Hints (help with task detection)
     "task_hints": {
-      "playbook": "string (optional) - prefered playbook",
+      "playbook": "string (optional) - preferred playbook",
       "category": "string (optional) - task category: customer, financial, compliance, etc",
       "operations": ["array (optional) - task operations: validate, update, notify, etc"],
       "priority": "string (optional) - task priority: low, medium, high, urgent"
@@ -130,6 +134,7 @@ External Request → Contract Agent → [Phase 1 Complete] → Planning Agent �
 ## Example: Customer Address Update (Structured Input/Output)
 
 **Input Contact Request:**
+
 ```json
 {
   "request": {
@@ -190,6 +195,7 @@ External Request → Contract Agent → [Phase 1 Complete] → Planning Agent �
 ```
 
 **Contract Output:**
+
 ```json
 {
   "execution_id": "exec_a7b8c9d2",
@@ -372,12 +378,14 @@ External Request → Contract Agent → [Phase 1 Complete] → Planning Agent �
 ## Summary of Input/Output Patterns
 
 ### Input Patterns Supported:
+
 1. **Structured API Requests** - Complete JSON with all fields
 2. **Natural Language Requests** - Human-readable descriptions with NLP processing
 3. **Mixed Formats** - Structured data with natural language objectives
 4. **Urgent/Priority Requests** - Time-sensitive with parallel execution patterns
 
 ### Output Enrichment Features:
+
 1. **OASF Compliance** - Full record metadata and protocol headers
 2. **Task Analysis** - Confidence scoring and pattern detection
 3. **Regulatory Mapping** - Automatic compliance framework assignment
@@ -386,7 +394,8 @@ External Request → Contract Agent → [Phase 1 Complete] → Planning Agent �
 6. **Skill Decomposition** - Task breakdown into executable agent skills
 
 ### Data Flow:
-```
+
+```text
 Raw Input → Validation → Task Detection → Skill Mapping → Regulatory Analysis → OASF Enrichment → Planning Agent
 ```
 

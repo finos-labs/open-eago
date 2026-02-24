@@ -5,6 +5,7 @@
 The Planning capability receives **OASF-compliant contracts** from the Contract Agent, performs intelligent agent discovery and selection, creates optimized execution plans, and applies regulatory constraints. It acts as the orchestration brain that transforms validated contracts into executable multi-agent workflows ready for validation approval.
 
 **Intelligent Workflow Orchestration**:
+
 1. **Agent Discovery** - Query registry for capable agents matching requirements
 2. **Capability Matching** - Map contract requirements to agent skills and compliance
 3. **Constraint Application** - Apply regulatory, cost, and performance constraints
@@ -13,11 +14,13 @@ The Planning capability receives **OASF-compliant contracts** from the Contract 
 6. **Plan Validation** - Ensure plan feasibility and constraint satisfaction
 
 ## What is Planning?
+
 Planning is the strategic orchestration phase that transforms validated contracts into executable multi-agent workflows. It involves discovering appropriate agents, matching their capabilities to task requirements, applying regulatory and business constraints, and creating optimized execution plans with resource allocation, timeline estimation, and risk mitigation strategies.
 
 ## What is the Agent Registry?
 
 The Agent Registry is a comprehensive distributed system that maintains detailed metadata about all registered agents in the OpenEMCP ecosystem, including:
+
 - **Agent Capabilities**: Skills, proficiency levels, and domain expertise
 - **Compliance Certifications**: Active regulatory framework certifications
 - **Performance Metrics**: Historical reliability, response times, and success rates
@@ -36,6 +39,7 @@ The Planning Agent integrates Large Language Models (LLMs) at every critical dec
 ## Core Functionality
 
 ### 1. **Agent Discovery & Selection**
+
 - **Registry Integration**: Query comprehensive agent registry with advanced filtering
 - **Multi-Criteria Evaluation**: Capability, compliance, performance, and geographic assessment
 - **Intelligent Ranking**: Weighted scoring with skill matching and certification validation
@@ -43,6 +47,7 @@ The Planning Agent integrates Large Language Models (LLMs) at every critical dec
 - **Load Balancing**: Distribute workload across available agents optimally
 
 ### 2. **Capability Matching Engine**
+
 - **Skill Taxonomy**: Hierarchical skill classification with proficiency levels
 - **Exact Matching**: Direct skill-to-requirement alignment with certification bonus
 - **Transferable Skills**: Cross-category capability assessment and domain overlap
@@ -50,6 +55,7 @@ The Planning Agent integrates Large Language Models (LLMs) at every critical dec
 - **Gap Analysis**: Identify missing capabilities and suggest alternatives
 
 ### 3. **Execution Planning & Optimization**
+
 - **Workflow Pattern Detection**: Sequential, parallel, mixed, conditional, and iterative patterns
 - **Dependency Analysis**: Task relationship mapping and critical path optimization
 - **Resource Allocation**: Memory, CPU, network bandwidth, and concurrent capacity planning
@@ -57,6 +63,7 @@ The Planning Agent integrates Large Language Models (LLMs) at every critical dec
 - **Cost Optimization**: Agent selection balancing quality, performance, and cost efficiency
 
 ### 4. **Constraint Application & Compliance**
+
 - **Regulatory Framework Mapping**: Automatic compliance requirement application
 - **Data Residency Enforcement**: Geographic constraint validation and agent filtering
 - **Security Level Matching**: Encryption, audit trail, and access control requirements
@@ -66,6 +73,7 @@ The Planning Agent integrates Large Language Models (LLMs) at every critical dec
 ### 5. **Advanced Planning Algorithms**
 
 #### **Multi-LLM Discovery Enhancement**
+
 ```python
 async def llm_enhanced_agent_discovery(discovery_query):
     """Enhanced agent discovery with parallel LLM validation."""
@@ -91,6 +99,7 @@ async def llm_enhanced_agent_discovery(discovery_query):
 ```
 
 #### **Consensus-Based Plan Validation**
+
 ```python
 async def validate_plan_with_llm_panel(execution_plan, validation_requirements):
     """Comprehensive plan validation using multiple specialized LLM validators."""
@@ -115,6 +124,7 @@ async def validate_plan_with_llm_panel(execution_plan, validation_requirements):
 ```
 
 ### 6. **Real-Time Plan Adaptation**
+
 - **Continuous Monitoring**: Execution performance tracking and deviation detection
 - **Dynamic Reoptimization**: Real-time plan adjustments based on agent health and performance
 - **Failure Recovery**: Automatic failover planning and backup agent activation
@@ -124,10 +134,12 @@ async def validate_plan_with_llm_panel(execution_plan, validation_requirements):
 ## Components
 
 ### [Planning](planning.md)
+
 **Purpose**: Intelligent Workflow Orchestration & Agent Selection  
 **Input**: OASF-compliant contracts from Contract Agent  
 **Output**: Optimized execution plans with agent assignments  
 **Key Features**:
+
 - Multi-criteria agent discovery with registry integration
 - LLM-enhanced capability matching and optimization
 - Advanced execution planning with multiple workflow patterns
@@ -138,7 +150,9 @@ async def validate_plan_with_llm_panel(execution_plan, validation_requirements):
 ## Integration with Contract and Validation Agents
 
 ### From Contract Agent
+
 The Planning Agent receives enriched OASF contracts containing:
+
 - **Validated Requirements** - Skill requirements with proficiency levels
 - **Security Context** - Authentication and authorization details
 - **Compliance Framework** - Regulatory requirements and data constraints
@@ -146,7 +160,9 @@ The Planning Agent receives enriched OASF contracts containing:
 - **Business Context** - Task objectives and payload data
 
 ### To Validation Agent
+
 The Planning Agent sends comprehensive execution plans including:
+
 - **Selected Agents** - Matched agents with capability rationale
 - **Workflow Design** - Sequential/parallel execution phases with dependencies
 - **Resource Allocation** - Time, cost, and capacity estimates
@@ -159,6 +175,7 @@ This enables the Validation Agent to focus on **plan approval and governance** r
 ## Advanced Features
 
 ### Multi-LLM Integration Benefits
+
 1. **Enhanced Accuracy**: Multiple model perspectives reduce planning errors
 2. **Intelligent Optimization**: AI-driven workflow improvements beyond traditional algorithms
 3. **Risk Assessment**: Comprehensive risk analysis with mitigation strategies
@@ -166,6 +183,7 @@ This enables the Validation Agent to focus on **plan approval and governance** r
 5. **Consensus Confidence**: Multi-model agreement scoring for planning decisions
 
 ### Registry Optimization
+
 1. **Intelligent Caching**: Frequently accessed agent profiles and query results
 2. **Predictive Load Balancing**: Capacity forecasting and proactive distribution
 3. **Health Monitoring**: Real-time agent status and performance tracking

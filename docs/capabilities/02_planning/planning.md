@@ -8,7 +8,7 @@ The Planning Agent receives **OASF-compliant contracts** from the Contract Agent
 
 ### Dependency
 
-The Planning Agent relies on the following components for its operation on external Agent Registry component. Agent Registry provides the necessary agent metadata and capabilities for discovery and selection.
+The Planning Agent relies on an external Agent Registry component. Agent Registry provides the necessary agent metadata and capabilities for discovery and selection.
 
 ## OpenEMCP Protocol Integration
 
@@ -22,21 +22,25 @@ The Planning Agent implements **Phase 2 (Planning & Negotiation)** of the six-ph
 6. Communication ← Agent discovery and routing
 
 **Architecture Flow**:
-```
+
+```text
 Contract Agent → [OASF Contract] → Planning Agent → [Execution Plan] → Validation Agent → [Phases 3-6] → Response
 ```
 
-**Security Integration**: 
+**Security Integration**:
+
 - Validates Level 2 authentication from Contract Agent output
 - Maintains SPIRE/SPIFFE certificate chain validation
 - Enforces security constraints during agent selection
 
 **Context Integration**:
+
 - Receives Session Context and Conversation Context from Contract
 - Creates Plan Context for execution orchestration
 - Propagates hierarchical context to selected agents
 
 **Core Planning Functions**:
+
 1. **Agent Discovery** - Query registry for capable agents matching requirements
 2. **Capability Matching** - Map contract requirements to agent skills and compliance
 3. **Constraint Application** - Apply regulatory, cost, and performance constraints
@@ -164,7 +168,8 @@ Contract Agent → [OASF Contract] → Planning Agent → [Execution Plan] → V
 ### 1. Agent Discovery Algorithm
 
 **Discovery Flow**:
-```
+
+```text
 Skill Requirements → Registry Query → Capability Matching → Compliance Filtering → Performance Ranking → Agent Selection
 ```
 
@@ -173,6 +178,7 @@ Skill Requirements → Registry Query → Capability Matching → Compliance Fil
 The Planning Agent integrates with the comprehensive OpenEMCP Agent Registry system to provide intelligent agent discovery and selection capabilities. The registry maintains detailed metadata about all registered agents including capabilities, compliance certifications, performance metrics, and geographic locations.
 
 **Registry Architecture**:
+
 - **Distributed Registry Servers**: Multiple registry instances for high availability
 - **Real-time Agent Health Monitoring**: Continuous heartbeat tracking and health status
 - **Performance Metrics Collection**: Historical and real-time performance data
@@ -575,7 +581,8 @@ Registry responses include comprehensive agent information and selection rationa
 ```
 
 **Discovery Criteria**:
-``` - **Skill Matching**: Exact match > Skill category > Domain category > Generic capability
+
+- **Skill Matching**: Exact match > Skill category > Domain category > Generic capability
 - **Compliance Requirements**: Mandatory frameworks must be met, preferred frameworks add scoring bonus
 - **Performance Thresholds**: All minimum requirements must be satisfied for consideration
 - **Geographic Constraints**: Hard constraints (data residency) vs soft preferences (latency optimization)
@@ -584,11 +591,13 @@ Registry responses include comprehensive agent information and selection rationa
 ### 2. Capability Matching Engine
 
 **Matching Algorithm Flow**:
-```
+
+```text
 Required Skills → Skill Taxonomy Lookup → Proficiency Assessment → Certification Validation → Compatibility Score
 ```
 
 **Skill Taxonomy Structure**:
+
 ```yaml
 skill_hierarchy:
   data_validation:
@@ -608,6 +617,7 @@ skill_hierarchy:
 ```
 
 **Capability Scoring Algorithm**:
+
 ```python
 def calculate_capability_score(agent_capabilities, required_skills):
     """Calculate weighted capability matching score."""
@@ -662,11 +672,13 @@ def calculate_skill_match(agent_capability, required_skill):
 ### 3. Execution Planning Engine
 
 **Plan Generation Process**:
-```
+
+```text
 Agent Selection → Dependency Analysis → Workflow Design → Resource Allocation → Timeline Optimization → Plan Validation
 ```
 
 **Workflow Pattern Detection**:
+
 - **Sequential**: Tasks with strict dependencies, no parallelization possible
 - **Parallel**: Independent tasks that can execute simultaneously  
 - **Mixed**: Combination of sequential and parallel execution paths
@@ -674,6 +686,7 @@ Agent Selection → Dependency Analysis → Workflow Design → Resource Allocat
 - **Iterative**: Tasks requiring retry loops or progressive refinement
 
 **Execution Plan Structure**:
+
 ```json
 {
   "execution_plan": {
@@ -854,6 +867,7 @@ Agent Selection → Dependency Analysis → Workflow Design → Resource Allocat
 ### 4. Constraint Application Engine
 
 **Regulatory Constraint Processing**:
+
 ```python
 def apply_regulatory_constraints(plan, regulatory_requirements):
     """Apply regulatory constraints to execution plan."""
@@ -891,6 +905,7 @@ def apply_regulatory_constraints(plan, regulatory_requirements):
 ```
 
 **Cost Optimization Engine**:
+
 ```python
 def optimize_execution_costs(plan, cost_constraints):
     """Optimize plan for cost efficiency while maintaining quality."""
@@ -925,8 +940,6 @@ def optimize_execution_costs(plan, cost_constraints):
 ```
 
 ## LLM-Enhanced Planning Architecture
-
-### Overview
 
 The Planning Agent integrates Large Language Models (LLMs) at every critical decision point to enhance validation, optimization, and confidence in the planning process. This multi-LLM approach combines deterministic algorithms with intelligent reasoning to deliver superior planning outcomes.
 

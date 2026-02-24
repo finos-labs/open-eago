@@ -18,21 +18,25 @@ The Communication Agent implements **Phase 6 (Communication)** of the six-phase 
 6. **Communication** ← **Communication Agent (This Component)**
 
 **Architecture Flow**:
-```
+
+```text
 Context Agent → [Context State] → Communication Agent → [Multi-Channel Response] → User/Systems
 ```
 
-**Security Integration**: 
+**Security Integration**:
+
 - Implements secure communication channels with encryption and authentication
 - Maintains message integrity and non-repudiation through digital signatures
 - Provides secure audit trails and compliance reporting
 
 **Context Integration**:
+
 - Receives comprehensive context state from Context Agent
 - Uses context for personalized response generation and communication optimization
 - Maintains communication history and user interaction patterns
 
 **Core Communication Functions**:
+
 1. **Response Generation** - Create intelligent, context-aware responses from execution results
 2. **Multi-Channel Delivery** - Support various communication channels (API, email, SMS, webhooks)
 3. **Personalization** - Tailor responses based on user preferences and communication styles
@@ -134,6 +138,7 @@ Context Agent → [Context State] → Communication Agent → [Multi-Channel Res
 ### 1. Response Generation Engine
 
 **Intelligent Response Generation**:
+
 ```python
 class ResponseGenerator:
     """Generate intelligent, context-aware responses from execution results."""
@@ -181,6 +186,7 @@ class ResponseGenerator:
 ```
 
 **Response Template Categories**:
+
 - **Success Templates**: Completed workflows with positive outcomes
 - **Partial Success Templates**: Completed with warnings or minor issues
 - **Failure Templates**: Failed workflows with error explanations and next steps
@@ -190,6 +196,7 @@ class ResponseGenerator:
 ### 2. Multi-Channel Delivery Engine
 
 **Channel Management**:
+
 ```python
 class MultiChannelDelivery:
     """Manage delivery across multiple communication channels."""
@@ -245,6 +252,7 @@ class MultiChannelDelivery:
 ```
 
 **Channel-Specific Adaptations**:
+
 - **API Response**: Structured JSON with complete technical details
 - **Email**: HTML formatted with executive summary and detailed sections
 - **SMS**: Concise text with key status and next steps
@@ -255,6 +263,7 @@ class MultiChannelDelivery:
 ### 3. Personalization Engine
 
 **User-Centric Personalization**:
+
 ```python
 class PersonalizationEngine:
     """Personalize communication based on user preferences and behavior."""
@@ -293,6 +302,7 @@ class PersonalizationEngine:
 ```
 
 **Personalization Factors**:
+
 - **Experience Level**: Adjust technical complexity and explanation depth
 - **Communication Style**: Formal, casual, technical, business-focused
 - **Detail Preference**: Summary, standard, comprehensive reporting levels
@@ -303,6 +313,7 @@ class PersonalizationEngine:
 ### 4. Notification & Alert Management
 
 **Proactive Notification System**:
+
 ```python
 class NotificationManager:
     """Manage notifications, alerts, and proactive communications."""
@@ -347,6 +358,7 @@ class NotificationManager:
 ```
 
 **Notification Types**:
+
 - **Status Updates**: Workflow progress and completion notifications
 - **Alert Notifications**: Error conditions, threshold breaches, compliance issues
 - **Scheduled Notifications**: Reminder and follow-up communications
@@ -357,6 +369,7 @@ class NotificationManager:
 ## Example: Customer Address Update Communication
 
 **Communication Input** (from Context Agent):
+
 ```json
 {
   "execution_id": "exec_a7b8c9d2",
@@ -369,6 +382,7 @@ class NotificationManager:
 **Response Generation Process**:
 
 **Generated Response Content**:
+
 ```json
 {
   "response_generation": {
@@ -484,6 +498,7 @@ class NotificationManager:
 **Multi-Channel Delivery**:
 
 **API Response Format**:
+
 ```json
 {
   "api_response": {
@@ -521,6 +536,7 @@ class NotificationManager:
 ```
 
 **Email Format**:
+
 ```html
 <!DOCTYPE html>
 <html>
@@ -561,6 +577,7 @@ class NotificationManager:
 ```
 
 **Communication Output** (Final Response):
+
 ```json
 {
   "execution_id": "exec_a7b8c9d2",
@@ -659,6 +676,7 @@ class NotificationManager:
 ### 1. Communication Effectiveness Measurement
 
 **Engagement Analytics**:
+
 ```python
 class CommunicationAnalytics:
     """Analyze communication effectiveness and user engagement."""
@@ -697,6 +715,7 @@ class CommunicationAnalytics:
 ### 2. Adaptive Communication Optimization
 
 **Dynamic Communication Optimization**:
+
 ```python
 class AdaptiveCommunicationOptimizer:
     """Optimize communication strategies based on user behavior and feedback."""
@@ -733,18 +752,21 @@ class AdaptiveCommunicationOptimizer:
 The Communication Agent produces the final system response that includes:
 
 **Core Communication Components**:
+
 - **Response Content**: Personalized, context-aware response with execution results
 - **Delivery Results**: Multi-channel delivery confirmation and tracking information
 - **Communication Analytics**: Effectiveness metrics and engagement predictions
 - **Follow-up Tracking**: Action items, conversation continuity, and next steps
 
 **Performance Analytics**:
+
 - **Communication Efficiency**: Response generation and delivery performance metrics
 - **User Engagement**: Predicted engagement and satisfaction scores
 - **Channel Effectiveness**: Delivery success rates and channel performance analysis
 - **Content Quality**: Relevance, personalization, and clarity assessments
 
 **Compliance & Audit**:
+
 - **Communication Compliance**: Data handling and privacy control verification
 - **Audit Trail**: Complete communication history and regulatory compliance
 - **Retention Management**: Communication retention and lifecycle management
@@ -752,8 +774,9 @@ The Communication Agent produces the final system response that includes:
 ## Integration with External Systems
 
 **System Integration Points**:
-```
-Communication Agent → [Multi-Channel Delivery] → {
+
+```text
+    Communication Agent → [Multi-Channel Delivery] → {
     API Response → Client Applications
     Email → Email Systems (SMTP/Exchange/Gmail)
     SMS → SMS Gateways (Twilio/AWS SNS)
@@ -764,6 +787,7 @@ Communication Agent → [Multi-Channel Delivery] → {
 ```
 
 **Integration Capabilities**:
+
 - **CRM Integration**: Seamless integration with customer relationship management systems
 - **ERP Integration**: Business process and workflow system integration
 - **Notification Platforms**: Push notifications, in-app messaging, and alert systems
@@ -774,6 +798,7 @@ Communication Agent → [Multi-Channel Delivery] → {
 ## Performance Metrics & Optimization
 
 **Communication Performance Metrics**:
+
 - **Response Generation Latency**: Time to generate personalized responses
 - **Delivery Success Rate**: Percentage of successful message deliveries across channels
 - **User Engagement Rate**: User interaction and engagement with communications
@@ -781,6 +806,7 @@ Communication Agent → [Multi-Channel Delivery] → {
 - **Channel Effectiveness**: Performance comparison across communication channels
 
 **Optimization Techniques**:
+
 - **Template Optimization**: Improve response templates based on user feedback
 - **Channel Selection**: Optimize channel selection based on user preferences and effectiveness
 - **Timing Optimization**: Deliver messages at optimal times for user engagement
@@ -790,6 +816,7 @@ Communication Agent → [Multi-Channel Delivery] → {
 ## Error Handling & Resilience
 
 **Communication Failure Scenarios**:
+
 - **Response Generation Failures**: Template errors, personalization failures, content generation issues
 - **Channel Delivery Failures**: Network issues, service outages, configuration problems
 - **Authentication Failures**: Channel authentication and authorization issues
@@ -797,6 +824,7 @@ Communication Agent → [Multi-Channel Delivery] → {
 - **Performance Degradation**: Slow response generation, delivery delays, resource constraints
 
 **Resilience Strategies**:
+
 - **Fallback Channels**: Automatic failover to alternative communication channels
 - **Retry Logic**: Intelligent retry mechanisms for transient delivery failures
 - **Graceful Degradation**: Basic communication delivery when advanced features fail
@@ -808,6 +836,7 @@ Communication Agent → [Multi-Channel Delivery] → {
 The Communication Agent serves as the final phase of the OpenEMCP system:
 
 **Core Responsibilities**:
+
 1. **Response Generation**: Create intelligent, context-aware responses from execution results
 2. **Multi-Channel Delivery**: Deliver responses across various communication channels with optimization
 3. **Personalization**: Tailor communications based on user preferences and behavioral patterns
@@ -816,12 +845,14 @@ The Communication Agent serves as the final phase of the OpenEMCP system:
 6. **Communication Analytics**: Track effectiveness, engagement, and optimization opportunities
 
 **Key Algorithms**:
+
 - **Response Generation Engine**: Context-aware content creation with personalization
 - **Multi-Channel Delivery Engine**: Optimized delivery orchestration across communication channels
 - **Personalization Engine**: User-centric content and style adaptation
 - **Analytics Engine**: Communication effectiveness measurement and optimization
 
 **Integration Points**:
+
 - **Input**: Context state and insights from Context Agent
 - **Output**: Multi-channel communications to users and external systems
 - **Analytics**: Communication effectiveness and user engagement measurement

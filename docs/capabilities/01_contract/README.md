@@ -5,6 +5,7 @@
 The Contract capability enables the EMCP framework to accept **any task** in structured or natural language format, validates input, reviews security and compliance details, detects task type, determines workflow patterns, and enriches to OASF-compliant contracts. It acts as the universal entry point for all task types in the EMCP system.
 
 **Universal Processing**:
+
 1. **Accept Any Input** - Structured JSON, API calls, or natural language text
 2. **Parse & Validate** - Extract entities and validate input quality
 3. **Security & Compliance** - Review security context and compliance requirements
@@ -13,11 +14,13 @@ The Contract capability enables the EMCP framework to accept **any task** in str
 6. **Route to Planner** - Send enriched contract for planning
 
 ## What is a Contract?
+
 A contract is a formal agreement between the client and the EMCP framework that outlines the scope of work, deliverables, timelines, and other essential details. It serves as a binding document that ensures both parties understand their responsibilities and expectations. It establishes a clear framework for collaboration and sets the stage for successful project execution. The contract is the first part of the EMCP Session Context, which is a structured representation of the entire project lifecycle.
 
 ## What is a "Client"?
 
 A client in the EMCP context can be:
+
 - **Human users** submitting requests through web interfaces or API/MCP calls
 - **Other agents** within the EMCP ecosystem requesting work from specialized capabilities
 - **External systems** integrating with EMCP through API/MCP endpoints
@@ -30,40 +33,46 @@ The Contract capability implements Level 2 authentication (User/Application-to-F
 ## Core Functionality
 
 ### 1. **Universal Input Acceptance**
+
 - **Structured API Input**: JSON format with universal task fields, source context, constraints, and task hints
 - **Natural Language Processing**: Free-text descriptions converted to structured format
 - **Flexible Task Data**: Accepts any business data structure relevant to task detection
 - **Smart Task Detection**: Automatic classification into workflow categories (customer management, financial processing, compliance verification, document processing, data analysis)
 
 ### 2. **Enhanced Task Type Detection**
+
 - **AI-Powered Classification**: Uses objective text, task data patterns, and optional hints
 - **Confidence Scoring**: Returns confidence scores for task type matches
 - **Hint-Based Enhancement**: Leverages task hints for higher accuracy classification
 - **Pattern Matching**: Analyzes keywords, data structures, and operations for classification
 
 ### 3. **Workflow Pattern Analysis**
+
 - **Sequential Processing**: Tasks completed in dependency order for validation/compliance workflows
 - **Parallel Processing**: Independent tasks run simultaneously for time-critical operations
 - **Hybrid Processing**: Mixed sequential and parallel stages for complex workflows
 - **Constraint-Based Optimization**: Considers time limits, priorities, and task complexity
 
 ### 4. **OASF Compliance & Enrichment**
+
 - **Skill Mapping**: Maps tasks to OASF skill categories and domain expertise
 - **Contract Generation**: Creates full OASF-compliant contract structures
 - **Regulatory Integration**: Applies appropriate compliance requirements based on task type
 - **Metadata Enhancement**: Enriches with execution metadata and analysis
 
 ### 5. **Playbook Integration**
+
 Pre-configured workflows for common business scenarios that provide specialized processing patterns, skill requirements, and compliance frameworks:
 
 #### **Playbook Examples**
 
 **KYC Onboarding (`kyc_onboarding`)**
+
 - **Purpose**: Complete customer identity verification and compliance screening
 - **Workflow Pattern**: Sequential (compliance-driven)
-- **Required Skills**: 
+- **Required Skills**:
   - `identity_verification` (Advanced)
-  - `document_verification` (Advanced) 
+  - `document_verification` (Advanced)
   - `sanctions_screening` (Expert)
   - `regulatory_compliance` (Expert)
 - **Process Flow**:
@@ -78,6 +87,7 @@ Pre-configured workflows for common business scenarios that provide specialized 
 - **Data Requirements**: Personal identification documents, address verification, beneficial ownership details
 
 **Payment Processing (`payment_processing`)**
+
 - **Purpose**: Secure financial transaction processing with fraud detection
 - **Workflow Pattern**: Sequential with parallel fraud checks
 - **Required Skills**:
@@ -97,6 +107,7 @@ Pre-configured workflows for common business scenarios that provide specialized 
 - **Data Requirements**: Payment details, account information, merchant data
 
 **Customer Update (`customer_update`)**
+
 - **Purpose**: Customer data modification with validation and notifications
 - **Workflow Pattern**: Sequential with parallel notifications
 - **Required Skills**:
@@ -116,6 +127,7 @@ Pre-configured workflows for common business scenarios that provide specialized 
 - **Data Requirements**: Customer identifiers, updated data fields, notification preferences
 
 **Compliance Audit (`compliance_audit`)**
+
 - **Purpose**: Regulatory compliance verification and reporting
 - **Workflow Pattern**: Sequential with comprehensive validation
 - **Required Skills**:
@@ -135,6 +147,7 @@ Pre-configured workflows for common business scenarios that provide specialized 
 - **Data Requirements**: Business processes, transaction data, policy documentation
 
 **Document Analysis (`document_analysis`)**
+
 - **Purpose**: Multi-document processing and data extraction
 - **Workflow Pattern**: Parallel document processing with sequential analysis
 - **Required Skills**:
@@ -232,10 +245,12 @@ def select_optimal_playbook(task_type: str, objective: str, task_data: Dict[str,
 ## Components
 
 ### [Contract](contract.md)
+
 **Purpose**: Universal Task Processing & OASF Enrichment  
 **Input**: Any structured or natural language task request  
 **Output**: Validated OASF Contract with task analysis  
 **Key Features**:
+
 - Universal input acceptance (structured JSON or natural language)
 - AI-powered task type detection and classification
 - Dynamic workflow pattern analysis (sequential/parallel/hybrid)
@@ -246,6 +261,7 @@ def select_optimal_playbook(task_type: str, objective: str, task_data: Dict[str,
 ## Integration with Planner
 
 The Contract Agent sends enriched contracts to the Planner Agent with:
+
 - **Full OASF Compliance** - All required fields populated
 - **Task Analysis** - Type detection, confidence scores, estimates
 - **Workflow Recommendations** - Execution patterns and skill requirements
