@@ -101,9 +101,27 @@ OpenEMCP is built on the principles of transparency, collaboration, and user emp
 
 ## Partner Projects
 
-[![AGNTCY](docs/images/agntcy.svg)](https://agntcy.org/)
-
-[![OASF Schema](docs/images/oasf.png)](https://schema.oasf.outshift.com/)
+<table align="center">
+  <tr>
+    <td align="center">
+      <a href="https://agntcy.org/">
+        <img src="docs/images/agntcy.svg" alt="AGNTCY" height="80">
+      </a>
+    </td>
+    <td style="width: 36px;"></td>
+    <td align="center">
+      <a href="https://schema.oasf.outshift.com/">
+        <img src="docs/images/oasf.png" alt="OASF Schema" height="80">
+      </a>
+    </td>
+    <td style="width: 36px;"></td>
+    <td align="center">
+      <a href="https://spiffe.io/">
+        <img src="docs/images/spiffe.png" alt="SPIFFE" height="80">
+      </a>
+    </td>
+  </tr>
+</table>
 
 ## Roadmap
 
