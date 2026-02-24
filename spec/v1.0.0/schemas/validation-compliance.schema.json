@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://finos-labs.github.io/open-emcp/schemas/v0.1/validation-compliance.schema.json",
+  "$id": "https://finos-labs.github.io/open-emcp/spec/v1.0.0/schemas/validation-compliance.schema.json",
   "title": "OpenEMCP Validation and Compliance",
   "type": "object",
   "required": ["plan_id", "validation_status", "policy_checks", "hitl"],

@@ -4,7 +4,7 @@
 
 OpenEMCP (Enterprise Multi-Agent Communication & Orchestration Protocol) defines a normative protocol for secure, compliant, and resilient multi-agent orchestration in enterprise environments.
 
-This document is the **single source of truth for human-readable normative behavior**. Machine-readable artifacts are maintained in [spec/spec.json](spec/spec.json) and in [schemas/](schemas/).
+This document is the **single source of truth for human-readable normative behavior**. Machine-readable artifacts are maintained in [spec/v1.0.0/spec.json](spec/v1.0.0/spec.json) and in [spec/v1.0.0/schemas/](spec/v1.0.0/schemas/).
 
 OpenEMCP standardizes exactly six protocol phases, required security controls, identity constraints, and conformance expectations for implementations operating in regulated contexts.
 
@@ -70,12 +70,12 @@ This matrix links protocol requirements to OASF requirement IDs, machine schema 
 
 | OpenEMCP requirement | OASF requirement ID | Schema path | Test evidence |
 | --- | --- | --- | --- |
-| Six standardized phase identifiers are enforced | OASF-PHASE-001 | `schemas/v0.1/base-envelope.schema.json` | `tests/conformance/phase-enum.json` (or equivalent CI evidence) |
-| Planning includes explicit negotiation sub-step | OASF-PLAN-NEG-001 | `schemas/v0.1/planning-negotiation.schema.json` | `tests/conformance/planning-negotiation.json` |
-| Validation includes mandatory HITL decision object | OASF-VAL-HITL-001 | `schemas/v0.1/validation-compliance.schema.json` | `tests/conformance/validation-hitl.json` |
-| Validation decision vocabulary is canonical (`approved`, `rejected`, `modified`) | OASF-VAL-ENUM-001 | `schemas/v0.1/validation-compliance.schema.json`, `spec/spec.json` | `tests/conformance/validation-enum.json` |
-| Context hierarchy supports `session`→`conversation`→`agent`→`task` | OASF-CTX-001 | `schemas/v0.1/context-state-management.schema.json` | `tests/conformance/context-hierarchy.json` |
-| Communication payload enforces delivery status and auth-level semantics | OASF-COMM-001 | `schemas/v0.1/communication-delivery.schema.json` | `tests/conformance/communication-delivery.json` |
+| Six standardized phase identifiers are enforced | OASF-PHASE-001 | `spec/v1.0.0/schemas/base-envelope.schema.json` | `tests/conformance/phase-enum.json` (or equivalent CI evidence) |
+| Planning includes explicit negotiation sub-step | OASF-PLAN-NEG-001 | `spec/v1.0.0/schemas/planning-negotiation.schema.json` | `tests/conformance/planning-negotiation.json` |
+| Validation includes mandatory HITL decision object | OASF-VAL-HITL-001 | `spec/v1.0.0/schemas/validation-compliance.schema.json` | `tests/conformance/validation-hitl.json` |
+| Validation decision vocabulary is canonical (`approved`, `rejected`, `modified`) | OASF-VAL-ENUM-001 | `spec/v1.0.0/schemas/validation-compliance.schema.json`, `spec/v1.0.0/spec.json` | `tests/conformance/validation-enum.json` |
+| Context hierarchy supports `session`→`conversation`→`agent`→`task` | OASF-CTX-001 | `spec/v1.0.0/schemas/context-state-management.schema.json` | `tests/conformance/context-hierarchy.json` |
+| Communication payload enforces delivery status and auth-level semantics | OASF-COMM-001 | `spec/v1.0.0/schemas/communication-delivery.schema.json` | `tests/conformance/communication-delivery.json` |
 
 `OASF requirement ID` values MUST be replaced with canonical IDs from the adopted OASF release and updated on each standards refresh.
 
@@ -135,23 +135,23 @@ Implementations MUST support secure message exchange, routing integrity, and del
 
 Machine-readable schema artifacts are defined in:
 
-- [spec/spec.json](spec/spec.json) (protocol-level machine model)
-- [schemas/](schemas/) (versioned schema set)
+- [spec/v1.0.0/spec.json](spec/v1.0.0/spec.json) (protocol-level machine model)
+- [spec/v1.0.0/schemas/](spec/v1.0.0/schemas/) (versioned schema set)
 
 The human-readable normative interpretation in this document governs in case of ambiguity; schemas MUST be updated to remain aligned.
 
-### 5.1 Schema Catalog (Mirrors spec/spec.json)
+### 5.1 Schema Catalog (Mirrors spec/v1.0.0/spec.json)
 
-The schema catalog keys and paths MUST match the `schema_catalog` object in [spec/spec.json](spec/spec.json):
+The schema catalog keys and paths MUST match the `schema_catalog` object in [spec/v1.0.0/spec.json](spec/v1.0.0/spec.json):
 
-- `version`: `v0.1`
-- `base`: `schemas/v0.1/base-envelope.schema.json`
-- `phases.contract_management`: `schemas/v0.1/contract-management.schema.json`
-- `phases.planning_negotiation`: `schemas/v0.1/planning-negotiation.schema.json`
-- `phases.validation_compliance`: `schemas/v0.1/validation-compliance.schema.json`
-- `phases.execution_resilience`: `schemas/v0.1/execution-resilience.schema.json`
-- `phases.context_state_management`: `schemas/v0.1/context-state-management.schema.json`
-- `phases.communication_delivery`: `schemas/v0.1/communication-delivery.schema.json`
+- `version`: `v1.0.0`
+- `base`: `spec/v1.0.0/schemas/base-envelope.schema.json`
+- `phases.contract_management`: `spec/v1.0.0/schemas/contract-management.schema.json`
+- `phases.planning_negotiation`: `spec/v1.0.0/schemas/planning-negotiation.schema.json`
+- `phases.validation_compliance`: `spec/v1.0.0/schemas/validation-compliance.schema.json`
+- `phases.execution_resilience`: `spec/v1.0.0/schemas/execution-resilience.schema.json`
+- `phases.context_state_management`: `spec/v1.0.0/schemas/context-state-management.schema.json`
+- `phases.communication_delivery`: `spec/v1.0.0/schemas/communication-delivery.schema.json`
 
 ## 6. Security and Identity
 
@@ -182,7 +182,7 @@ An implementation is conformant only if it:
 3. Enforces Validation & Compliance behavior including mandatory HITL gate conditions.
 4. Enforces certificate TTL <= 48 hours and declared auth level controls.
 5. Preserves auditable records of planning, validation, execution, and delivery outcomes.
-6. Aligns machine artifacts in [spec/spec.json](spec/spec.json) and [schemas/](schemas/) with this document.
+6. Aligns machine artifacts in [spec/v1.0.0/spec.json](spec/v1.0.0/spec.json) and [spec/v1.0.0/schemas/](spec/v1.0.0/schemas/) with this document.
 
 Conformance claims SHOULD declare supported profile(s), auth level(s), and known limitations.
 

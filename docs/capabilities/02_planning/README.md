@@ -10,8 +10,8 @@ The Planning capability transforms validated contracts into executable plans by 
 
 - Detailed specification: [planning.md](./planning.md)
 - Normative protocol behavior: [../../../SPECIFICATION.md](../../../SPECIFICATION.md)
-- Machine model: [../../../spec/spec.json](../../../spec/spec.json)
-- Phase schema: [../../../schemas/v0.1/planning-negotiation.schema.json](../../../schemas/v0.1/planning-negotiation.schema.json)
+- Machine model: [../../../spec/v1.0.0/spec.json](../../../spec/v1.0.0/spec.json)
+- Phase schema: [../../../spec/v1.0.0/schemas/planning-negotiation.schema.json](../../../spec/v1.0.0/schemas/planning-negotiation.schema.json)
 
 ## Inputs and Outputs
 

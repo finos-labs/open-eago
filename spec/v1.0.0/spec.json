@@ -35,15 +35,15 @@
   },
 
   "schema_catalog": {
-    "version": "v0.1",
-    "base": "schemas/v0.1/base-envelope.schema.json",
+    "version": "v1.0.0",
+    "base": "schemas/base-envelope.schema.json",
     "phases": {
-      "contract_management": "schemas/v0.1/contract-management.schema.json",
-      "planning_negotiation": "schemas/v0.1/planning-negotiation.schema.json",
-      "validation_compliance": "schemas/v0.1/validation-compliance.schema.json",
-      "execution_resilience": "schemas/v0.1/execution-resilience.schema.json",
-      "context_state_management": "schemas/v0.1/context-state-management.schema.json",
-      "communication_delivery": "schemas/v0.1/communication-delivery.schema.json"
+      "contract_management": "schemas/contract-management.schema.json",
+      "planning_negotiation": "schemas/planning-negotiation.schema.json",
+      "validation_compliance": "schemas/validation-compliance.schema.json",
+      "execution_resilience": "schemas/execution-resilience.schema.json",
+      "context_state_management": "schemas/context-state-management.schema.json",
+      "communication_delivery": "schemas/communication-delivery.schema.json"
     }
   },
 

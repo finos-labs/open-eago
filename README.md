@@ -99,7 +99,7 @@ OpenEMCP is built on the principles of transparency, collaboration, and user emp
 
 **Our goal is to create an enterprise-grade protocol for AI agent interoperability that fosters innovation while ensuring security and regulatory compliance, building upon existing open source projects and industry standards.**
 
-## Partner Projects
+## Linked Projects
 
 <table align="center">
   <tr>
