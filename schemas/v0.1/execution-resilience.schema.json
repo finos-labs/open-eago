@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://finos-labs.github.io/open-emcp/schemas/v0.1/execution-resilience.schema.json",
+  "title": "OpenEMCP Execution and Resilience",
+  "type": "object",
+  "required": ["execution_id", "plan_id", "status", "resilience"],
+  "properties": {
+    "execution_id": {
+      "type": "string"
+    },
+    "plan_id": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["running", "completed", "failed", "compensated"]
+    },
+    "tasks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["task_id", "status"],
+        "properties": {
+          "task_id": {"type": "string"},
+          "status": {"type": "string"}
+        },
+        "additionalProperties": true
+      }
+    },
+    "resilience": {
+      "type": "object",
+      "properties": {
+        "circuit_breaker": {"type": "boolean"},
+        "fallback_used": {"type": "boolean"},
+        "compensation_applied": {"type": "boolean"}
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

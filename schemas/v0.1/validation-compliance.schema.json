@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://finos-labs.github.io/open-emcp/schemas/v0.1/validation-compliance.schema.json",
+  "title": "OpenEMCP Validation and Compliance",
+  "type": "object",
+  "required": ["plan_id", "validation_status", "policy_checks", "hitl"],
+  "properties": {
+    "plan_id": {
+      "type": "string"
+    },
+    "validation_status": {
+      "type": "string",
+      "enum": ["approved", "rejected", "modified"]
+    },
+    "policy_checks": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1
+    },
+    "compliance_profiles": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "hitl": {
+      "type": "object",
+      "required": ["required", "decision"],
+      "properties": {
+        "required": {
+          "type": "boolean",
+          "const": true
+        },
+        "reviewer_id": {
+          "type": "string"
+        },
+        "decision": {
+          "type": "string",
+          "enum": ["approved", "rejected", "modified"]
+        },
+        "decision_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

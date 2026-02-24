@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://finos-labs.github.io/open-emcp/schemas/v0.1/contract-management.schema.json",
+  "title": "OpenEMCP Contract Management",
+  "type": "object",
+  "required": ["contract_id", "requested_capabilities", "requester", "constraints"],
+  "properties": {
+    "contract_id": {
+      "type": "string"
+    },
+    "requester": {
+      "type": "string"
+    },
+    "requested_capabilities": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1
+    },
+    "constraints": {
+      "type": "object",
+      "properties": {
+        "regulatory_profile": {
+          "type": "string"
+        },
+        "data_residency": {
+          "type": "string"
+        },
+        "acu_budget": {
+          "type": "number",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": true
+    },
+    "risk_tier": {
+      "type": "string",
+      "enum": ["low", "medium", "high", "critical"]
+    }
+  },
+  "additionalProperties": false
+}

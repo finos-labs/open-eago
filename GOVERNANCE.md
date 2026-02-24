@@ -12,7 +12,7 @@ OpenEMCP is an open specification and related artifacts for enterprise multi-age
 
 The TSC is the project's primary technical decision-making body.
 
-**Responsibilities**
+**Responsibilities**:
 
 - Set and maintain technical direction and roadmap priorities.
 - Approve normative specification changes and major architectural decisions.
@@ -20,14 +20,14 @@ The TSC is the project's primary technical decision-making body.
 - Resolve technical disputes not resolved in normal maintainer workflow.
 - Coordinate with relevant FINOS and Linux Foundation initiatives.
 
-**Composition and Membership**
+**Composition and Membership**:
 
 - TSC members are active contributors with sustained, material contributions.
 - New TSC members are nominated by an existing TSC member and approved by TSC vote.
 - Members are expected to participate regularly in meetings and asynchronous reviews.
 - Members may step down voluntarily or be removed by a two-thirds TSC vote for prolonged inactivity or conduct concerns.
 
-**Chair**
+**Chair**:
 
 - The TSC elects a Chair from current TSC members.
 - The Chair manages agenda, meeting cadence, and decision records.

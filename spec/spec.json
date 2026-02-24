@@ -1,5 +1,6 @@
 {
-  "$schema": "https://raw.githubusercontent.com/finos-labs/open-emcp/spec/spec.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$comment": "Full human-readable normative specification is defined in SPECIFICATION.md",
   "spec_version": "0.1.0",
   
   "metadata": {
@@ -15,7 +16,35 @@
     "created": "2026-02-18T00:00:00Z",
     "organization": "FINOS Labs",
     "tags": ["enterprise", "multi-agent", "orchestration", "compliance", "security", "blockchain"],
-    "emcp_phases": ["contract", "planning", "validation", "execution", "context", "communication"]
+    "emcp_phases": [
+      "contract_management",
+      "planning_negotiation",
+      "validation_compliance",
+      "execution_resilience",
+      "context_state_management",
+      "communication_delivery"
+    ],
+    "phase_display_names": [
+      "Contract Management",
+      "Planning & Negotiation",
+      "Validation & Compliance",
+      "Execution & Resilience",
+      "Context & State Management",
+      "Communication & Delivery"
+    ]
+  },
+
+  "schema_catalog": {
+    "version": "v0.1",
+    "base": "schemas/v0.1/base-envelope.schema.json",
+    "phases": {
+      "contract_management": "schemas/v0.1/contract-management.schema.json",
+      "planning_negotiation": "schemas/v0.1/planning-negotiation.schema.json",
+      "validation_compliance": "schemas/v0.1/validation-compliance.schema.json",
+      "execution_resilience": "schemas/v0.1/execution-resilience.schema.json",
+      "context_state_management": "schemas/v0.1/context-state-management.schema.json",
+      "communication_delivery": "schemas/v0.1/communication-delivery.schema.json"
+    }
   },
 
   "components": [
@@ -23,7 +52,7 @@
       "id": "contract-agent",
       "component_type": "Agent",
       "properties": {
-        "phase": "contract",
+        "phase": "contract_management",
         "pattern": "generator-evaluator-optimizer",
         "llm": "$ref:enterprise-llm",
         "system_prompt": "You are an enterprise contract management agent responsible for validating and processing incoming workflow requests according to EMCP standards.",
@@ -43,6 +72,17 @@
           "type": "object",
           "properties": {
             "contract_id": {"type": "string"},
+            "requester": {"type": "string"},
+            "requested_capabilities": {"type": "array"},
+            "constraints": {
+              "type": "object",
+              "properties": {
+                "regulatory_profile": {"type": "string"},
+                "data_residency": {"type": "string"},
+                "acu_budget": {"type": "number", "minimum": 0}
+              }
+            },
+            "risk_tier": {"type": "string", "enum": ["low", "medium", "high", "critical"]},
             "tasks": {"type": "array"},
             "requirements": {"type": "object"},
             "compliance_flags": {"type": "array"},
@@ -55,7 +95,7 @@
       "id": "planning-agent",
       "component_type": "Agent",
       "properties": {
-        "phase": "planning",
+        "phase": "planning_negotiation",
         "llm": "$ref:enterprise-llm",
         "system_prompt": "You are an intelligent workflow orchestration agent responsible for agent discovery, selection, and execution planning.",
         "capabilities": ["agent_discovery", "capability_matching", "execution_planning", "constraint_enforcement"],
@@ -75,10 +115,30 @@
           "type": "object",
           "properties": {
             "plan_id": {"type": "string"},
+            "contract_id": {"type": "string"},
             "selected_agents": {"type": "array"},
             "execution_pattern": {"type": "string", "enum": ["sequential", "parallel", "mixed"]},
             "task_assignments": {"type": "array"},
-            "fallback_options": {"type": "array"}
+            "fallback_options": {"type": "array"},
+            "negotiation": {
+              "type": "object",
+              "properties": {
+                "status": {"type": "string", "enum": ["accepted", "rejected", "countered"]},
+                "checks": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "capability_fit",
+                      "policy_constraints",
+                      "sla_slo",
+                      "acu_thresholds",
+                      "data_residency"
+                    ]
+                  }
+                }
+              }
+            }
           }
         }
       ]
@@ -87,7 +147,7 @@
       "id": "validation-agent",
       "component_type": "Agent",
       "properties": {
-        "phase": "validation",
+        "phase": "validation_compliance",
         "llm": "$ref:enterprise-llm",
         "system_prompt": "You are a human-in-the-loop validation agent responsible for plan review, risk assessment, and compliance checking.",
         "capabilities": ["plan_review", "risk_assessment", "policy_validation", "approval_workflow"],
@@ -105,7 +165,19 @@
           "title": "validation_result",
           "type": "object",
           "properties": {
-            "status": {"type": "string", "enum": ["approved", "rejected", "modified"]},
+            "plan_id": {"type": "string"},
+            "validation_status": {"type": "string", "enum": ["approved", "rejected", "modified"]},
+            "policy_checks": {"type": "array"},
+            "compliance_profiles": {"type": "array"},
+            "hitl": {
+              "type": "object",
+              "properties": {
+                "required": {"type": "boolean", "const": true},
+                "reviewer_id": {"type": "string"},
+                "decision": {"type": "string", "enum": ["approved", "rejected", "modified"]},
+                "decision_at": {"type": "string", "format": "date-time"}
+              }
+            },
             "feedback": {"type": "string"},
             "modifications": {"type": "array"},
             "risk_score": {"type": "number"}
@@ -117,7 +189,7 @@
       "id": "orchestration-agent",
       "component_type": "Agent",
       "properties": {
-        "phase": "execution",
+        "phase": "execution_resilience",
         "llm": "$ref:enterprise-llm",
         "system_prompt": "You are a workflow orchestration agent responsible for coordinating multi-agent task execution with resilience and recovery management.",
         "capabilities": ["task_coordination", "failure_handling", "result_validation", "contract_fulfillment"],
@@ -137,7 +209,17 @@
           "type": "object",
           "properties": {
             "execution_id": {"type": "string"},
+            "plan_id": {"type": "string"},
             "status": {"type": "string"},
+            "tasks": {"type": "array"},
+            "resilience": {
+              "type": "object",
+              "properties": {
+                "circuit_breaker": {"type": "boolean"},
+                "fallback_used": {"type": "boolean"},
+                "compensation_applied": {"type": "boolean"}
+              }
+            },
             "results": {"type": "array"},
             "context_updates": {"type": "object"},
             "audit_trail": {"type": "array"}
@@ -149,7 +231,7 @@
       "id": "context-manager",
       "component_type": "Agent",
       "properties": {
-        "phase": "context",
+        "phase": "context_state_management",
         "capabilities": ["hierarchical_context", "session_management", "data_lineage", "context_propagation"],
         "context_hierarchy": ["session", "conversation", "agent", "task"],
         "persistence_options": ["memory", "database", "blockchain"]
@@ -171,9 +253,10 @@
           "type": "object",
           "properties": {
             "context_id": {"type": "string"},
-            "hierarchy_path": {"type": "string"},
-            "data": {"type": "object"},
-            "lineage": {"type": "array"}
+            "level": {"type": "string", "enum": ["session", "conversation", "agent", "task"]},
+            "state": {"type": "object"},
+            "lineage": {"type": "array"},
+            "ttl_seconds": {"type": "integer", "minimum": 0}
           }
         }
       ]
@@ -182,7 +265,7 @@
       "id": "communication-gateway",
       "component_type": "Agent",
       "properties": {
-        "phase": "communication",
+        "phase": "communication_delivery",
         "capabilities": ["message_routing", "security_enforcement", "compliance_monitoring", "audit_anchoring"],
         "communication_patterns": ["resource_discovery", "invocation", "context_propagation", "audit_anchoring"],
         "security_features": ["mtls", "encryption", "authentication", "authorization"]
@@ -192,7 +275,7 @@
           "title": "message",
           "type": "object",
           "properties": {
-            "id": {"type": "string"},
+            "message_id": {"type": "string"},
             "method": {"type": "string"},
             "params": {"type": "object"},
             "sender": {"type": "string"},
@@ -207,9 +290,18 @@
           "type": "object",
           "properties": {
             "message_id": {"type": "string"},
+            "delivery_status": {"type": "string", "enum": ["queued", "delivered", "failed", "expired"]},
+            "security": {
+              "type": "object",
+              "properties": {
+                "mtls": {"type": "boolean"},
+                "auth_level": {"type": "integer", "minimum": 1, "maximum": 4}
+              }
+            },
             "routing_status": {"type": "string"},
             "security_validation": {"type": "boolean"},
             "compliance_check": {"type": "boolean"},
+            "audit_ref": {"type": "string"},
             "blockchain_hash": {"type": "string"}
           }
         }
@@ -244,27 +336,27 @@
       "id": "emcp-six-phase-workflow",
       "description": "Complete OpenEMCP six-phase workflow execution",
       "nodes": [
-        {"id": "contract", "ref": "$ref:contract-agent"},
-        {"id": "planning", "ref": "$ref:planning-agent"},
-        {"id": "validation", "ref": "$ref:validation-agent"},
-        {"id": "execution", "ref": "$ref:orchestration-agent"},
-        {"id": "context", "ref": "$ref:context-manager"},
-        {"id": "communication", "ref": "$ref:communication-gateway"}
+        {"id": "contract_management", "ref": "$ref:contract-agent"},
+        {"id": "planning_negotiation", "ref": "$ref:planning-agent"},
+        {"id": "validation_compliance", "ref": "$ref:validation-agent"},
+        {"id": "execution_resilience", "ref": "$ref:orchestration-agent"},
+        {"id": "context_state_management", "ref": "$ref:context-manager"},
+        {"id": "communication_delivery", "ref": "$ref:communication-gateway"}
       ],
       "control_flow_connections": [
-        {"from": "contract", "to": "planning", "condition": "contract.status == 'validated'"},
-        {"from": "planning", "to": "validation", "condition": "plan.generated == true"},
-        {"from": "validation", "to": "execution", "condition": "validation.status == 'approved'"},
-        {"from": "validation", "to": "planning", "condition": "validation.status == 'modified'"},
-        {"from": "execution", "to": "context", "condition": "always"},
-        {"from": "execution", "to": "communication", "condition": "always"}
+        {"from": "contract_management", "to": "planning_negotiation", "condition": "contract_management.status == 'validated'"},
+        {"from": "planning_negotiation", "to": "validation_compliance", "condition": "plan.generated == true"},
+        {"from": "validation_compliance", "to": "execution_resilience", "condition": "validation.validation_status == 'approved'"},
+        {"from": "validation_compliance", "to": "planning_negotiation", "condition": "validation.validation_status == 'modified'"},
+        {"from": "execution_resilience", "to": "context_state_management", "condition": "always"},
+        {"from": "execution_resilience", "to": "communication_delivery", "condition": "always"}
       ],
       "data_flow_connections": [
-        {"from": "contract.validated_contract", "to": "planning.validated_contract"},
-        {"from": "planning.execution_plan", "to": "validation.execution_plan"},
-        {"from": "validation.validation_result", "to": "execution.approved_plan"},
-        {"from": "execution.execution_result", "to": "context.context_operation"},
-        {"from": "execution.execution_result", "to": "communication.message"}
+        {"from": "contract_management.validated_contract", "to": "planning_negotiation.validated_contract"},
+        {"from": "planning_negotiation.execution_plan", "to": "validation_compliance.execution_plan"},
+        {"from": "validation_compliance.validation_result", "to": "execution_resilience.approved_plan"},
+        {"from": "execution_resilience.execution_result", "to": "context_state_management.context_operation"},
+        {"from": "execution_resilience.execution_result", "to": "communication_delivery.message"}
       ]
     }
   ],
@@ -272,23 +364,23 @@
   "orchestration": {
     "type": "emcp_six_phase_graph",
     "phases": [
-      {"id": "contract", "ref": "$ref:contract-agent", "required": true},
-      {"id": "planning", "ref": "$ref:planning-agent", "required": true},
-      {"id": "validation", "ref": "$ref:validation-agent", "required": true},
-      {"id": "execution", "ref": "$ref:orchestration-agent", "required": true},
-      {"id": "context", "ref": "$ref:context-manager", "required": true},
-      {"id": "communication", "ref": "$ref:communication-gateway", "required": true}
+      {"id": "contract_management", "ref": "$ref:contract-agent", "required": true},
+      {"id": "planning_negotiation", "ref": "$ref:planning-agent", "required": true},
+      {"id": "validation_compliance", "ref": "$ref:validation-agent", "required": true},
+      {"id": "execution_resilience", "ref": "$ref:orchestration-agent", "required": true},
+      {"id": "context_state_management", "ref": "$ref:context-manager", "required": true},
+      {"id": "communication_delivery", "ref": "$ref:communication-gateway", "required": true}
     ],
     "phase_transitions": [
-      {"from": "contract", "to": "planning", "trigger": "contract_validated"},
-      {"from": "planning", "to": "validation", "trigger": "plan_generated"},
-      {"from": "validation", "to": "execution", "trigger": "plan_approved"},
-      {"from": "validation", "to": "planning", "trigger": "plan_modified"},
-      {"from": "execution", "to": "context", "trigger": "context_update_required"},
-      {"from": "execution", "to": "communication", "trigger": "communication_required"}
+      {"from": "contract_management", "to": "planning_negotiation", "trigger": "contract_validated"},
+      {"from": "planning_negotiation", "to": "validation_compliance", "trigger": "plan_generated"},
+      {"from": "validation_compliance", "to": "execution_resilience", "trigger": "plan_approved"},
+      {"from": "validation_compliance", "to": "planning_negotiation", "trigger": "plan_modified"},
+      {"from": "execution_resilience", "to": "context_state_management", "trigger": "context_update_required"},
+      {"from": "execution_resilience", "to": "communication_delivery", "trigger": "communication_required"}
     ],
-    "entry_point": "contract",
-    "exit_points": ["execution.final_result", "communication.audit_complete"],
+    "entry_point": "contract_management",
+    "exit_points": ["execution_resilience.final_result", "communication_delivery.audit_complete"],
     "context_propagation": {
       "hierarchy": ["session", "conversation", "agent", "task"],
       "inheritance": "read_only_parent_context",
@@ -308,9 +400,9 @@
     },
     "message_schema": {
       "type": "object",
-      "required": ["id", "method", "sender", "recipient", "timestamp"],
+      "required": ["message_id", "method", "sender", "recipient", "timestamp"],
       "properties": {
-        "id": {"type": "string", "format": "uuid"},
+        "message_id": {"type": "string", "format": "uuid"},
         "method": {"type": "string"},
         "params": {"type": "object"},
         "sender": {"type": "string", "description": "SPIFFE ID of sender"},
@@ -318,17 +410,17 @@
         "timestamp": {"type": "string", "format": "date-time"},
         "session_id": {"type": "string", "format": "uuid"},
         "conversation_id": {"type": "string", "format": "uuid"},
-        "phase": {"type": "string", "enum": ["contract", "planning", "validation", "execution", "context", "communication"]},
+        "phase": {"type": "string", "enum": ["contract_management", "planning_negotiation", "validation_compliance", "execution_resilience", "context_state_management", "communication_delivery"]},
         "security_context": {"type": "object"},
         "compliance_metadata": {"type": "object"}
       }
     },
     "handoff_rules": [
-      {"from_phase": "contract", "to_phase": "planning", "trigger": "contract_validation_complete"},
-      {"from_phase": "planning", "to_phase": "validation", "trigger": "execution_plan_ready"},
-      {"from_phase": "validation", "to_phase": "execution", "trigger": "plan_approved"},
-      {"from_phase": "execution", "to_phase": "context", "trigger": "context_update_needed"},
-      {"from_phase": "execution", "to_phase": "communication", "trigger": "communication_required"}
+      {"from_phase": "contract_management", "to_phase": "planning_negotiation", "trigger": "contract_validation_complete"},
+      {"from_phase": "planning_negotiation", "to_phase": "validation_compliance", "trigger": "execution_plan_ready"},
+      {"from_phase": "validation_compliance", "to_phase": "execution_resilience", "trigger": "plan_approved"},
+      {"from_phase": "execution_resilience", "to_phase": "context_state_management", "trigger": "context_update_needed"},
+      {"from_phase": "execution_resilience", "to_phase": "communication_delivery", "trigger": "communication_required"}
     ]
   },
 

@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://finos-labs.github.io/open-emcp/schemas/v0.1/context-state-management.schema.json",
+  "title": "OpenEMCP Context and State Management",
+  "type": "object",
+  "required": ["context_id", "level", "state", "lineage"],
+  "properties": {
+    "context_id": {
+      "type": "string"
+    },
+    "level": {
+      "type": "string",
+      "enum": ["session", "conversation", "agent", "task"]
+    },
+    "state": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "lineage": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "ttl_seconds": {
+      "type": "integer",
+      "minimum": 0
+    }
+  },
+  "additionalProperties": false
+}
