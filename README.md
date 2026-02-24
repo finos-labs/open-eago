@@ -12,11 +12,9 @@
 
 <div align="center" style="display: flex; gap: 10px; justify-content: center;">
   <img src="https://user-images.githubusercontent.com/327285/230928932-7c75f8ed-e57b-41db-9fb7-a292a13a1e58.svg" alt="badge-labs">
-
   <img src="https://img.shields.io/github/commit-activity/m/finos-labs/open-emcp?style=flat-square" alt="commit activity">
   <img src="https://img.shields.io/github/last-commit/finos-labs/open-emcp?style=flat-square" alt="last commit">
   <img src="https://img.shields.io/github/license/finos-labs/open-emcp?style=flat-square" alt="license">
-  <br />
 </div>
 
 ---
@@ -25,7 +23,6 @@
 
 - Authors: Jan Rock (<jan.rock@citi.com>), Denis Urusov (<denis.urusov@citi.com>), Paul Groves (<paul.groves@citi.com>)
 - Date: 18/02/2026 - Version: 0.1
-- Citi classification: Interest (Major)
 
 ## Overview
 
@@ -47,6 +44,7 @@ The protocol enables:
 OpenEMCP orchestrates multi-agent workflows through a comprehensive protocol architecture:
 
 **Client Interface:**
+
 - **Request** - Client applications (API, CLI, SDK) submit business requests to work contracts
 
 **Protocol:**
@@ -67,12 +65,14 @@ The **Agent Registry** acts as a centralized service discovery and capability ma
 ## Documentation
 
 ### Getting Started
+
 - [Documentation Index](docs/README.md) - Protocol introduction and navigation
 - [Overview](docs/overview/overview.md) - Comprehensive protocol overview
 - [Architecture](docs/overview/architecture.md) - High-level architecture overview
 - [Security Considerations](docs/overview/security.md) - Security architecture and requirements
 
 ### Core Specification
+
 - [Contract Capability](docs/capabilities/01_contract/contract.md) - Contract negotiation and management
 - [Planning Capability](docs/capabilities/02_planning/planning.md) - Execution planning and optimization  
 - [Validation Capability](docs/capabilities/03_validation/validation.md) - Validation and compliance checking
@@ -81,6 +81,7 @@ The **Agent Registry** acts as a centralized service discovery and capability ma
 - [Communication Capability](docs/capabilities/06_communication/communication.md) - Agent communication protocols
 
 ### Advanced Topics
+
 - [OpenEMCP Proposal](docs/overview/openemcp_proposal.md) - Detailed proposal with distinctive features
 - [Identity Management](docs/overview/identity.md) - Agent identity and trust establishment
 
@@ -126,6 +127,7 @@ Signed-off-by: John Doe <john.doe@example.com>
 See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed contribution guidelines.
 
 **Community Resources:**
+
 - [Git Tools - Signing Your Work](https://git-scm.com/book/en/v2/Git-Tools-Signing-Your-Work)
 - [GitHub - Signing Commits](https://docs.github.com/en/github/authenticating-to-github/signing-commits)
 
@@ -137,6 +139,6 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed contribution guidelines.
 
 ## Contact
 
-- **Project Team** - jan.rock@citi.com / rock@linux.com
+- **Project Team** - <jan.rock@citi.com> / <rock@linux.com>
 - **FINOS** - [finos.org](https://www.finos.org/)
 - **GitHub** - [github.com/finos-labs/open-emcp](https://github.com/finos-labs/open-emcp)

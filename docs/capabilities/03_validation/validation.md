@@ -18,21 +18,25 @@ The Validation Agent implements **Phase 3 (Validation/Evaluation)** of the six-p
 6. Communication ← Audit trail and approval notifications
 
 **Architecture Flow**:
-```
+
+```text
 Planning Agent → [Execution Plan] → Validation Agent → [Validation Decision] → Execution Agent → [Phases 4-6] → Response
 ```
 
-**Security Integration**: 
+**Security Integration**:
+
 - Validates Level 3 security clearance for plan execution
 - Enforces multi-level approval workflows for high-risk operations
 - Maintains immutable audit trail with blockchain anchoring
 
 **Context Integration**:
+
 - Receives Plan Context from Planning Agent
 - Creates Validation Context for approval decisions
 - Propagates enhanced context to execution phase
 
 **Core Validation Functions**:
+
 1. **Policy Compliance** - Verify adherence to organizational policies and procedures
 2. **Risk Assessment** - Evaluate operational, financial, and compliance risks
 3. **Cost Approval** - Validate budget constraints and financial authorization
@@ -155,11 +159,13 @@ Planning Agent → [Execution Plan] → Validation Agent → [Validation Decisio
 ### 1. Policy Compliance Engine
 
 **Compliance Validation Flow**:
-```
+
+```text
 Plan Input → Policy Lookup → Rule Evaluation → Compliance Scoring → Exception Handling → Compliance Decision
 ```
 
 **Policy Categories**:
+
 - **Financial Policies**: Budget limits, cost approval thresholds, ACU consumption limits
 - **Security Policies**: Data classification handling, encryption requirements, access controls
 - **Operational Policies**: Agent selection criteria, SLA requirements, performance thresholds
@@ -167,6 +173,7 @@ Plan Input → Policy Lookup → Rule Evaluation → Compliance Scoring → Exce
 - **Business Policies**: Approval workflows, escalation paths, notification requirements
 
 **Policy Evaluation Structure**:
+
 ```json
 {
   "policy_evaluation": {
@@ -199,6 +206,7 @@ Plan Input → Policy Lookup → Rule Evaluation → Compliance Scoring → Exce
 ### 2. Risk Assessment Engine
 
 **Risk Evaluation Algorithm**:
+
 ```python
 def calculate_risk_score(plan_data):
     """Calculate comprehensive risk score for execution plan."""
@@ -224,6 +232,7 @@ def calculate_risk_score(plan_data):
 ```
 
 **Risk Categories**:
+
 - **Financial Risk**: Cost overrun probability, budget impact assessment
 - **Operational Risk**: Agent failure rates, performance degradation likelihood
 - **Compliance Risk**: Regulatory violation probability, audit finding risk
@@ -233,7 +242,8 @@ def calculate_risk_score(plan_data):
 ### 3. Approval Workflow Engine
 
 **Approval Decision Matrix**:
-```
+
+```text
 Risk Level | Cost Threshold | Approval Required
 Low        | < $5.00       | Automatic Approval
 Low        | $5.00-$25.00  | Supervisor Approval
@@ -244,6 +254,7 @@ Critical   | Any Amount    | Board Approval + Legal Review
 ```
 
 **Human Approval Triggers**:
+
 - Total estimated cost exceeds delegated authority limits
 - High or critical risk assessment score
 - New regulatory framework or jurisdiction
@@ -252,8 +263,6 @@ Critical   | Any Amount    | Board Approval + Legal Review
 - Agent failure rate above acceptable threshold
 
 ## LLM-Enhanced Validation Architecture
-
-### Overview
 
 The Validation Agent integrates Large Language Models (LLMs) to enhance policy compliance validation, risk assessment accuracy, and decision-making quality. This multi-LLM approach combines rule-based validation with intelligent analysis to deliver superior governance outcomes and adaptive compliance assessment.
 
@@ -450,6 +459,7 @@ This comprehensive LLM enhancement transforms the Validation Agent from a rule-b
 ## Example: Customer Address Update Validation
 
 **Validation Input** (from Planning Agent):
+
 ```json
 {
   "execution_id": "exec_a7b8c9d2",
@@ -460,6 +470,7 @@ This comprehensive LLM enhancement transforms the Validation Agent from a rule-b
 ```
 
 **Validation Processing Results**:
+
 ```json
 {
   "validation_results": {
@@ -554,6 +565,7 @@ This comprehensive LLM enhancement transforms the Validation Agent from a rule-b
 ```
 
 **Validation Decision Output** (for Execution Agent):
+
 ```json
 {
   "execution_id": "exec_a7b8c9d2",
@@ -722,6 +734,7 @@ This comprehensive LLM enhancement transforms the Validation Agent from a rule-b
 ### Automated Decision Rules
 
 **Auto-Approval Criteria**:
+
 - Risk score ≤ 0.30 (Low risk)
 - Cost ≤ $10.00 or within delegated authority
 - All policy compliance checks passed
@@ -729,6 +742,7 @@ This comprehensive LLM enhancement transforms the Validation Agent from a rule-b
 - Standard data classification (non-sensitive)
 
 **Human Review Triggers**:
+
 - Risk score > 0.60 (High risk)
 - Cost > delegated authority limit
 - Policy compliance failures
@@ -739,6 +753,7 @@ This comprehensive LLM enhancement transforms the Validation Agent from a rule-b
 ### Approval Workflows
 
 **Escalation Levels**:
+
 1. **Automatic Approval**: Low risk, standard operations
 2. **Supervisor Review**: Medium risk, moderate cost
 3. **Manager Approval**: High cost, complex compliance
@@ -746,6 +761,7 @@ This comprehensive LLM enhancement transforms the Validation Agent from a rule-b
 5. **Board Approval**: Critical risk, major compliance implications
 
 **Review Criteria**:
+
 - **Financial Impact**: Total cost and budget implications
 - **Risk Assessment**: Comprehensive risk evaluation
 - **Compliance Impact**: Regulatory and policy implications
@@ -758,6 +774,7 @@ This comprehensive LLM enhancement transforms the Validation Agent from a rule-b
 The Validation Agent outputs a comprehensive validation decision that includes:
 
 **Core Decision Components**:
+
 - **Validation Decision**: Approved/Rejected/Conditionally Approved/Escalated
 - **Execution Conditions**: Mandatory monitoring, optional enhancements, escalation triggers
 - **Approved Parameters**: Maximum cost, time, and performance requirements
@@ -765,10 +782,12 @@ The Validation Agent outputs a comprehensive validation decision that includes:
 - **Audit Trail**: Immutable record of validation process and decisions
 
 **Context Propagation**:
+
 - **Session Context**: Maintained user and authentication context
 - **Validation Context**: Approval authority, risk tolerance, monitoring requirements
 
 **Monitoring Requirements**:
+
 - **Real-time Tracking**: Cost, performance, and compliance monitoring
 - **Alerting**: Threshold-based notifications and escalations
 - **Reporting**: Compliance and audit reporting requirements
@@ -776,11 +795,13 @@ The Validation Agent outputs a comprehensive validation decision that includes:
 ## Integration with Execution Phase
 
 **Handoff to Execution Agent**:
-```
+
+```text
 Validation Agent → [Validation Decision] → Execution Agent → [Orchestrated Execution] → Response
 ```
 
 **Execution Guidelines** (provided to Execution Agent):
+
 - Approved execution parameters and constraints
 - Mandatory monitoring and reporting requirements
 - Escalation triggers and response procedures
@@ -788,6 +809,7 @@ Validation Agent → [Validation Decision] → Execution Agent → [Orchestrated
 - Audit trail and logging requirements
 
 **Execution Outcomes**:
+
 - **Proceed**: Execute plan within approved parameters
 - **Monitor**: Execute with enhanced monitoring and reporting
 - **Escalate**: Pause execution and request human review
@@ -796,6 +818,7 @@ Validation Agent → [Validation Decision] → Execution Agent → [Orchestrated
 ## Performance Metrics & Optimization
 
 **Validation Performance Metrics**:
+
 - **Validation Latency**: Time to complete validation assessment
 - **Decision Accuracy**: Percentage of correct validation decisions
 - **Policy Coverage**: Percentage of applicable policies evaluated
@@ -803,6 +826,7 @@ Validation Agent → [Validation Decision] → Execution Agent → [Orchestrated
 - **Compliance Rate**: Percentage of validated plans meeting compliance requirements
 
 **Optimization Techniques**:
+
 - **Policy Caching**: Cache frequently accessed policies and rules
 - **Parallel Evaluation**: Execute independent validation checks concurrently
 - **Machine Learning**: Improve risk assessment based on historical outcomes
@@ -811,6 +835,7 @@ Validation Agent → [Validation Decision] → Execution Agent → [Orchestrated
 ## Error Handling & Resilience
 
 **Validation Failure Scenarios**:
+
 - **Policy Violations**: Plans violating organizational policies
 - **Regulatory Non-compliance**: Plans not meeting regulatory requirements
 - **Risk Threshold Exceeded**: Plans exceeding acceptable risk levels
@@ -818,6 +843,7 @@ Validation Agent → [Validation Decision] → Execution Agent → [Orchestrated
 - **Technical Failures**: Validation system or database unavailability
 
 **Resilience Strategies**:
+
 - **Graceful Degradation**: Fallback to manual approval processes
 - **Redundant Systems**: Multiple validation engines for critical decisions
 - **Audit Continuity**: Maintain audit trails during system failures
@@ -828,6 +854,7 @@ Validation Agent → [Validation Decision] → Execution Agent → [Orchestrated
 The Validation Agent serves as the governance and compliance gatekeeper of the OpenEMCP system:
 
 **Core Responsibilities**:
+
 1. **Policy Compliance**: Verify adherence to organizational policies and procedures
 2. **Risk Assessment**: Evaluate and score operational, financial, and compliance risks
 3. **Cost Approval**: Validate budget constraints and authorize expenditures
@@ -836,12 +863,14 @@ The Validation Agent serves as the governance and compliance gatekeeper of the O
 6. **Audit Trail**: Maintain immutable records of all validation decisions
 
 **Key Algorithms**:
+
 - **Policy Engine**: Rule-based evaluation of organizational policies
 - **Risk Engine**: Multi-factor risk assessment and scoring
 - **Approval Engine**: Automated decision-making with human escalation
 - **Compliance Engine**: Regulatory framework validation and verification
 
 **Integration Points**:
+
 - **Input**: Execution plans from Planning Agent
 - **Output**: Validation decisions for Execution Agent
 - **Context**: Enhanced validation context for execution tracking

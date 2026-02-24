@@ -5,6 +5,7 @@
 The Validation capability receives **execution plans** from the Planning Agent, performs comprehensive policy compliance validation, risk assessment, cost approval, and regulatory framework verification. It acts as the governance gatekeeper that ensures all execution plans meet organizational policies, regulatory requirements, and risk tolerance before proceeding to execution.
 
 **Intelligent Governance Control**:
+
 1. **Policy Compliance** - Verify adherence to organizational policies and procedures
 2. **Risk Assessment** - Evaluate operational, financial, and compliance risks
 3. **Cost Approval** - Validate budget constraints and financial authorization
@@ -13,6 +14,7 @@ The Validation capability receives **execution plans** from the Planning Agent, 
 6. **Audit Trail** - Maintain immutable record of all validation decisions
 
 ## What is Validation?
+
 Validation is the governance phase that evaluates execution plans against organizational policies, regulatory requirements, and risk tolerance levels. It involves comprehensive compliance checking, multi-dimensional risk assessment, cost approval workflows, and intelligent decision-making to ensure all executions meet governance standards before proceeding to implementation.
 
 ## What is the Approval Workflow?
@@ -37,6 +39,7 @@ The Validation Agent integrates Large Language Models (LLMs) to enhance policy c
 ## Core Functionality
 
 ### 1. **Policy Compliance Engine**
+
 - **Multi-Category Evaluation**: Financial, security, operational, regulatory, and business policies
 - **Rule-Based Validation**: Deterministic evaluation of organizational policy requirements
 - **Exception Handling**: Intelligent assessment of policy violation justifications
@@ -44,6 +47,7 @@ The Validation Agent integrates Large Language Models (LLMs) to enhance policy c
 - **Warning Systems**: Proactive identification of potential compliance issues
 
 ### 2. **Risk Assessment Framework**
+
 - **Multi-Dimensional Analysis**: Financial, operational, compliance, security, and availability risks
 - **Quantitative Scoring**: Mathematical risk calculation with weighted factor analysis
 - **Scenario Modeling**: Assessment of potential failure scenarios and impact analysis
@@ -51,6 +55,7 @@ The Validation Agent integrates Large Language Models (LLMs) to enhance policy c
 - **Predictive Analytics**: Historical pattern analysis for enhanced risk prediction
 
 ### 3. **Cost Approval System**
+
 - **Delegated Authority Management**: Automated routing based on approval limits
 - **Budget Impact Analysis**: Assessment of financial implications and resource allocation
 - **Multi-Level Approval**: Hierarchical approval workflows with escalation procedures
@@ -58,6 +63,7 @@ The Validation Agent integrates Large Language Models (LLMs) to enhance policy c
 - **Financial Risk Assessment**: Evaluation of budget overrun probability and impact
 
 ### 4. **Regulatory Compliance Verification**
+
 - **Framework Mapping**: Automatic application of relevant regulatory requirements
 - **Cross-Border Analysis**: Assessment of international data transfer regulations
 - **Compliance Gap Detection**: Identification of potential regulatory violations
@@ -67,6 +73,7 @@ The Validation Agent integrates Large Language Models (LLMs) to enhance policy c
 ### 5. **Advanced Validation Algorithms**
 
 #### **LLM-Enhanced Policy Compliance Analysis**
+
 ```python
 async def llm_enhanced_policy_compliance(execution_plan, policy_framework):
     """Enhanced policy compliance analysis using multiple LLM perspectives."""
@@ -93,6 +100,7 @@ async def llm_enhanced_policy_compliance(execution_plan, policy_framework):
 ```
 
 #### **Multi-LLM Risk Assessment Framework**
+
 ```python
 async def llm_enhanced_risk_assessment(execution_plan, risk_context):
     """Comprehensive risk assessment using multiple LLM risk analysis perspectives."""
@@ -119,6 +127,7 @@ async def llm_enhanced_risk_assessment(execution_plan, risk_context):
 ```
 
 ### 6. **Intelligent Decision Making**
+
 - **Consensus-Based Decisions**: Multi-LLM agreement for complex validation scenarios
 - **Contextual Analysis**: Deep understanding of business context and implications
 - **Precedent Analysis**: Learning from historical approval patterns and outcomes
@@ -128,10 +137,12 @@ async def llm_enhanced_risk_assessment(execution_plan, risk_context):
 ## Components
 
 ### [Validation](validation.md)
+
 **Purpose**: Policy Compliance & Risk Assessment  
 **Input**: Execution plans from Planning Agent  
 **Output**: Validation decisions with approval status  
 **Key Features**:
+
 - Comprehensive policy compliance validation across multiple categories
 - Multi-dimensional risk assessment with quantitative scoring
 - Automated approval workflows with intelligent escalation
@@ -142,7 +153,9 @@ async def llm_enhanced_risk_assessment(execution_plan, risk_context):
 ## Integration with Planning and Execution Agents
 
 ### From Planning Agent
+
 The Validation Agent receives comprehensive execution plans containing:
+
 - **Agent Assignments** - Selected agents with capability assessments
 - **Workflow Design** - Sequential/parallel execution phases with dependencies
 - **Resource Allocation** - Time, cost, and capacity estimates
@@ -151,7 +164,9 @@ The Validation Agent receives comprehensive execution plans containing:
 - **Performance Projections** - Expected outcomes and success criteria
 
 ### To Execution Agent
+
 The Validation Agent sends validation decisions including:
+
 - **Approval Status** - Approved/Rejected/Conditionally Approved/Escalated
 - **Execution Conditions** - Mandatory monitoring, optional enhancements, escalation triggers
 - **Approved Parameters** - Maximum cost, time, and performance requirements
@@ -164,6 +179,7 @@ This enables the Execution Agent to focus on **orchestrated implementation** wit
 ## Advanced Features
 
 ### Multi-LLM Integration Benefits
+
 1. **Enhanced Accuracy**: Multiple model perspectives reduce validation errors
 2. **Intelligent Reasoning**: AI-driven analysis beyond traditional rule-based systems
 3. **Contextual Understanding**: Deep comprehension of business implications
@@ -171,6 +187,7 @@ This enables the Execution Agent to focus on **orchestrated implementation** wit
 5. **Consensus Confidence**: Multi-model agreement scoring for decision validation
 
 ### Approval Workflow Optimization
+
 1. **Dynamic Authority Management**: Flexible delegation based on risk and context
 2. **Predictive Routing**: Intelligent escalation path selection
 3. **Performance-Based Thresholds**: Adaptive approval criteria optimization
@@ -178,6 +195,7 @@ This enables the Execution Agent to focus on **orchestrated implementation** wit
 5. **Real-Time Monitoring**: Continuous compliance and performance tracking
 
 ### Risk Assessment Enhancement
+
 1. **Pattern Recognition**: Historical trend analysis for improved prediction
 2. **Scenario Modeling**: Advanced simulation of potential outcomes
 3. **Cross-Domain Analysis**: Integrated risk assessment across multiple dimensions

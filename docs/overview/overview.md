@@ -7,6 +7,7 @@
 Modern enterprises, particularly in regulated industries like financial services, face unprecedented complexity in their operational workflows. Bank-to-bank transactions, cross-border payments, trade finance, process documentation, process explainability, and regulatory reporting require intricate choreography of multiple systems, compliance checks, and real-time decision-making across jurisdictional boundaries.
 
 Traditional AI implementations fall short when dealing with:
+
 - **Multi-step compliance workflows** spanning multiple regulatory jurisdictions
 - **Service Level Agreements (SLAs)** requiring guaranteed response times and availability
 - **Risk management protocols** demanding real-time monitoring and circuit breakers
@@ -18,7 +19,8 @@ Traditional AI implementations fall short when dealing with:
 Consider a typical cross-border corporate banking scenario where a UK bank branch needs to request data about a Singapore-registered company owned by a director with dual Singapore and USA citizenship:
 
 **Cross-Border Corporate Data Request Workflow:**
-```
+
+```text
 UK Data Request → Customer Identity Verification (UK GDPR) → 
 Corporate Beneficiary Analysis → Singapore Corporate Registry Query → 
 USA Beneficial Ownership Screening → Enhanced Due Diligence → 
@@ -28,16 +30,19 @@ Information Retrieval → Regulatory Reporting
 ```
 
 **Multi-Jurisdictional Complexity Example:**
+
 - **UK Agent** initiates data request processing under FCA regulations
 - **Singapore Agent** queries ACRA corporate registry (Singapore PDPA compliance required)  
 - **USA Agent** performs enhanced due diligence on 40% US beneficial ownership (FATCA obligations)
 - **Clearance Requirements**: Each data transfer requires explicit authorization under:
+  
   - UK GDPR Article 49 derogations for necessary transfers
   - Singapore PDPA cross-border transfer provisions  
   - US FATCA reporting and sanctions screening requirements
   - DOJ Final Rule restrictions on bulk sensitive data transfers
 
 Each step involves:
+
 - **Multiple specialized AI agents** across three jurisdictions (fraud detection, compliance validation, beneficial ownership analysis)
 - **Cascading regulatory requirements** (FCA prudential rules, MAS corporate governance, FinCEN beneficial ownership)
 - **Real-time SLA commitments** (sub-second sanctions screening, same-day corporate verification, 24-hour FATCA reporting)
@@ -50,6 +55,7 @@ Each step involves:
 While the Model Context Protocol (MCP) provides valuable capabilities for feeding external context into language models, it falls critically short for enterprise agentic systems. Our comprehensive analysis in the [OpenEMCP Proposal](openemcp_proposal.md) identifies fundamental gaps:
 
 **MCP's Design Limitations:**
+
 - **Single-model focus**: MCP optimizes for feeding context to individual LLMs, not orchestrating multi-agent workflows
 - **No enterprise security**: Lacks comprehensive authentication, authorization, and audit capabilities required for financial services
 - **No regulatory compliance**: Missing data sovereignty, cross-border controls, and automated compliance validation
@@ -58,6 +64,7 @@ While the Model Context Protocol (MCP) provides valuable capabilities for feedin
 - **No business orchestration**: Cannot handle complex multi-step workflows with dependencies and rollback capabilities
 
 **Enterprise Requirements MCP Cannot Address:**
+
 - Cross-border data transfer restrictions (GDPR, DORA, DOJ Final Rule)
 - Real-time compliance validation (EU AI Act, Basel III, AML regulations)
 - Agent identity management and non-human authentication
@@ -118,10 +125,13 @@ OpenEMCP's architecture creates a cohesive ecosystem where enterprise capabiliti
 ## 3. OpenEMCP Agent Classifications
 
 ### 3.1 Framework Agents
+
 **Purpose**: Agents built using established AI frameworks, adapted for enterprise use
 
 **Examples**:
+
 - **LangChain Agents**: Customer service bots, document analyzers, research assistants
+
   ```json
   {
     "agent_type": "framework",
@@ -129,15 +139,19 @@ OpenEMCP's architecture creates a cohesive ecosystem where enterprise capabiliti
     "capabilities": ["document_analysis", "customer_inquiry", "research"]
   }
   ```
+
 - **LangGraph Agents**: Complex stateful workflows, approval processes, case management
 - **AutoGPT Agents**: Autonomous task completion, report generation, data synthesis
 - **Custom Framework Agents**: Specialized implementations using TensorFlow, PyTorch, or proprietary frameworks
 
 ### 3.2 Core Agents
+
 **Purpose**: Essential enterprise services that provide foundational capabilities
 
 **Examples**:
+
 - **Identity Verification Agent**: KYC/AML compliance, document verification, biometric validation
+
   ```json
   {
     "agent_type": "core",
@@ -145,15 +159,19 @@ OpenEMCP's architecture creates a cohesive ecosystem where enterprise capabiliti
     "certifications": ["SOC2", "GDPR_Article_25", "KYC_AML"]
   }
   ```
+
 - **Risk Assessment Agent**: Credit scoring, fraud detection, regulatory risk calculation
 - **Compliance Validation Agent**: Policy enforcement, regulatory checking, audit preparation
 - **Data Classification Agent**: Sensitivity labeling, residency enforcement, retention management
 
 ### 3.3 Utility Agents
+
 **Purpose**: Supporting services that enable core business functions
 
 **Examples**:
+
 - **Address Standardization Agent**: USPS validation, international formatting, geocoding
+
   ```json
   {
     "agent_type": "utility",
@@ -161,15 +179,19 @@ OpenEMCP's architecture creates a cohesive ecosystem where enterprise capabiliti
     "data_residency": ["US", "CA", "MX"]
   }
   ```
+
 - **Currency Conversion Agent**: Real-time FX rates, historical data, regulatory reporting rates
 - **Document Translation Agent**: Multi-language support, legal document translation, cultural adaptation
 - **Encryption/Decryption Agent**: Data protection, key management, compliance encryption
 
 ### 3.4 Flow Agents
+
 **Purpose**: Orchestration and workflow management agents that coordinate complex business processes
 
 **Examples**:
+
 - **Payment Processing Flow**: Orchestrates end-to-end payment workflows across multiple banks
+
   ```json
   {
     "agent_type": "flow",
@@ -177,6 +199,7 @@ OpenEMCP's architecture creates a cohesive ecosystem where enterprise capabiliti
     "orchestrates": ["aml_agent", "fx_agent", "settlement_agent", "reporting_agent"]
   }
   ```
+
 - **Loan Origination Flow**: Manages application, underwriting, approval, and funding processes
 - **Customer Onboarding Flow**: Coordinates KYC, account opening, product enrollment, and activation
 - **Regulatory Reporting Flow**: Aggregates data, validates compliance, generates reports, manages submissions

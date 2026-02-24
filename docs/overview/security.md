@@ -6,6 +6,7 @@
 Think of SPIRE as an "identity factory" for your services - instead of managing SSH keys, passwords, or API tokens, every service gets a cryptographically verifiable identity that proves who it is, not just where it runs.
 
 ## Architecture Overview
+
 ```mermaid
 graph TB
    subgraph "SPIRE Infrastructure"
@@ -23,12 +24,14 @@ graph TB
 ```
 
 **Key Components:**
+
 - **SPIRE Server**: Acts as the Certificate Authority (CA) and identity control plane. It stores registration entries (which workloads are allowed) and issues signed certificates.
 - **SPIRE Agent**: Runs on each node, attests workload identity (verifies "you are who you say you are"), and delivers certificates via a Unix domain socket.
 - **Registry**: Rust service that accepts agent registrations over HTTPS, requires client certificates for authentication.
 - **MCP Agent**: Python service that registers with the registry, fetches its identity from SPIRE, and uses mTLS for secure communication.
 
 ## Flow 1: Registration Entry Creation
+
 ```mermaid
 sequenceDiagram
    participant Admin
@@ -42,12 +45,14 @@ sequenceDiagram
 ```
 
 **What's happening:**
+
 1. Administrator creates a "registration entry" - a policy that says "any process running as UID 1000 can get an identity of `spiffe://example.org/registry`"
 2. SPIRE Server stores this entry in its database
 3. The entry includes selectors (attestation criteria), TTL (certificate lifetime), and DNS names
 **Why it matters:** This is the authorization step - you're telling SPIRE "these workloads are allowed to exist in my infrastructure."
 
 ## Flow 2: SVID Issuance (Getting Certificates)
+
 ```mermaid
 sequenceDiagram
    participant Registry as Registry Process<br/>(UID: 1000)
@@ -67,6 +72,7 @@ sequenceDiagram
 ```
 
 **What's happening:**
+
 1. **Registry requests identity**: Process calls SPIRE Agent via Unix socket
 2. **Agent attests workload**: Verifies the process matches the selector (UID 1000)
 3. **Agent requests certificate**: Asks SPIRE Server for an SVID
@@ -77,6 +83,7 @@ sequenceDiagram
 **Why it matters:** This is the authentication step - SPIRE cryptographically proves the workload's identity without passwords or API keys.
 
 ## Flow 3: mTLS Communication
+
 ```mermaid
 sequenceDiagram
    participant MCP as MCP Agent<br/>(spiffe://example.org/mini-agent)
@@ -106,7 +113,7 @@ sequenceDiagram
 5. **Encrypted communication**: After mutual authentication, all data is encrypted with symmetric keys
 6. **Application logic**: Registry processes the registration request
 7. **Encrypted response**: Registry sends response back through encrypted channel
-   
+
 **Why it matters:**
 
 - **Traditional HTTPS**: Only server proves identity (client could be anyone)
@@ -114,6 +121,7 @@ sequenceDiagram
 - **Zero-Trust**: No reliance on network perimeter, VPN, or IP whitelist
 
 ## Certificate Structure
+
 ```mermaid
 graph LR
    subgraph "X.509 SVID Certificate"
@@ -140,7 +148,9 @@ graph LR
    J -->|Signs| K
    K -->|Signs| L
 ```
+
 **Key Fields:**
+
 - **Subject**: Common Name (CN) - human-readable identifier
 - **Issuer**: The SPIRE CA that signed this certificate
 - **Validity**: 48-hour lifetime (default) - forces automatic rotation
@@ -153,6 +163,7 @@ graph LR
 - `/registry`: Workload-specific identifier
 
 ## Security Comparison
+
 ```mermaid
 graph TD
    subgraph "Traditional HTTPS Only"
@@ -168,6 +179,7 @@ graph TD
        Note2[Advantages:<br/>- Both parties authenticated<br/>- Cryptographic identity<br/>- Zero-trust architecture]
    end
 ```
+
 | Security Aspect | Traditional TLS | SPIRE mTLS |
 |-----------------|-----------------|------------|
 | **Server Authentication** | ✓ (DNS + Public CA) | ✓ (SPIFFE ID + Private CA) |
@@ -180,6 +192,7 @@ graph TD
 | **Works Across Networks** | Same datacenter only | Yes, anywhere |
 
 ## Complete End-to-End Flow
+
 ```mermaid
 sequenceDiagram
    autonumber

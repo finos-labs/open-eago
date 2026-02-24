@@ -5,6 +5,7 @@
 The Context capability receives **execution results** from the Execution Agent, manages hierarchical context state across the entire OpenEMCP lifecycle, maintains session continuity, enables conversation resumption, and provides state persistence. It acts as the memory and state management system that preserves context across multi-phase workflows and enables complex multi-turn interactions.
 
 **Intelligent State Management**:
+
 1. **Hierarchical State Management** - Manage Session, Conversation, and Execution contexts
 2. **State Persistence** - Store and retrieve context state across system restarts
 3. **Context Consolidation** - Merge and update context from multiple sources
@@ -13,6 +14,7 @@ The Context capability receives **execution results** from the Execution Agent, 
 6. **State Synchronization** - Coordinate context updates across distributed components
 
 ## What is Context Management?
+
 Context Management is the intelligent preservation and organization of state information throughout multi-agent workflows. It maintains hierarchical context across sessions, conversations, and executions, enabling personalized experiences, workflow continuity, pattern recognition, and intelligent optimization based on historical interactions and user behavior.
 
 ## What is the Context Hierarchy?
@@ -38,6 +40,7 @@ The Context Agent provides advanced analytics and intelligence capabilities that
 ## Core Functionality
 
 ### 1. **Hierarchical Context Structure**
+
 - **Multi-Level Organization**: Session, Conversation, Contract, Plan, Validation, and Execution contexts
 - **Context Inheritance**: Automatic propagation of relevant state between phases
 - **Scope Isolation**: Secure separation of context data by user, session, and conversation
@@ -45,6 +48,7 @@ The Context Agent provides advanced analytics and intelligence capabilities that
 - **Cross-Reference Tracking**: Maintain relationships between related workflow executions
 
 ### 2. **State Persistence & Recovery**
+
 - **Durable Storage**: Persistent storage of context state across system restarts
 - **Checkpoint Creation**: Regular state snapshots for conversation and session recovery
 - **Session Resumption**: Seamless continuation of interrupted workflows
@@ -52,6 +56,7 @@ The Context Agent provides advanced analytics and intelligence capabilities that
 - **Data Integrity**: Verification and validation of stored context data
 
 ### 3. **Context Consolidation & Updates**
+
 - **Multi-Source Integration**: Merge context updates from Contract, Planning, Validation, and Execution phases
 - **Conflict Resolution**: Intelligent handling of concurrent context updates
 - **Version Management**: Maintain context history and enable rollback capabilities
@@ -59,6 +64,7 @@ The Context Agent provides advanced analytics and intelligence capabilities that
 - **Consistency Validation**: Ensure context coherence across all hierarchy levels
 
 ### 4. **Intelligent Context Querying**
+
 - **Natural Language Queries**: Support for conversational context retrieval
 - **Similarity Search**: Find related conversations, executions, and patterns
 - **Historical Analysis**: Deep analysis of user behavior and workflow patterns
@@ -68,6 +74,7 @@ The Context Agent provides advanced analytics and intelligence capabilities that
 ### 5. **Advanced Context Algorithms**
 
 #### **Context State Management Engine**
+
 ```python
 class ContextStateManager:
     """Manage context state transitions and persistence."""
@@ -96,6 +103,7 @@ class ContextStateManager:
 ```
 
 #### **Context Analytics Engine**
+
 ```python
 class ContextAnalytics:
     """Analyze context patterns for intelligence and optimization."""
@@ -121,6 +129,7 @@ class ContextAnalytics:
 ```
 
 ### 6. **Session Continuity & Recovery**
+
 - **Session Resumption**: Intelligent restoration of interrupted user sessions
 - **Conversation Checkpoints**: Regular state snapshots for recovery and rollback
 - **Context Dependencies**: Track and maintain relationships between context elements
@@ -130,10 +139,12 @@ class ContextAnalytics:
 ## Components
 
 ### [Context](context.md)
+
 **Purpose**: Hierarchical State Management & Session Continuity  
 **Input**: Execution results from Execution Agent  
 **Output**: Comprehensive context state for Communication Agent  
 **Key Features**:
+
 - Hierarchical context management with inheritance and isolation
 - Intelligent state persistence and recovery mechanisms
 - Advanced context analytics with pattern recognition and satisfaction prediction
@@ -144,7 +155,9 @@ class ContextAnalytics:
 ## Integration with Communication Agent
 
 ### From Execution Agent
+
 The Context Agent receives execution results containing:
+
 - **Business Results** - Objective achievement and deliverable completion
 - **Performance Metrics** - Execution efficiency, cost, and quality data
 - **Compliance Verification** - Regulatory and policy compliance confirmation
@@ -153,7 +166,9 @@ The Context Agent receives execution results containing:
 - **Audit Trail** - Immutable execution history and performance data
 
 ### To Communication Agent
+
 The Context Agent sends comprehensive context state including:
+
 - **Session Context** - User authentication, preferences, and activity history
 - **Conversation Context** - Topic, objective, workflow history, and completion status
 - **Response Context** - User expectations, personalization data, and continuity information
@@ -166,6 +181,7 @@ This enables the Communication Agent to deliver **personalized, context-aware re
 ## Advanced Features
 
 ### Context Intelligence Benefits
+
 1. **Personalized Experience**: Tailored interactions based on user behavior patterns
 2. **Predictive Optimization**: Proactive workflow and agent selection recommendations
 3. **Satisfaction Forecasting**: AI-driven prediction of user satisfaction and experience quality
@@ -173,6 +189,7 @@ This enables the Communication Agent to deliver **personalized, context-aware re
 5. **Cross-Session Continuity**: Persistent user preferences and workflow optimizations
 
 ### State Management Optimization
+
 1. **Intelligent Caching**: Performance-optimized context retrieval and storage
 2. **Adaptive Retention**: Dynamic context retention policies based on usage patterns
 3. **Conflict Resolution**: Sophisticated handling of concurrent context updates
@@ -180,6 +197,7 @@ This enables the Communication Agent to deliver **personalized, context-aware re
 5. **Multi-Level Consistency**: Ensuring coherent state across all hierarchy levels
 
 ### Analytics & Learning
+
 1. **Behavioral Analysis**: Deep understanding of user workflow preferences and patterns
 2. **Performance Correlation**: Identification of factors affecting execution success
 3. **Optimization Discovery**: Automatic identification of workflow improvement opportunities

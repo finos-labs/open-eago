@@ -2,9 +2,9 @@
 
 This document serves as a proposed baseline standard for identity in OpenEMCP deployments.
 
-In the rapidly evolving landscape of agentic AI, autonomous systems powered by advanced models perform complex tasks such as planning and decision-making. For regulated enterprises like banks, establishing a robust agent identity framework is critical to fostering trust, security, and compliance. Agent identity serves as the foundational "code" enabling reliability, traceability, and adherence to regulations including BSA/AML, GLBA, and GDPR. 
+In the rapidly evolving landscape of agentic AI, autonomous systems powered by advanced models perform complex tasks such as planning and decision-making. For regulated enterprises like banks, establishing a robust agent identity framework is critical to fostering trust, security, and compliance. Agent identity serves as the foundational "code" enabling reliability, traceability, and adherence to regulations including BSA/AML, GLBA, and GDPR.
 
-The agent identity framework within the Open Enterprise Multi-agent Communication Protocol (OpenEMCP) leverages open-source contributions from the AGNTCY project under the Linux Foundation (https://agntcy.org). This framework promotes verifiable, secure identities to support interoperable multi-agent systems, forming the basis for secured enterprise and hybrid agents suitable for high-stakes environments such as intra/inter-banking or cross-industry collaborations for services like fraud detection and credit risk assessment.
+The agent identity framework within the Open Enterprise Multi-agent Communication Protocol (OpenEMCP) leverages open-source contributions from the AGNTCY project under the Linux Foundation (<https://agntcy.org>). This framework promotes verifiable, secure identities to support interoperable multi-agent systems, forming the basis for secured enterprise and hybrid agents suitable for high-stakes environments such as intra/inter-banking or cross-industry collaborations for services like fraud detection and credit risk assessment.
 
 ## Introduction: Foundations of Agent Identity in Agentic AI
 
@@ -19,19 +19,25 @@ OpenEMCP adopts a decentralized approach to identity management, avoiding single
 The OpenEMCP framework implements a comprehensive three-level authentication system to ensure security and prevent malicious access at different layers, aligning with the enterprise-grade security requirements outlined in the overall architecture.
 
 ### Level 1: Agent-to-Registry Authentication
+
 **Purpose**: Eliminate malicious agents from entering the system
+
 - **What it protects**: The agent registry and service discovery infrastructure
 - **Threat prevention**: Prevents rogue, compromised, or unauthorized AI agents from registering and offering services
 - **Authentication method**: Mutual TLS (mTLS) with CA-issued certificates and capability validation using SPIRE/SPIFFE identity framework
 
-### Level 2: User/App-to-Framework Authentication  
+### Level 2: User/App-to-Framework Authentication
+
 **Purpose**: Prevent malicious applications from accessing the framework
+
 - **What it protects**: The entire OpenEMCP framework from unauthorized client access
 - **Threat prevention**: Prevents malicious applications, unauthorized users, or compromised clients from making requests
 - **Authentication method**: OAuth2/OIDC with JWT tokens, role-based access control (RBAC), and client certificate validation
 
 ### Level 3: Task-to-Contract/Planner Authorization
+
 **Purpose**: Decide if user/app has permission to run specific tasks
+
 - **What it protects**: Individual agent capabilities and sensitive operations
 - **Threat prevention**: Prevents authorized users from executing unauthorized tasks or accessing capabilities beyond their permissions
 - **Authentication method**: Fine-grained capability-based authorization with execution tokens and policy enforcement
@@ -60,6 +66,7 @@ flowchart TD
 ### Identity and Authorization Flow Overview
 
 The identity and authorization flow involves five main actors:
+
 1. **Central Authority** - Identity provider and certificate authority (SPIRE Server)
 2. **AI Agent** - The service requesting identity and registration
 3. **Agent Registry** - Service discovery and capability registry  
@@ -92,7 +99,7 @@ These rules are fundamental because they mitigate security risks in multi-agent 
 
 ## Integration with Standards and Protocols
 
-OpenEMCP integrates agent identity with established protocols to ensure secure interactions, building upon the AGNTCY project (Linux Foundation, https://agntcy.org)—an open-source Internet of Agents (IoA) infrastructure initiated by Outshift by Cisco and donated to the Linux Foundation in July 2025 with founding members including Cisco, Dell Technologies, Google Cloud, Oracle, and Red Hat. The protocol emphasizes interoperability via common protocols, security through authentication, authorization, and encryption, scalability with cloud-native architecture, and standardization of data models and schemas. This decentralized approach avoids single points of failure, making it ideal for regulated environments like banking where secure, verifiable interactions are paramount.
+OpenEMCP integrates agent identity with established protocols to ensure secure interactions, building upon the AGNTCY project (Linux Foundation, <https://agntcy.org>) — an open-source Internet of Agents (IoA) infrastructure initiated by Outshift by Cisco and donated to the Linux Foundation in July 2025 with founding members including Cisco, Dell Technologies, Google Cloud, Oracle, and Red Hat. The protocol emphasizes interoperability via common protocols, security through authentication, authorization, and encryption, scalability with cloud-native architecture, and standardization of data models and schemas. This decentralized approach avoids single points of failure, making it ideal for regulated environments like banking where secure, verifiable interactions are paramount.
 
 For the Model Context Protocol (MCP)—a standard for connecting AI models to external tools and data—OpenEMCP embeds identity checks in every invocation, such as during tool calls. MCP integration leverages Identity and Directory components, using verifiable credentials for authorization. Recommendations include OAuth-based tokens bound to agent identities, preventing data leaks in sensitive banking operations like querying transaction histories. The Identity Service facilitates this by connecting to identity providers, creating agentic service identities, verifying them, and enforcing policies, all while utilizing Decentralized Identifiers (DIDs) and verifiable credentials. This includes badges for agents and MCP servers, ensuring trusted assertions that align with compliance and traceability requirements.
 
@@ -194,7 +201,8 @@ Each profile should include protocol test vectors for MCP tool invocation, direc
 ### Phase 1: Level 1 Authentication - Agent Bootstrap and Registration
 
 #### Step 1: Agent Bootstrap and Identity Generation
-```
+
+```text
 1.1. Agent starts up and reads configuration (agent_config.yaml)
 1.2. Agent generates or loads existing private/public key pair
 1.3. Agent creates Certificate Signing Request (CSR) with:
@@ -207,7 +215,8 @@ Each profile should include protocol test vectors for MCP tool invocation, direc
 ```
 
 #### Step 2: Request Identity from Central Authority (SPIRE Server)
-```
+
+```text
 2.1. Agent sends CSR to Central Authority endpoint:
      POST /api/v1/identity/request
      {
@@ -295,7 +304,8 @@ Each profile should include protocol test vectors for MCP tool invocation, direc
 ```
 
 #### Step 3: Agent Registry Registration with Anti-Malicious Validation
-```
+
+```text
 3.1. Agent validates received certificate chain
 3.2. Agent stores certificate and private key securely (HSM preferred)
 3.3. Agent creates registration payload with signed attestation:
@@ -372,7 +382,8 @@ Each profile should include protocol test vectors for MCP tool invocation, direc
 ### Phase 2: Level 2 Authentication - User/Application Authentication
 
 #### Step 4: User Authentication
-```
+
+```text
 4.1. User accesses client application
 4.2. Client application redirects to authentication provider (OAuth2/OIDC)
 4.3. User provides credentials (username/password, MFA, biometric, etc.)
@@ -407,7 +418,8 @@ Each profile should include protocol test vectors for MCP tool invocation, direc
 ```
 
 #### Step 5: API Request with Anti-Malicious App Validation
-```
+
+```text
 5.1. User initiates action in client application (e.g., "Analyze this contract")
 5.2. Client application prepares request with comprehensive context:
      {
@@ -444,7 +456,8 @@ Each profile should include protocol test vectors for MCP tool invocation, direc
 ```
 
 #### Step 6: Framework-Level Authorization (Malicious App Detection)
-```
+
+```text
 6.1. OpenEMCP Framework receives signed request at Level 2 gateway
 6.2. Framework performs malicious application detection:
      - Validates client application certificate against trusted CA
@@ -484,7 +497,8 @@ Each profile should include protocol test vectors for MCP tool invocation, direc
 ### Phase 3: Level 3 Authentication - Task Authorization and Execution
 
 #### Step 7: Agent Discovery and Capability Matching
-```
+
+```text
 7.1. Authorization service queries agent registry for qualified agents:
      GET /agents?skill_id=contract_analysis&skill_category=document_processing&domain_category=legal&jurisdiction=US-EAST&compliance=SOX
 
@@ -523,7 +537,8 @@ Each profile should include protocol test vectors for MCP tool invocation, direc
 ```
 
 #### Step 8: Task-Level Permission Validation (Level 3 Authorization)
-```
+
+```text
 8.1. Contract/Planner service receives task authorization request
 8.2. Service performs fine-grained permission validation:
      - Validates specific task against user's detailed permissions
@@ -583,7 +598,8 @@ Each profile should include protocol test vectors for MCP tool invocation, direc
 ```
 
 #### Step 9: Secure Command Execution with Three-Level Validation
-```
+
+```text
 9.1. Agent receives execution request with Level 3 authorization token
 9.2. Agent performs final validation:
      - Verifies execution token signature (Level 3 validation)
@@ -633,18 +649,21 @@ Each profile should include protocol test vectors for MCP tool invocation, direc
 ## Security Benefits of Three-Level Authentication
 
 ### Level 1 Benefits (Agent-to-Registry)
+
 - **Prevents rogue agents**: Malicious or compromised AI agents cannot register
 - **Capability validation**: Only agents with verified capabilities can offer services
 - **Continuous monitoring**: Behavioral analysis detects compromised agents post-registration
 - **Certificate-based trust**: Strong cryptographic identity using SPIFFE IDs for all agents
 
 ### Level 2 Benefits (User/App-to-Framework)
+
 - **Application verification**: Only trusted client applications can access the framework
 - **User authentication**: Multi-factor authentication prevents unauthorized access
 - **Request integrity**: Digital signatures prevent request tampering
 - **Rate limiting**: Prevents abuse and DoS attacks from malicious applications
 
 ### Level 3 Benefits (Task-to-Contract/Planner)
+
 - **Fine-grained control**: Precise permission control for specific tasks and resources
 - **Principle of least privilege**: Users can only execute tasks they are specifically authorized for
 - **Dynamic authorization**: Real-time permission validation based on current context
@@ -721,7 +740,8 @@ State transitions MUST be logged with actor, reason, timestamp, and approval con
 ## Certificate Structure and SPIRE Integration
 
 ### X.509 SVID Certificate Structure
-```
+
+```text
 Subject: CN=agent-contract-001
 Issuer: SPIRE CA
 Validity: 48 hours (automatic rotation)
@@ -737,7 +757,8 @@ Signature Algorithm: SHA256withRSA or SHA256withECDSA
 ```
 
 ### SPIRE Agent Integration Flow
-```
+
+```text
 1. SPIRE Server acts as Certificate Authority for OpenEMCP agents
 2. SPIRE Agent runs on each node, attests workload identity
 3. Workload API provides certificates via Unix domain socket
@@ -766,12 +787,14 @@ OpenEMCP identity controls explicitly address common threats through the three-l
 To accelerate adoption, OpenEMCP defines three conformance profiles aligned with the three-level authentication architecture:
 
 ### Foundation Profile
+
 - Core SPIFFE identifier with basic certificate validation (Level 1)
 - Basic credential validation and audit logging
 - Essential agent discovery and registration capabilities
 - Minimum viable security for development environments
 
-### Regulated Profile  
+### Regulated Profile
+
 - Full three-level authentication system implementation
 - Complete lifecycle controls with KYA attributes
 - Continuous monitoring and stronger non-repudiation
@@ -779,12 +802,14 @@ To accelerate adoption, OpenEMCP defines three conformance profiles aligned with
 - Enhanced threat detection and response capabilities
 
 ### Cross-Organization Profile
+
 - Federation-ready trust anchors across organizational boundaries
 - Interoperable OASF schema profile for multi-vendor environments
 - Delegated authorization controls for cross-border operations
 - Advanced jurisdictional compliance and data sovereignty controls
 
 Each profile includes protocol test vectors for:
+
 - MCP tool invocation with identity validation
 - Directory lookup with capability verification  
 - SLIM messaging with embedded identity verification
