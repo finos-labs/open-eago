@@ -103,10 +103,10 @@ OpenEMCP is built on the principles of transparency, collaboration, and user emp
 
 <div align="center">
   <div style="display: flex; justify-content: center; align-items: center; gap: 80px; flex-wrap: wrap; margin: 40px 0;">
-    <a href="https://agntcy.org/" target="_blank">
+    <a href="https://agntcy.org/" target="_blank" style="display: inline-block; line-height: 0; text-decoration: none;">
       <img src="docs/images/agntcy.svg" alt="AGNTCY" height="60px">
     </a>
-    <a href="https://schema.oasf.outshift.com/" target="_blank">
+    <a href="https://schema.oasf.outshift.com/" target="_blank" style="display: inline-block; line-height: 0; text-decoration: none; margin-left: 1px;">
       <img src="docs/images/oasf.png" alt="OASF Schema" height="90px">
     </a>
   </div>
