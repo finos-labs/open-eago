@@ -10,8 +10,8 @@ The Contract capability is the protocol entry point. It accepts incoming request
 
 - Detailed specification: [contract.md](./contract.md)
 - Normative protocol behavior: [../../../SPECIFICATION.md](../../../SPECIFICATION.md)
-- Machine model: [../../../spec/spec.json](../../../spec/spec.json)
-- Phase schema: [../../../schemas/v0.1/contract-management.schema.json](../../../schemas/v0.1/contract-management.schema.json)
+- Machine model: [../../../spec/v1.0.0/spec.json](../../../spec/v1.0.0/spec.json)
+- Phase schema: [../../../spec/v1.0.0/schemas/contract-management.schema.json](../../../spec/v1.0.0/schemas/contract-management.schema.json)
 
 ## Inputs and Outputs
 

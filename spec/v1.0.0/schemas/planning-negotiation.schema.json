@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://finos-labs.github.io/open-emcp/schemas/v0.1/planning-negotiation.schema.json",
+  "$id": "https://finos-labs.github.io/open-emcp/spec/v1.0.0/schemas/planning-negotiation.schema.json",
   "title": "OpenEMCP Planning and Negotiation",
   "type": "object",
   "required": ["plan_id", "contract_id", "selected_agents", "negotiation"],
