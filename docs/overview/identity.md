@@ -597,7 +597,7 @@ Proactive monitoring via the Observability SDK detects anomalies, aligning with 
 ## Threat Model Coverage
 
 | Threat Type | Level 1 Protection | Level 2 Protection | Level 3 Protection |
-|-------------|-------------------|-------------------|-------------------|
+| ------------- | ------------------- | ------------------- | ------------------- |
 | Malicious Agent | Certificate validation, behavioral monitoring | N/A | Capability enforcement |
 | Compromised Agent | Continuous monitoring, certificate revocation | N/A | Resource limits, audit trails |
 | Malicious Application | N/A | Client certificate validation, app verification | Task-specific permissions |
