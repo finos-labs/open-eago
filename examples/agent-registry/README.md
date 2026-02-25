@@ -947,3 +947,13 @@ And the instance_id, capability_codes, and compliance fields are unchanged
 ### 17.3 UI Dashboard Results
 
 ![Dashboard Results](./images/dashboard_3.png)
+
+### 17.4 Comparison to other service discovery solutions
+
+#### ERC8004
+
+tbd
+
+#### Gemini Enterprise Service Directory
+
+tbd
