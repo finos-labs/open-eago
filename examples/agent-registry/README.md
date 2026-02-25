@@ -1,9 +1,9 @@
-# Product Specification: OpenEMCP Registry
+# RFC: OpenEMCP - Agent Registry
 
 **Version:** 0.1.0  
 **Status:** Active Development  
 **Last Updated:** 2026-02-24  
-**Authors:** OpenEMCP
+**Authors:** OpenEMCP Team
 
 ---
 
@@ -25,6 +25,7 @@
 14. [Acceptance Criteria](#14-acceptance-criteria)
 15. [Constraints and Dependencies](#15-constraints-and-dependencies)
 16. [Glossary](#16-glossary)
+17. [Appendices](#17-appendices)
 
 ---
 
@@ -934,7 +935,7 @@ And the instance_id, capability_codes, and compliance fields are unchanged
 
 ---
 
-## 17. Appendices - Ideas, Mockups, and Additional Context
+## 17. Appendices
 
 ### 17.1 UI Dashboard Mockup
 
