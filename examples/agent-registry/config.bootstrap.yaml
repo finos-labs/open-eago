@@ -1,0 +1,18 @@
+server:
+  port: 8443
+  swagger_port: 8080
+  bootstrap: true
+  max_ttl: 300
+
+bootstrap:
+  urls: []
+  sync_interval: 30
+
+# SPIRE workload API certificate paths.
+# Uncomment and edit to override the defaults.
+# Each path also accepts an environment variable override (SPIRE_CERT_PATH,
+# SPIRE_KEY_PATH, SPIRE_BUNDLE_PATH) when the field is not set here.
+spire:
+  cert_path: /tmp/svid.0.pem
+  key_path: /tmp/svid.0.key
+  bundle_path: /tmp/bundle.0.pem
