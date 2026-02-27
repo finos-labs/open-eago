@@ -1,89 +1,107 @@
-# RFC: OpenEMCP - Agent Registry
+# OpenEMCP Agent Registry
 
-**Version:** 0.1.0  
-**Status:** Active Development  
-**Last Updated:** 2026-02-24  
-**Authors:** OpenEMCP Team
+A reference implementation of a distributed agent registry for the [OpenEMCP](../../README.md) architecture. Agents register themselves, exchange capability metadata, and discover peers through bootstrap servers — all over mutual TLS enforced by [SPIRE](https://spiffe.io/docs/latest/spire-about/).
+
+> **Reference implementation only.** Not intended for production use.
 
 ---
 
-## Introduction
+## Architecture
 
-The Agent Registry is a core component of the OpenEMCP architecture, responsible for managing the lifecycle of agents within the system. It provides functionalities for registering, updating, and deregistering agents, as well as maintaining a directory of available agents and their capabilities.
+```log
+Bootstrap server          Node agent
+┌──────────────┐          ┌──────────────┐
+│  POST /register ◄───────┤  on startup  │
+│  GET  /list             │  sync loop   │
+│  PUT  /status  ◄────────┤  liveness    │
+└──────────────┘          └──────────────┘
+```
 
-**Important:** This is a reference implementation of the Agent Registry. It is not intended for production use and may contain bugs or security vulnerabilities. Use at your own risk.
+**Bootstrap mode** (`bootstrap: true`) — accepts registrations, serves the full registry, and gossips peer lists back to callers.  
+**Node mode** — registers with one or more bootstrap servers and periodically re-syncs.
+
+All API traffic uses mTLS with SPIRE-issued X.509 SVIDs. The Swagger UI runs on a separate HTTP port that proxies to the mTLS backend.
+
+---
 
 ## Prerequisites
 
-### Install SPIRE (replacing the local copy)
+| Requirement | Version | Notes |
+| --- | --- | --- |
+| Rust | stable | `curl https://sh.rustup.rs -sSf \| sh` |
+| pkg-config | any | `sudo apt install pkg-config` |
+| SPIRE | 1.14.1 | see [Install SPIRE](#install-spire) |
+
+---
+
+## Quick Start
+
+```bash
+./scripts/quick_start.sh
+```
+
+The script starts SPIRE server + agent, registers a workload entry, fetches an SVID to `/tmp/svid.0.{pem,key}` and `/tmp/bundle.0.pem`, and builds the binary.
+
+Then start the registry:
+
+```bash
+cargo run --release -- --config config.bootstrap.yaml
+```
+
+Verify it is running:
+
+```bash
+curl -s https://localhost:8443/health \
+  --cert /tmp/svid.0.pem --key /tmp/svid.0.key \
+  --cacert /tmp/bundle.0.pem --insecure | jq
+```
+
+Swagger UI (no mTLS): <http://localhost:8080/swagger-ui/>
+
+> `--insecure` skips hostname verification only. SPIFFE SVIDs use URI SANs (`spiffe://…`), not DNS SANs. CA-chain trust is still enforced by the bundle.
+
+---
+
+## Manual Setup
+
+### Install SPIRE
 
 #### 1. Download from GitHub Releases
 
 ```bash
 export SPIRE_VERSION="1.14.1"
-cd /tmp
-curl -Lo spire.tar.gz "https://github.com/spiffe/spire/releases/download/v${SPIRE_VERSION}/spire-${SPIRE_VERSION}-linux-amd64-musl.tar.gz"
-tar -xzf spire.tar.gz
+curl -Lo /tmp/spire.tar.gz \
+  "https://github.com/spiffe/spire/releases/download/v${SPIRE_VERSION}/spire-${SPIRE_VERSION}-linux-amd64-musl.tar.gz"
+tar -xzf /tmp/spire.tar.gz -C /tmp
 ```
 
-#### 2. Install binaries system-wide
+#### 2. Install binaries
 
 ```bash
-sudo install -m 755 spire-${SPIRE_VERSION}/bin/spire-server /usr/local/bin/
-sudo install -m 755 spire-${SPIRE_VERSION}/bin/spire-agent  /usr/local/bin/
+# system-wide
+sudo install -m 755 /tmp/spire-${SPIRE_VERSION}/bin/spire-server /usr/local/bin/
+sudo install -m 755 /tmp/spire-${SPIRE_VERSION}/bin/spire-agent  /usr/local/bin/
+
+# or user-local (~/.local/bin must be on PATH)
+install -m 755 /tmp/spire-${SPIRE_VERSION}/bin/spire-server ~/.local/bin/
+install -m 755 /tmp/spire-${SPIRE_VERSION}/bin/spire-agent  ~/.local/bin/
 ```
 
-Or user-local (~/.local/bin must be on PATH):
-
-```bash
-install -m 755 spire-${SPIRE_VERSION}/bin/spire-server ~/.local/bin/
-install -m 755 spire-${SPIRE_VERSION}/bin/spire-agent  ~/.local/bin/
-```
-
-#### 3. Set up config and data dirs
+#### 3. Create config and data directories
 
 ```bash
 mkdir -p ~/spire/{conf/server,conf/agent,data/server,data/agent}
 ```
 
-~/spire/conf/server/server.conf — copy from server.conf, update data_dir:
+`~/spire/conf/server/server.conf`:
 
-```json
-agent {
-    data_dir = "/home/vscode/spire/data/agent"
-    log_level = "DEBUG"
-    trust_domain = "example.org"
-    server_address = "localhost"
-    server_port = 8081
-    insecure_bootstrap = true
-}
-
-plugins {
-    KeyManager "disk" {
-        plugin_data {
-            directory = "/home/vscode/spire/data/agent"
-        }
-    }
-
-    NodeAttestor "join_token" {
-        plugin_data {}
-    }
-
-    WorkloadAttestor "unix" {
-        plugin_data {}
-    }
-}
-```
-
-~/spire/conf/agent/agent.conf — copy from agent.conf, update data_dir:
-
-```json
+```hcl
 server {
     bind_address = "127.0.0.1"
     bind_port = "8081"
     trust_domain = "example.org"
-    data_dir = "/home/vscode/spire/data/server"
-    log_level = "DEBUG"
+    data_dir = "~/spire/data/server"
+    log_level = "INFO"
     ca_ttl = "168h"
     default_x509_svid_ttl = "48h"
 }
@@ -92,138 +110,191 @@ plugins {
     DataStore "sql" {
         plugin_data {
             database_type = "sqlite3"
-            connection_string = "/home/vscode/spire/data/server/datastore.sqlite3"
+            connection_string = "~/spire/data/server/datastore.sqlite3"
         }
     }
-
     KeyManager "disk" {
-        plugin_data {
-            keys_path = "/home/vscode/spire/data/server/keys.json"
-        }
+        plugin_data { keys_path = "~/spire/data/server/keys.json" }
     }
-
-    NodeAttestor "join_token" {
-        plugin_data {}
-    }
+    NodeAttestor "join_token" { plugin_data {} }
 }
 ```
 
-#### 4. Run (mirrors what setup_spire.sh does)
+`~/spire/conf/agent/agent.conf`:
+
+```hcl
+agent {
+    data_dir = "~/spire/data/agent"
+    log_level = "INFO"
+    trust_domain = "example.org"
+    server_address = "localhost"
+    server_port = 8081
+    insecure_bootstrap = true
+}
+
+plugins {
+    KeyManager "disk" {
+        plugin_data { directory = "~/spire/data/agent" }
+    }
+    NodeAttestor "join_token" { plugin_data {} }
+    WorkloadAttestor "unix"   { plugin_data {} }
+}
+```
+
+#### 4. Start SPIRE and fetch an SVID
 
 ```bash
-# Start server (background)
 spire-server run -config ~/spire/conf/server/server.conf &
 
-# Verify server is running
-netstat -tulpn | grep 8081
-Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name    
-tcp        0      0 127.0.0.1:8081          0.0.0.0:*               LISTEN      9051/rosetta        
-
-# Generate a join token
 TOKEN=$(spire-server token generate -spiffeID spiffe://example.org/agent | awk '{print $2}')
-echo "Token: $TOKEN"
-
-# Start agent
 spire-agent run -config ~/spire/conf/agent/agent.conf -joinToken "$TOKEN" &
+
+# Register the workload entry (uid must match the user running the registry)
+spire-server entry create \
+  -parentID "spiffe://example.org/spire/agent/join_token/$TOKEN" \
+  -spiffeID spiffe://example.org/agent \
+  -selector unix:uid:$(id -u)
+
+# Fetch SVID to disk
+spire-agent api fetch x509 \
+  -socketPath /tmp/spire-agent/public/api.sock \
+  -write /tmp
 ```
 
-#### 5. Run with quick start script
+### Build and run
 
 ```bash
-./scripts/quick_start.sh
-```
-
-output:
-
-```log
-./quick_start.sh 
-╔════════════════════════════════════════════════╗
-║  OpenEMCP Registry + SPIRE Quick Start         ║
-╚════════════════════════════════════════════════╝
-
-✓ SPIRE is already running
-
-Registering workload entry...
-  Agent ID: spiffe://example.org/spire/agent/join_token/f3a79052-f2ef-41d6-b894-99d408a12486
-  Deleting stale entry: 057bd539-680d-4c7f-b233-1913fe3d0d57
-Deleted entry with ID: 057bd539-680d-4c7f-b233-1913fe3d0d57
-
-
-Deleted 1 entries successfullyEntry ID         : 37794fa5-d3d2-4199-a53b-1050bd3a320f
-SPIFFE ID        : spiffe://example.org/agent
-Parent ID        : spiffe://example.org/spire/agent/join_token/f3a79052-f2ef-41d6-b894-99d408a12486
-Revision         : 0
-X509-SVID TTL    : default
-JWT-SVID TTL     : default
-Selector         : unix:uid:1000
-
-✓ Workload entry registered (uid=1000)
-
-Fetching SPIRE SVID...
-Received 1 svid after 14.452584ms
-
-SPIFFE ID:              spiffe://example.org/agent
-SVID Valid After:       2026-02-26 13:56:25 +0000 UTC
-SVID Valid Until:       2026-02-28 13:56:35 +0000 UTC
-CA #1 Valid After:      2026-02-26 12:26:01 +0000 UTC
-CA #1 Valid Until:      2026-03-05 12:26:11 +0000 UTC
-
-Writing SVID #0 to file /tmp/svid.0.pem.
-Writing key #0 to file /tmp/svid.0.key.
-Writing bundle #0 to file /tmp/bundle.0.pem.
-✓ SVID fetched successfully
-
-Building registry...
-    Finished `release` profile [optimized] target(s) in 0.25s
-
-═══════════════════════════════════════════════
-Setup complete! Ready to start services.
-═══════════════════════════════════════════════
-
-Next steps:
-
-1. Start the registry (bootstrap server):
-   cargo run --release -- --config config.bootstrap.yaml
-
-2. Quick curl test:
-   curl -X GET https://localhost:8443/health \
-     --cert /tmp/svid.0.pem \
-     --key /tmp/svid.0.key \
-     --cacert /tmp/bundle.0.pem \
-     --insecure -s | jq
-   # --insecure skips hostname verification; required because SPIFFE SVIDs use
-   # URI SANs (spiffe://...) rather than DNS SANs. CA trust is still enforced.
-```
-
-#### 6. Install Cargo (Rust)
-
-```bash
-curl https://sh.rustup.rs -sSf | sh
-```
-
-#### 7. Install pkg-config (for building Rust dependencies)
-
-```bash
-sudo apt install pkg-config
-```
-
-#### 8. Build and run the registry (bootstrap server)
-
-```bash
-# Build the registry:
 cargo build --release
 
-# Start the registry (bootstrap server):
-cargo run --release -- --bootstrap true
-# Or with custom config file and port:
-cargo run --release -- --config config.bootstrap.yaml --port 8443
+# start as bootstrap server
+cargo run --release -- --config config.bootstrap.yaml
 
-# Quick curl test:
-curl -X GET https://localhost:8443/health \
-  --cert /tmp/svid.0.pem \
-  --key /tmp/svid.0.key \
-  --cacert /tmp/bundle.0.pem \
-  --insecure -s | jq
-# --insecure skips hostname verification; required because SPIFFE SVIDs use
-# URI SANs (spiffe://...) rather than DNS SANs. CA trust is still enforced.
+# stop
+pkill -f openemcp-registry
 ```
+
+---
+
+## Configuration
+
+`config.bootstrap.yaml` (default config file):
+
+```yaml
+server:
+  port: 8443           # mTLS HTTPS API port
+  swagger_port: 8080   # HTTP Swagger UI port (localhost only)
+  bootstrap: true      # run as bootstrap server
+  max_ttl: 300         # seconds before an unseen agent is evicted
+
+bootstrap:
+  urls: []             # bootstrap server URLs for node mode
+  sync_interval: 30    # re-registration interval (seconds) in node mode
+
+agent:                 # metadata advertised when this instance registers
+  instance_id: ~
+  capability_codes: []
+  version: ~
+  jurisdiction: ~
+  data_center: ~
+
+spire:                 # SPIRE workload API certificate paths
+  cert_path: /tmp/svid.0.pem    # SVID certificate (PEM)
+  key_path:  /tmp/svid.0.key    # SVID private key (PEM)
+  bundle_path: /tmp/bundle.0.pem # CA trust bundle (PEM)
+  # Each path can also be set via SPIRE_CERT_PATH / SPIRE_KEY_PATH /
+  # SPIRE_BUNDLE_PATH environment variables when not specified in the config.
+```
+
+### CLI flags (override config)
+
+| Flag | Default | Description |
+| --- | --- | --- |
+| `--config` | `config.bootstrap.yaml` | Path to config file |
+| `--port` | `8443` | mTLS API port |
+| `--swagger-port` | `8080` | Swagger UI port |
+| `--bootstrap` | — | Force bootstrap mode |
+| `--bootstrap-url` | — | Add a bootstrap URL (repeatable) |
+| `--sync-interval` | — | Override sync interval (seconds) |
+| `--allow-insecure` | false | Fall back to HTTP when SPIRE certs are absent (**dev/test only**) |
+
+---
+
+## API
+
+| Method | Path | Auth | Description |
+| --- | --- | --- | --- |
+| `GET` | `/health` | mTLS | Liveness check |
+| `GET` | `/list` | mTLS | List all registered agents |
+| `POST` | `/register` | mTLS | Register or refresh an agent (bootstrap only) |
+| `PUT` | `/status` | mTLS (owner) | Update reliability / health for own address |
+
+Full schema: Swagger UI at `http://localhost:8080/swagger-ui/` while the server is running.
+
+### Example: register an agent
+
+```bash
+curl -s -X POST https://localhost:8443/register \
+  -H "Content-Type: application/json" \
+  --cert /tmp/svid.0.pem --key /tmp/svid.0.key \
+  --cacert /tmp/bundle.0.pem --insecure \
+  -d '{
+    "address": "localhost:8091",
+    "known_bootstrap_urls": ["https://localhost:8443"],
+    "agent_details": {
+      "instance_id": "agent-001",
+      "capability_codes": ["SPIRE_ENABLED"],
+      "jurisdiction": "US",
+      "data_center": "dc1",
+      "compliance": ["SOC2"],
+      "reliability": 0.99,
+      "version": "1.0.0",
+      "health_status": "healthy",
+      "uptime_percentage": 99.9
+    }
+  }' | jq
+```
+
+### Example: list registered agents
+
+```bash
+curl -s https://localhost:8443/list \
+  --cert /tmp/svid.0.pem --key /tmp/svid.0.key \
+  --cacert /tmp/bundle.0.pem --insecure | jq
+```
+
+### Example: update agent status
+
+```bash
+curl -s -X PUT https://localhost:8443/status \
+  -H "Content-Type: application/json" \
+  --cert /tmp/svid.0.pem --key /tmp/svid.0.key \
+  --cacert /tmp/bundle.0.pem --insecure \
+  -d '{"address": "localhost:8091", "health_status": "degraded", "reliability": 0.85}' | jq
+```
+
+---
+
+## Security
+
+- All API endpoints require a valid SPIRE X.509 SVID (mTLS).
+- `PUT /status` additionally verifies the caller's peer IP matches the registered address, preventing agents from modifying each other's entries.
+- The Swagger UI server binds to `127.0.0.1` only and proxies to the mTLS backend using the registry's own SVID.
+- SPIRE cert paths (`/tmp/svid.0.*`) match the default SPIRE workload API fetch output path. Adjust `SPIRE_CERT_PATH`, `SPIRE_KEY_PATH`, and `SPIRE_BUNDLE_PATH` in `src/main.rs` for other deployments.
+
+---
+
+## Testing
+
+```bash
+cargo test
+```
+
+---
+
+## Contributing
+
+See [CONTRIBUTING.md](../../CONTRIBUTING.md).
+
+## License
+
+Apache 2.0 — see [LICENSE](../../LICENSE).
