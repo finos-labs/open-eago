@@ -1,0 +1,9 @@
+server:
+  port: 8443
+  swagger_port: 8080
+  bootstrap: true
+  max_ttl: 300
+
+bootstrap:
+  urls: []
+  sync_interval: 30
