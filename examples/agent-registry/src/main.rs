@@ -1,7 +1,7 @@
 mod models;
 
 use models::{
-    AddressInfo, AgentConfig, AgentDetails, AppState, Args, BootstrapUrls, Config,
+    AddressInfo, AgentDetails, AppState, Args, BootstrapUrls, Config,
     HealthResponse, ListResponse, RegisterRequest, RegisterResponse, Registry, SpireConfig, Timestamp,
     UpdateStatusRequest, UpdateStatusResponse,
 };
@@ -384,14 +384,14 @@ async fn update_status(
             .json(serde_json::json!({"error": format!("Forbidden: {}", e)}));
     }
     if let Some(reliability) = req.reliability {
-        if reliability < 0.0 || reliability > 1.0 {
+        if !(0.0..=1.0).contains(&reliability) {
             return HttpResponse::BadRequest().json(serde_json::json!({
                 "error": "Reliability must be between 0.0 and 1.0"
             }));
         }
     }
     if let Some(uptime) = req.uptime_percentage {
-        if uptime < 0.0 || uptime > 100.0 {
+        if !(0.0..=100.0).contains(&uptime) {
             return HttpResponse::BadRequest().json(serde_json::json!({
                 "error": "Uptime percentage must be between 0.0 and 100.0"
             }));
@@ -461,10 +461,10 @@ async fn register_with_bootstrap(
     bootstrap_url: &str,
     local_address: &str,
     known_urls: Option<Vec<String>>,
-    agent_config: &AgentConfig,
+    agent: &AgentDetails,
 ) -> Result<(Vec<AddressInfo>, Vec<String>)> {
     let url = format!("{}/register", bootstrap_url.trim_end_matches('/'));
-    let agent_details = agent_config.to_agent_details();
+    let agent_details = agent.clone().stamp_now();
     
     let response: RegisterResponse = client
         .post(&url)
@@ -485,7 +485,7 @@ async fn register_with_bootstrap(
 async fn sync_from_bootstrap(
     registry: Registry,
     bootstrap_urls: BootstrapUrls,
-    agent_config: AgentConfig,
+    agent: AgentDetails,
     spire: SpireConfig,
     interval: Duration,
     local_address: String,
@@ -498,7 +498,7 @@ async fn sync_from_bootstrap(
             continue;
         }
         
-        let (addresses, urls) = sync_with_all_bootstraps(&known_urls, &local_address, &agent_config, &spire).await;
+        let (addresses, urls) = sync_with_all_bootstraps(&known_urls, &local_address, &agent, &spire).await;
         
         merge_addresses(&registry, addresses);
         // Route learned URLs through the capped helper so a malicious bootstrap
@@ -507,7 +507,7 @@ async fn sync_from_bootstrap(
     }
 }
 
-async fn sync_with_all_bootstraps(urls: &[String], local_address: &str, agent_config: &AgentConfig, spire: &SpireConfig) -> (Vec<AddressInfo>, HashSet<String>) {
+async fn sync_with_all_bootstraps(urls: &[String], local_address: &str, agent: &AgentDetails, spire: &SpireConfig) -> (Vec<AddressInfo>, HashSet<String>) {
     let client = match build_mtls_client(spire) {
         Ok(c) => c,
         Err(e) => {
@@ -520,7 +520,7 @@ async fn sync_with_all_bootstraps(urls: &[String], local_address: &str, agent_co
     let mut all_bootstrap_urls = HashSet::new();
     
     for url in urls {
-        match register_with_bootstrap(&client, url, local_address, Some(urls.to_vec()), agent_config).await {
+        match register_with_bootstrap(&client, url, local_address, Some(urls.to_vec()), agent).await {
             Ok((addrs, bs_urls)) => {
                 all_addresses.extend(addrs);
                 all_bootstrap_urls.extend(bs_urls);
@@ -575,11 +575,11 @@ async fn initialize_registry(config: &Config, local_address: &str, allow_insecur
     init_as_node(config, local_address).await
 }
 
-fn init_as_bootstrap(local_address: &str, agent_config: &AgentConfig, spire: &SpireConfig, allow_insecure: bool) -> (HashMap<String, AgentDetails>, HashSet<String>) {
+fn init_as_bootstrap(local_address: &str, agent: &AgentDetails, spire: &SpireConfig, allow_insecure: bool) -> (HashMap<String, AgentDetails>, HashSet<String>) {
     let mut addresses = HashMap::new();
     addresses.insert(
-        local_address.to_string(), 
-        agent_config.to_agent_details(),
+        local_address.to_string(),
+        agent.clone().stamp_now(),
     );
 
     // Advertise https:// unless running in explicit insecure/dev mode without SPIRE certs present
@@ -620,8 +620,8 @@ async fn init_as_node(config: &Config, local_address: &str) -> (HashMap<String, 
     
     if addresses.is_empty() {
         addresses.insert(
-            local_address.to_string(), 
-            config.agent.to_agent_details(),
+            local_address.to_string(),
+            config.agent.clone().stamp_now(),
         );
     }
     
@@ -649,7 +649,7 @@ async fn main() -> std::io::Result<()> {
     // Install the ring CryptoProvider for rustls before any TLS is used.
     rustls::crypto::ring::default_provider()
         .install_default()
-        .map_err(|_| std::io::Error::new(std::io::ErrorKind::Other, "Failed to install rustls CryptoProvider"))?;
+        .map_err(|_| std::io::Error::other("Failed to install rustls CryptoProvider"))?;
 
     let args = Args::parse();
     let config = load_config(&args);
@@ -723,7 +723,7 @@ fn create_app_state(
         is_bootstrap: config.server.bootstrap,
         bootstrap_urls: Arc::new(Mutex::new(urls)),
         local_address,
-        agent_config: config.agent,
+        agent: config.agent,
         spire: config.spire,
         allow_insecure,
         proxy_client,
@@ -735,7 +735,7 @@ fn spawn_sync_task_if_needed(config: &Config, app_state: &web::Data<AppState>, l
         tokio::spawn(sync_from_bootstrap(
             app_state.registry.clone(),
             app_state.bootstrap_urls.clone(),
-            app_state.agent_config.clone(),
+            app_state.agent.clone(),
             app_state.spire.clone(),
             Duration::from_secs(config.bootstrap.sync_interval),
             local_address.to_string(),
@@ -974,7 +974,7 @@ async fn start_server(port: u16, app_state: web::Data<AppState>) -> std::io::Res
         Err(e) => {
             error!("SPIRE certificates unavailable: {}", e);
             error!("Cannot start without mTLS. Pass --allow-insecure for development use only.");
-            Err(std::io::Error::new(std::io::ErrorKind::Other, e.to_string()))
+            Err(std::io::Error::other(e.to_string()))
         }
     }
 }

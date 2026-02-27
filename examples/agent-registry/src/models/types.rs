@@ -6,7 +6,7 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use utoipa::ToSchema;
 
 /// Agent health status
-#[derive(Debug, Clone, Serialize, Deserialize, ToSchema, PartialEq)]
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema, PartialEq, Default)]
 #[serde(rename_all = "lowercase")]
 #[non_exhaustive]
 pub enum AgentStatus {
@@ -17,13 +17,8 @@ pub enum AgentStatus {
     /// Agent is unhealthy
     Unhealthy,
     /// Agent status is unknown
+    #[default]
     Unknown,
-}
-
-impl Default for AgentStatus {
-    fn default() -> Self {
-        AgentStatus::Unknown
-    }
 }
 
 /// Service endpoints for service discovery
@@ -88,6 +83,7 @@ pub struct GeoLocation {
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
 pub struct AgentDetails {
     /// Timestamp when last seen (seconds since UNIX epoch)
+    #[serde(default)]
     pub last_seen: u64,
     /// Unique instance identifier
     pub instance_id: Option<String>,
@@ -166,6 +162,46 @@ impl AgentDetails {
     pub fn now() -> Self {
         Self::new(AppState::current_timestamp())
     }
+
+    /// Stamp `last_seen` and (if unset) `registration_time` with the current time.
+    /// Used when promoting config metadata into a live registry entry.
+    pub fn stamp_now(mut self) -> Self {
+        let ts = AppState::current_timestamp();
+        self.last_seen = ts;
+        if self.registration_time.is_none() {
+            self.registration_time = Some(ts);
+        }
+        self
+    }
+
+    /// Validate numeric fields that have bounded ranges.
+    pub fn validate(&self) -> Result<(), String> {
+        if let Some(reliability) = self.reliability {
+            if !(0.0..=1.0).contains(&reliability) {
+                return Err(format!("Reliability must be between 0.0 and 1.0, got {}", reliability));
+            }
+        }
+        if let Some(uptime) = self.uptime_percentage {
+            if !(0.0..=100.0).contains(&uptime) {
+                return Err(format!("Uptime percentage must be between 0.0 and 100.0, got {}", uptime));
+            }
+        }
+        if let Some(ref geo) = self.geographic_location {
+            if !(-90.0..=90.0).contains(&geo.latitude) {
+                return Err(format!("Latitude must be between -90 and 90, got {}", geo.latitude));
+            }
+            if !(-180.0..=180.0).contains(&geo.longitude) {
+                return Err(format!("Longitude must be between -180 and 180, got {}", geo.longitude));
+            }
+        }
+        Ok(())
+    }
+}
+
+impl Default for AgentDetails {
+    fn default() -> Self {
+        Self::new(0)
+    }
 }
 
 /// In-memory registry of agent addresses → details.
@@ -190,8 +226,11 @@ const DEFAULT_MAX_TTL: u64 = 60;
 pub struct Config {
     pub server: ServerConfig,
     pub bootstrap: BootstrapConfig,
+    /// Agent metadata advertised when this instance registers.
+    /// `last_seen` and `registration_time` are ignored if present — they are
+    /// always stamped with the current time at registration.
     #[serde(default)]
-    pub agent: AgentConfig,
+    pub agent: AgentDetails,
     #[serde(default)]
     pub spire: SpireConfig,
 }
@@ -245,112 +284,6 @@ impl Default for SpireConfig {
     }
 }
 
-#[derive(Debug, Clone, Deserialize, Serialize)]
-pub struct AgentConfig {
-    #[serde(default)]
-    pub instance_id: Option<String>,
-    #[serde(default)]
-    pub capability_codes: Vec<String>,
-    pub jurisdiction: Option<String>,
-    pub data_center: Option<String>,
-    #[serde(default)]
-    pub compliance: Vec<String>,
-    pub reliability: Option<f64>,
-    pub version: Option<String>,
-    pub timestamp: Option<String>,
-    #[serde(default)]
-    pub tags: HashMap<String, String>,
-    #[serde(default)]
-    pub endpoints: ServiceEndpoints,
-    #[serde(default)]
-    pub resource_limits: ResourceLimits,
-    #[serde(default)]
-    pub health_status: AgentStatus,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub uptime_percentage: Option<f64>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub geographic_location: Option<GeoLocation>,
-    #[serde(default)]
-    pub dependencies: Vec<String>,
-}
-
-impl From<AgentConfig> for AgentDetails {
-    fn from(cfg: AgentConfig) -> Self {
-        let current_time = AppState::current_timestamp();
-        AgentDetails {
-            last_seen: current_time,
-            instance_id: cfg.instance_id,
-            capability_codes: cfg.capability_codes,
-            jurisdiction: cfg.jurisdiction,
-            data_center: cfg.data_center,
-            compliance: cfg.compliance,
-            reliability: cfg.reliability,
-            version: cfg.version,
-            timestamp: cfg.timestamp,
-            tags: cfg.tags,
-            endpoints: cfg.endpoints,
-            resource_limits: cfg.resource_limits,
-            health_status: cfg.health_status,
-            registration_time: Some(current_time),
-            uptime_percentage: cfg.uptime_percentage,
-            geographic_location: cfg.geographic_location,
-            dependencies: cfg.dependencies,
-        }
-    }
-}
-
-impl AgentConfig {
-    /// Convert AgentConfig to AgentDetails with current timestamp.
-    pub fn to_agent_details(&self) -> AgentDetails {
-        AgentDetails::from(self.clone())
-    }
-    
-    /// Validate reliability is within valid range (0.0 to 1.0)
-    pub fn validate(&self) -> Result<(), String> {
-        if let Some(reliability) = self.reliability {
-            if !(0.0..=1.0).contains(&reliability) {
-                return Err(format!("Reliability must be between 0.0 and 1.0, got {}", reliability));
-            }
-        }
-        if let Some(uptime) = self.uptime_percentage {
-            if !(0.0..=100.0).contains(&uptime) {
-                return Err(format!("Uptime percentage must be between 0.0 and 100.0, got {}", uptime));
-            }
-        }
-        if let Some(ref geo) = self.geographic_location {
-            if !(-90.0..=90.0).contains(&geo.latitude) {
-                return Err(format!("Latitude must be between -90 and 90, got {}", geo.latitude));
-            }
-            if !(-180.0..=180.0).contains(&geo.longitude) {
-                return Err(format!("Longitude must be between -180 and 180, got {}", geo.longitude));
-            }
-        }
-        Ok(())
-    }
-}
-
-impl Default for AgentConfig {
-    fn default() -> Self {
-        Self {
-            instance_id: None,
-            capability_codes: vec![],
-            jurisdiction: None,
-            data_center: None,
-            compliance: vec![],
-            reliability: None,
-            version: None,
-            timestamp: None,
-            tags: HashMap::new(),
-            endpoints: ServiceEndpoints::default(),
-            resource_limits: ResourceLimits::default(),
-            health_status: AgentStatus::Unknown,
-            uptime_percentage: None,
-            geographic_location: None,
-            dependencies: vec![],
-        }
-    }
-}
-
 impl Default for Config {
     fn default() -> Self {
         Self {
@@ -364,7 +297,7 @@ impl Default for Config {
                 urls: vec![],
                 sync_interval: DEFAULT_SYNC_INTERVAL,
             },
-            agent: AgentConfig::default(),
+            agent: AgentDetails::default(),
             spire: SpireConfig::default(),
         }
     }
@@ -441,7 +374,8 @@ pub struct AppState {
     pub is_bootstrap: bool,
     pub bootstrap_urls: BootstrapUrls,
     pub local_address: String,
-    pub agent_config: AgentConfig,
+    /// Agent metadata advertised in registrations and sync rounds.
+    pub agent: AgentDetails,
     /// SPIRE certificate paths used for mTLS (inbound TLS + outbound client cert).
     pub spire: SpireConfig,
     /// When true, falls back to plaintext HTTP if SPIRE certs are missing.

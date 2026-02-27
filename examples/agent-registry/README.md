@@ -279,7 +279,7 @@ curl -s -X PUT https://localhost:8443/status \
 - All API endpoints require a valid SPIRE X.509 SVID (mTLS).
 - `PUT /status` additionally verifies the caller's peer IP matches the registered address, preventing agents from modifying each other's entries.
 - The Swagger UI server binds to `127.0.0.1` only and proxies to the mTLS backend using the registry's own SVID.
-- SPIRE cert paths (`/tmp/svid.0.*`) match the default SPIRE workload API fetch output path. Adjust `SPIRE_CERT_PATH`, `SPIRE_KEY_PATH`, and `SPIRE_BUNDLE_PATH` in `src/main.rs` for other deployments.
+- SPIRE cert paths default to the standard SPIRE workload API fetch output under `/tmp/`. Override them in the `spire:` section of the config file or via `SPIRE_CERT_PATH`, `SPIRE_KEY_PATH`, and `SPIRE_BUNDLE_PATH` environment variables.
 
 ---
 
