@@ -43,9 +43,74 @@
             ]
           },
           "minItems": 1
+        },
+        "sla_feasibility_summary": {
+          "type": "object",
+          "properties": {
+            "all_agents_feasible": { "type": "boolean" },
+            "agents_evaluated": { "type": "integer", "minimum": 0 },
+            "agents_at_sla_risk": { "type": "integer", "minimum": 0 },
+            "fallback_agents_verified": { "type": "boolean" }
+          }
         }
       },
       "additionalProperties": false
+    },
+    "sla_guarantees": {
+      "$comment": "Canonical sla_guarantees schema — see docs/overview/performance-sla-slo-kpi.md",
+      "type": "object",
+      "required": ["latency", "availability", "throughput", "error_rate"],
+      "properties": {
+        "sla_id": { "type": "string" },
+        "sla_version": { "type": "string" },
+        "agreed_at": { "type": "string", "format": "date-time" },
+        "valid_until": { "type": "string", "format": "date-time" },
+        "provider_agent_id": { "type": "string" },
+        "consumer_contract_id": { "type": "string" },
+        "latency": {
+          "type": "object",
+          "required": ["p99_ms"],
+          "properties": {
+            "p50_ms": { "type": "number", "minimum": 0 },
+            "p95_ms": { "type": "number", "minimum": 0 },
+            "p99_ms": { "type": "number", "minimum": 0 }
+          }
+        },
+        "availability": {
+          "type": "object",
+          "required": ["availability_pct"],
+          "properties": {
+            "availability_pct": { "type": "number", "minimum": 0, "maximum": 1 },
+            "measurement_window": { "type": "string" }
+          }
+        },
+        "throughput": {
+          "type": "object",
+          "required": ["throughput_rps"],
+          "properties": {
+            "throughput_rps": { "type": "number", "minimum": 0 },
+            "burst_rps": { "type": "number", "minimum": 0 }
+          }
+        },
+        "error_rate": {
+          "type": "object",
+          "required": ["error_rate_max"],
+          "properties": {
+            "error_rate_max": { "type": "number", "minimum": 0, "maximum": 1 }
+          }
+        },
+        "breach_policy": {
+          "type": "object",
+          "properties": {
+            "at_risk_threshold_pct": { "type": "number", "minimum": 0, "maximum": 1 },
+            "breach_response": {
+              "type": "string",
+              "enum": ["pause_and_review", "activate_fallback", "escalate"]
+            },
+            "escalation_contact": { "type": "string" }
+          }
+        }
+      }
     }
   },
   "additionalProperties": false

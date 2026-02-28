@@ -3,7 +3,7 @@
   "$id": "https://finos-labs.github.io/open-emcp/spec/v1.0.0/schemas/validation-compliance.schema.json",
   "title": "OpenEMCP Validation and Compliance",
   "type": "object",
-  "required": ["plan_id", "validation_status", "policy_checks", "hitl"],
+  "required": ["plan_id", "validation_status", "policy_checks", "hitl", "risk_assessment"],
   "properties": {
     "plan_id": {
       "type": "string"
@@ -46,6 +46,73 @@
         }
       },
       "additionalProperties": false
+    },
+    "risk_assessment": {
+      "$comment": "Authoritative risk assessment — see docs/overview/risk-management.md",
+      "type": "object",
+      "required": ["composite_risk_score", "risk_tier", "dimension_scores", "dimension_weights", "escalation_outcome"],
+      "properties": {
+        "composite_risk_score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "risk_tier": {
+          "type": "string",
+          "enum": ["low", "medium", "high", "critical"]
+        },
+        "dimension_scores": {
+          "type": "object",
+          "required": ["financial_risk", "operational_risk", "compliance_risk", "security_risk"],
+          "properties": {
+            "financial_risk": { "type": "number", "minimum": 0, "maximum": 1 },
+            "operational_risk": { "type": "number", "minimum": 0, "maximum": 1 },
+            "compliance_risk": { "type": "number", "minimum": 0, "maximum": 1 },
+            "security_risk": { "type": "number", "minimum": 0, "maximum": 1 }
+          },
+          "additionalProperties": false
+        },
+        "dimension_weights": {
+          "type": "object",
+          "required": ["financial_risk", "operational_risk", "compliance_risk", "security_risk"],
+          "properties": {
+            "financial_risk": { "type": "number", "minimum": 0, "maximum": 1 },
+            "operational_risk": { "type": "number", "minimum": 0, "maximum": 1 },
+            "compliance_risk": { "type": "number", "minimum": 0.25, "maximum": 1 },
+            "security_risk": { "type": "number", "minimum": 0, "maximum": 1 }
+          },
+          "additionalProperties": false
+        },
+        "escalation_outcome": {
+          "type": "string",
+          "enum": [
+            "approved",
+            "approved_with_enhanced_monitoring",
+            "hitl_pending",
+            "rejected"
+          ]
+        },
+        "hitl_required": { "type": "boolean" },
+        "override_ref": {
+          "type": "string",
+          "description": "board_approval_ref or legal_review_ref required for critical tier overrides"
+        }
+      },
+      "additionalProperties": false
+    },
+    "risk_context": {
+      "$comment": "Cross-phase risk context propagated to Phase 4 — see docs/overview/risk-management.md",
+      "type": "object",
+      "properties": {
+        "phase_assessed": { "type": "string" },
+        "composite_risk_score": { "type": "number", "minimum": 0, "maximum": 1 },
+        "risk_tier": { "type": "string", "enum": ["low", "medium", "high", "critical"] },
+        "risk_flags": { "type": "array", "items": { "type": "string" } },
+        "risk_events": { "type": "array", "items": { "type": "object" } },
+        "circuit_breaker_trips": { "type": "integer", "minimum": 0 },
+        "assessment_timestamp": { "type": "string", "format": "date-time" },
+        "assessed_by": { "type": "string" }
+      }
     }
   },
   "additionalProperties": false

@@ -214,30 +214,122 @@ def calculate_risk_score(plan_data):
         "financial_risk": calculate_financial_risk(plan_data["cost_estimates"]),
         "operational_risk": calculate_operational_risk(plan_data["agent_assignments"]),
         "compliance_risk": calculate_compliance_risk(plan_data["regulatory_requirements"]),
-        "security_risk": calculate_security_risk(plan_data["data_classification"]),
-        "availability_risk": calculate_availability_risk(plan_data["agent_availability"])
+        "security_risk": calculate_security_risk(plan_data["data_classification"])
     }
     
-    # Weight factors based on organizational priorities
+    # Normative weights per SPECIFICATION.md Appendix E.1
+    # compliance_risk weight MUST NOT be reduced below 0.25
     weights = {
         "financial_risk": 0.25,
         "operational_risk": 0.20,
         "compliance_risk": 0.30,
-        "security_risk": 0.20,
-        "availability_risk": 0.05
+        "security_risk": 0.25
     }
     
     weighted_score = sum(risk_factors[factor] * weights[factor] for factor in risk_factors)
-    return min(1.0, max(0.0, weighted_score))
+    composite_risk_score = min(1.0, max(0.0, weighted_score))
+    
+    # Determine risk tier per normative thresholds (SPECIFICATION.md Appendix E.2)
+    if composite_risk_score >= 0.80:
+        risk_tier = "critical"
+    elif composite_risk_score >= 0.60:
+        risk_tier = "high"
+    elif composite_risk_score >= 0.40:
+        risk_tier = "medium"
+    else:
+        risk_tier = "low"
+    
+    return {
+        "composite_risk_score": composite_risk_score,
+        "risk_tier": risk_tier,
+        "dimension_scores": risk_factors,
+        "dimension_weights": weights
+    }
 ```
+
+**Risk Tier Thresholds (Normative — SPECIFICATION.md Appendix E.2)**:
+
+| Tier | `composite_risk_score` | Required Action |
+| --- | --- | --- |
+| `low` | 0.00 – 0.39 | Automated approval eligible |
+| `medium` | 0.40 – 0.59 | Proceed with enhanced monitoring |
+| `high` | 0.60 – 0.79 | **MUST trigger HITL gate**; Phase 4 blocked until human approves |
+| `critical` | 0.80 – 1.00 | **MUST automatically reject**; requires `board_approval_ref` or `legal_review_ref` for override |
 
 **Risk Categories**:
 
-- **Financial Risk**: Cost overrun probability, budget impact assessment
-- **Operational Risk**: Agent failure rates, performance degradation likelihood
-- **Compliance Risk**: Regulatory violation probability, audit finding risk
-- **Security Risk**: Data breach likelihood, unauthorized access risk
-- **Availability Risk**: Service disruption probability, SLA violation risk
+- **Financial Risk**: Cost overrun probability, budget impact assessment, ACU consumption against approved thresholds
+- **Operational Risk**: Agent failure rates, performance degradation likelihood, `sla_breach_probability` for each SLO objective (see [Performance SLA/SLO and KPIs](../../overview/performance-sla-slo-kpi.md))
+- **Compliance Risk**: Regulatory violation probability, audit finding risk, policy breach likelihood
+- **Security Risk**: Data breach likelihood, unauthorized access risk, identity anomaly indicators
+
+**Risk Context Propagation**:
+
+The Validation Agent MUST output a `risk_context` object in the validation decision envelope. This object propagates across all remaining phase transitions (Phases 4–6) and MUST be persisted to the audit trail. See [Risk Management Framework](../../overview/risk-management.md) for the full cross-phase lifecycle and `risk_context` schema.
+
+### 2a. KPI Validation
+
+Before approving an execution plan, the Validation Agent MUST verify that every selected agent meets the Agent Registry minimum performance bar defined in [Performance SLA/SLO and KPIs](../../overview/performance-sla-slo-kpi.md) and SPECIFICATION.md Appendix D.1. This is a blocking check: plans referencing agents that fail the minimum bar MUST NOT be approved.
+
+**KPI Validation Check**:
+
+```python
+def validate_agent_kpis(execution_plan, agent_registry):
+    """
+    Blocking pre-approval check: verify all selected agents meet the
+    Agent Registry minimum performance bar.
+    Returns (passed: bool, violations: list).
+    """
+    violations = []
+    
+    MINIMUM_BAR = {
+        "reliability_score": 0.95,        # rolling 7d minimum
+        "availability_pct": 0.9900,        # rolling 30d minimum
+        "error_rate_max": 0.05,            # rolling 7d maximum
+        "latency_p99_degradation": 1.20    # max multiple of declared SLO p99
+    }
+    
+    for agent_ref in execution_plan["selected_agents"]:
+        agent = agent_registry.get_agent(agent_ref["agent_id"])
+        metrics = agent["performance_metrics"]
+        
+        if metrics["reliability_score"] < MINIMUM_BAR["reliability_score"]:
+            violations.append({
+                "agent_id": agent_ref["agent_id"],
+                "kpi": "reliability_score",
+                "required": MINIMUM_BAR["reliability_score"],
+                "observed": metrics["reliability_score"],
+                "registry_status": agent["registry_status"]
+            })
+        
+        if metrics["availability_pct"] < MINIMUM_BAR["availability_pct"]:
+            violations.append({
+                "agent_id": agent_ref["agent_id"],
+                "kpi": "availability_pct",
+                "required": MINIMUM_BAR["availability_pct"],
+                "observed": metrics["availability_pct"],
+                "registry_status": agent["registry_status"]
+            })
+        
+        if metrics["error_rate"] > MINIMUM_BAR["error_rate_max"]:
+            violations.append({
+                "agent_id": agent_ref["agent_id"],
+                "kpi": "error_rate",
+                "required": f"≤ {MINIMUM_BAR['error_rate_max']}",
+                "observed": metrics["error_rate"],
+                "registry_status": agent["registry_status"]
+            })
+    
+    return {
+        "passed": len(violations) == 0,
+        "violations": violations,
+        "agents_evaluated": len(execution_plan["selected_agents"])
+    }
+```
+
+**Integration with Validation Decision**:
+
+If `validate_agent_kpis` returns `passed: false`, the Validation Agent MUST set `validation_status: "rejected"` with `rejection_reason: "agent_kpi_minimum_bar_not_met"` regardless of risk score or compliance status. This rule cannot be waived by HITL approval alone; the Planning Agent must re-select compliant agents and resubmit the plan.
 
 ### 3. Approval Workflow Engine
 

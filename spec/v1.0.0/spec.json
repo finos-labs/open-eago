@@ -571,7 +571,133 @@
       "ccpa",
       "sox",
       "eu_ai_act",
-      "nist_ai_rmf"
+      "nist_ai_rmf",
+      "sr_11_7",
+      "dora",
+      "bcbs_239"
     ]
+  },
+
+  "risk_management": {
+    "$comment": "Normative risk management framework — full design in docs/overview/risk-management.md",
+    "taxonomy": {
+      "dimensions": ["financial_risk", "operational_risk", "compliance_risk", "security_risk"],
+      "default_weights": {
+        "financial_risk": 0.25,
+        "operational_risk": 0.20,
+        "compliance_risk": 0.30,
+        "security_risk": 0.25
+      },
+      "constraints": {
+        "compliance_risk_weight_minimum": 0.25
+      }
+    },
+    "risk_tiers": {
+      "low":      {"min": 0.00, "max": 0.39, "action": "proceed_standard_monitoring"},
+      "medium":   {"min": 0.40, "max": 0.59, "action": "proceed_enhanced_monitoring"},
+      "high":     {"min": 0.60, "max": 0.79, "action": "hitl_gate_required"},
+      "critical": {"min": 0.80, "max": 1.00, "action": "automatic_rejection"}
+    },
+    "runtime_risk_indicators": {
+      "agent_failure_rate":   {"threshold": 0.05,  "risk_dimension": "operational_risk"},
+      "cost_overrun_ratio":   {"threshold": 1.20,  "risk_dimension": "financial_risk"},
+      "sla_breach_indicator": {"threshold": true,   "risk_dimension": "operational_risk"},
+      "anomaly_score":        {"threshold": 0.70,  "risk_dimension": "security_risk"}
+    },
+    "circuit_breaker": {
+      "trip_condition": "two_or_more_indicators_breach_simultaneously",
+      "actions_on_trip": ["pause_execution", "emit_circuit_breaker_trip_event", "escalate_to_hitl"]
+    },
+    "escalation_rules": {
+      "critical_override_requires": ["board_approval_ref", "legal_review_ref"],
+      "hitl_maximum_response_hours": 4
+    },
+    "audit_retention": {
+      "regulated_financial_profile_years": 7,
+      "anchor": "blockchain_anchored"
+    },
+    "regulatory_alignment": {
+      "sr_11_7": "Phase 3 risk assessment + Phase 4 runtime monitoring",
+      "eu_ai_act": "Phase 1 risk identification + Phase 3 high/critical controls + Phase 6 reporting",
+      "nist_ai_rmf": "Govern=policies; Map=Phase1; Measure=Phase3; Manage=Phase4",
+      "bcbs_239": "Phase 5 persistence (7yr) + Phase 6 blockchain-anchored risk reporting",
+      "dora": "Phase 4 circuit breaker + fallback routing + compensating transactions"
+    }
+  },
+
+  "sla_slo": {
+    "$comment": "Normative SLA/SLO framework — full design in docs/overview/performance-sla-slo-kpi.md",
+    "vocabulary": {
+      "sla": "Contractual performance commitment agreed in Phase 2 Negotiation",
+      "slo": "Internal protocol target for a measurable property at a defined percentile",
+      "sli": "Raw measured value of a specific property, compared against SLO targets at runtime"
+    },
+    "slo_objective_types": ["latency", "availability", "throughput", "error_rate"],
+    "phase_latency_p99_ms_targets": {
+      "contract_management": 200,
+      "planning_negotiation": 1000,
+      "validation_compliance": 500,
+      "execution_resilience": 5000,
+      "context_state_management": 100,
+      "communication_delivery": 300
+    },
+    "agent_registry_minimum_bar": {
+      "reliability_score_min": 0.95,
+      "availability_pct_min": 0.9900,
+      "error_rate_max": 0.05,
+      "latency_p99_degradation_max_multiple": 1.20
+    },
+    "registry_states": ["healthy", "degraded", "suspended", "removed"],
+    "breach_state_machine_states": [
+      "active", "at_risk", "breached",
+      "pause_and_review", "fallback_activated", "escalated",
+      "completed", "terminated"
+    ],
+    "breach_response_options": ["pause_and_review", "activate_fallback", "escalate"],
+    "breach_event_emit_max_seconds": 5,
+    "feasibility_check_required_in_phase_2": true,
+    "negotiation_rejection_reason_sla_infeasible": "sla_slo_infeasible"
+  },
+
+  "kpi_catalog": {
+    "$comment": "Protocol-level KPIs — full catalog in docs/overview/performance-sla-slo-kpi.md. All KPIs MUST be exported via OpenTelemetry and Prometheus.",
+    "reliability": {
+      "phase_success_rate":           {"target": ">=0.99", "phase": "each_phase"},
+      "workflow_e2e_success_rate":    {"target": ">=0.95", "phase": "all_phases"},
+      "agent_uptime":                 {"target": ">=0.9900", "window": "30d"},
+      "circuit_breaker_trip_rate":    {"target": "<=0.01"},
+      "fallback_activation_rate":     {"target": "<=0.05"}
+    },
+    "performance": {
+      "phase_latency_p99_ms":         {"see": "sla_slo.phase_latency_p99_ms_targets"},
+      "phase_latency_p95_ms":         {"target": "80pct_of_p99_target"},
+      "agent_queue_depth":            {"alert_threshold": 100},
+      "workflow_throughput_rps":      {"target": "deployment_specific"},
+      "planning_agent_selection_time_ms": {"target": "<=500", "percentile": "p99"},
+      "validation_latency_ms":        {"target": "<=500", "percentile": "p99", "path": "automated_only"}
+    },
+    "compliance": {
+      "policy_pass_rate":             {"alert": ">=10pct_drop_week_over_week"},
+      "hitl_intervention_rate":       {"target": "organizational_risk_appetite"},
+      "hitl_response_time_hours":     {"sla": "<=4"},
+      "risk_prediction_accuracy":     {"target": ">=0.85"},
+      "sla_compliance_rate":          {"target": ">=0.95"},
+      "audit_completeness_rate":      {"target": "1.00", "mandatory": true}
+    },
+    "financial": {
+      "acu_budget_adherence_rate":    {"target": ">=0.95"},
+      "cost_overrun_rate":            {"target": "<=0.05"},
+      "cost_per_successful_workflow": {"alert": ">=20pct_increase_week_over_week"}
+    },
+    "security": {
+      "auth_failure_rate":                    {"target": "<=0.001"},
+      "certificate_rotation_compliance_rate": {"target": "1.00", "mandatory": true},
+      "anomaly_detection_rate":               {"alert": "sudden_increase"},
+      "policy_override_rate":                 {"target": "<=0.005", "note": "each_override_requires_board_or_legal_ref"}
+    },
+    "export": {
+      "observability_stack": ["opentelemetry", "prometheus"],
+      "max_data_age_seconds": 60
+    }
   }
 }
