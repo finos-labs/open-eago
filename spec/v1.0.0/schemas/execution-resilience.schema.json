@@ -3,7 +3,7 @@
   "$id": "https://finos-labs.github.io/open-emcp/spec/v1.0.0/schemas/execution-resilience.schema.json",
   "title": "OpenEMCP Execution and Resilience",
   "type": "object",
-  "required": ["execution_id", "plan_id", "status", "resilience"],
+  "required": ["execution_id", "plan_id", "status", "resilience", "sla_compliance_status"],
   "properties": {
     "execution_id": {
       "type": "string"
@@ -35,6 +35,99 @@
         "compensation_applied": {"type": "boolean"}
       },
       "additionalProperties": false
+    },
+    "sla_compliance_status": {
+      "$comment": "SLA breach state machine output — see docs/overview/performance-sla-slo-kpi.md",
+      "type": "object",
+      "required": ["breach_state", "overall_sla_status"],
+      "properties": {
+        "breach_state": {
+          "type": "string",
+          "enum": [
+            "active",
+            "at_risk",
+            "breached",
+            "pause_and_review",
+            "fallback_activated",
+            "escalated",
+            "completed",
+            "terminated"
+          ]
+        },
+        "overall_sla_status": {
+          "type": "string",
+          "enum": ["met", "breached"]
+        },
+        "circuit_breaker_trips": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "slo_results": {
+          "type": "object",
+          "properties": {
+            "latency_p99_ms": {
+              "type": "object",
+              "properties": {
+                "target": {"type": "number"},
+                "observed": {"type": "number"},
+                "status": {"type": "string", "enum": ["met", "at_risk", "breached"]}
+              }
+            },
+            "availability_pct": {
+              "type": "object",
+              "properties": {
+                "target": {"type": "number"},
+                "observed": {"type": "number"},
+                "status": {"type": "string", "enum": ["met", "at_risk", "breached"]}
+              }
+            },
+            "throughput_rps": {
+              "type": "object",
+              "properties": {
+                "target": {"type": "number"},
+                "observed": {"type": "number"},
+                "status": {"type": "string", "enum": ["met", "at_risk", "breached"]}
+              }
+            },
+            "error_rate": {
+              "type": "object",
+              "properties": {
+                "target": {"type": "number"},
+                "observed": {"type": "number"},
+                "status": {"type": "string", "enum": ["met", "at_risk", "breached"]}
+              }
+            }
+          }
+        },
+        "breach_events": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "event_type": {"type": "string"},
+              "event_timestamp": {"type": "string", "format": "date-time"},
+              "breached_slo": {"type": "string"},
+              "slo_target": {"type": "number"},
+              "sli_observed": {"type": "number"},
+              "breach_response": {
+                "type": "string",
+                "enum": ["pause_and_review", "activate_fallback", "escalate"]
+              }
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "risk_context": {
+      "$comment": "Risk context propagated from Phase 3 — see docs/overview/risk-management.md",
+      "type": "object",
+      "properties": {
+        "composite_risk_score": {"type": "number", "minimum": 0, "maximum": 1},
+        "risk_tier": {"type": "string", "enum": ["low", "medium", "high", "critical"]},
+        "risk_events": {"type": "array", "items": {"type": "object"}},
+        "circuit_breaker_trips": {"type": "integer", "minimum": 0}
+      }
     }
   },
   "additionalProperties": false

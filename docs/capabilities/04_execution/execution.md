@@ -350,11 +350,192 @@ class FailureManager:
 
 **Recovery Strategies**:
 
-- **Retry Logic**: Exponential backoff, fixed retry, circuit breaker patterns
+- **Retry Logic**: Exponential backoff (REQUIRED), fixed retry, circuit breaker patterns
 - **Fallback Agents**: Automatic failover to backup agents
 - **Graceful Degradation**: Continue with reduced functionality
-- **Circuit Breakers**: Prevent cascade failures with service isolation
+- **Circuit Breakers**: Prevent cascade failures with service isolation (see Section 3a)
 - **Human Escalation**: Route critical failures to human operators
+
+### 3a. SLA Monitoring & Breach Handling
+
+The Execution Agent MUST implement the SLA breach state machine defined in [Performance SLA/SLO and KPIs](../../overview/performance-sla-slo-kpi.md) and SPECIFICATION.md Appendix D.2. Each active execution carries an `sla_state` that transitions through `active` → `at_risk` → `breached` and associated response states.
+
+**SLA State Monitor**:
+
+```python
+class SLAMonitor:
+    """
+    Real-time SLA breach state machine implementation.
+    Required by SPECIFICATION.md Appendix D.2.
+    """
+    
+    AT_RISK_THRESHOLD = 0.90  # SLI > 90% of SLO target triggers at_risk
+    BREACH_EVENT_EMIT_WINDOW_SEC = 5  # MUST emit within 5 seconds of detection
+    
+    def __init__(self, sla_guarantees: dict, execution_id: str):
+        self.sla = sla_guarantees
+        self.execution_id = execution_id
+        self.state = "active"
+        self.breach_events = []
+    
+    async def evaluate_slos(self, current_slis: dict) -> dict:
+        """Evaluate current SLIs against SLO targets; update breach state."""
+        
+        slo_results = {}
+        any_at_risk = False
+        any_breached = False
+        
+        # Latency p99
+        if current_slis.get("latency_p99_ms"):
+            target = self.sla["latency"]["p99_ms"]
+            observed = current_slis["latency_p99_ms"]
+            at_risk_threshold = target * self.AT_RISK_THRESHOLD
+            slo_results["latency_p99_ms"] = {
+                "target": target, "observed": observed,
+                "status": "breached" if observed > target
+                         else "at_risk" if observed > at_risk_threshold
+                         else "met"
+            }
+            if slo_results["latency_p99_ms"]["status"] == "breached":
+                any_breached = True
+                await self._emit_breach_event("latency_p99_ms", target, observed)
+            elif slo_results["latency_p99_ms"]["status"] == "at_risk":
+                any_at_risk = True
+        
+        # Availability
+        if current_slis.get("availability_pct") is not None:
+            target = self.sla["availability"]["availability_pct"]
+            observed = current_slis["availability_pct"]
+            slo_results["availability_pct"] = {
+                "target": target, "observed": observed,
+                "status": "breached" if observed < target
+                         else "at_risk" if observed < (target + (1 - target) * self.AT_RISK_THRESHOLD)
+                         else "met"
+            }
+            if slo_results["availability_pct"]["status"] == "breached":
+                any_breached = True
+                await self._emit_breach_event("availability_pct", target, observed)
+        
+        # Error rate
+        if current_slis.get("error_rate") is not None:
+            target = self.sla["error_rate"]["error_rate_max"]
+            observed = current_slis["error_rate"]
+            slo_results["error_rate"] = {
+                "target": target, "observed": observed,
+                "status": "breached" if observed > target
+                         else "at_risk" if observed > (target * self.AT_RISK_THRESHOLD)
+                         else "met"
+            }
+            if slo_results["error_rate"]["status"] == "breached":
+                any_breached = True
+                await self._emit_breach_event("error_rate", target, observed)
+        
+        # State transitions
+        if any_breached:
+            self.state = "breached"
+            await self._execute_breach_response()
+        elif any_at_risk and self.state == "active":
+            self.state = "at_risk"
+            await self._emit_at_risk_event()
+        elif not any_at_risk and not any_breached and self.state == "at_risk":
+            self.state = "active"  # Recovery
+        
+        return {
+            "sla_state": self.state,
+            "slo_results": slo_results,
+            "overall_sla_status": "breached" if any_breached else "met"
+        }
+    
+    async def _emit_breach_event(self, breached_slo: str, target, observed):
+        """Emit SLA breach event to audit trail within 5 seconds."""
+        event = {
+            "event_type": "sla_breach_event",
+            "event_timestamp": datetime.utcnow().isoformat() + "Z",
+            "execution_id": self.execution_id,
+            "breach_state": "breached",
+            "sla_id": self.sla.get("sla_id"),
+            "breached_slo": breached_slo,
+            "slo_target": target,
+            "sli_observed": observed,
+            "breach_response": self.sla.get("breach_policy", {}).get("breach_response", "pause_and_review"),
+            "risk_event_emitted": True,
+            "risk_dimension": "operational_risk"
+        }
+        self.breach_events.append(event)
+        await audit_trail.emit(event)  # MUST be within 5 seconds
+    
+    async def _execute_breach_response(self):
+        """Execute the configured breach response action."""
+        response = self.sla.get("breach_policy", {}).get("breach_response", "pause_and_review")
+        
+        if response == "activate_fallback":
+            self.state = "fallback_activated"
+            await self._activate_fallback()
+        elif response == "escalate":
+            self.state = "escalated"
+            await self._escalate_to_hitl()
+        else:  # pause_and_review (default)
+            self.state = "pause_and_review"
+            await self._pause_execution()
+```
+
+**Circuit Breaker Implementation** (REQUIRED per SPECIFICATION.md Appendix E.4):
+
+```python
+class CircuitBreaker:
+    """
+    Required circuit breaker: trips when two or more runtime risk indicators
+    simultaneously breach their thresholds.
+    """
+    
+    THRESHOLDS = {
+        "agent_failure_rate": 0.05,
+        "cost_overrun_ratio": 1.20,
+        "sla_breach_indicator": True,    # trips when SLA state = "breached"
+        "anomaly_score": 0.70
+    }
+    
+    def evaluate(self, runtime_indicators: dict) -> dict:
+        breached = []
+        
+        if runtime_indicators.get("agent_failure_rate", 0) > self.THRESHOLDS["agent_failure_rate"]:
+            breached.append("agent_failure_rate")
+        if runtime_indicators.get("cost_overrun_ratio", 0) > self.THRESHOLDS["cost_overrun_ratio"]:
+            breached.append("cost_overrun_ratio")
+        if runtime_indicators.get("sla_breach_indicator", False):
+            breached.append("sla_breach_indicator")
+        if runtime_indicators.get("anomaly_score", 0) > self.THRESHOLDS["anomaly_score"]:
+            breached.append("anomaly_score")
+        
+        trip = len(breached) >= 2
+        
+        return {
+            "tripped": trip,
+            "breached_indicators": breached,
+            "action": "pause_and_escalate_to_hitl" if trip else "continue"
+        }
+```
+
+**SLA Compliance Status in Execution Output**:
+
+All execution result outputs MUST include an `sla_compliance_status` object:
+
+```json
+{
+  "sla_compliance_status": {
+    "breach_state": "completed",
+    "overall_sla_status": "met",
+    "circuit_breaker_trips": 0,
+    "slo_results": {
+      "latency_p99_ms": {"target": 800, "observed": 420, "status": "met"},
+      "availability_pct": {"target": 0.9900, "observed": 0.9994, "status": "met"},
+      "throughput_rps": {"target": 10, "observed": 47, "status": "met"},
+      "error_rate": {"target": 0.05, "observed": 0.003, "status": "met"}
+    },
+    "breach_events": []
+  }
+}
+```
 
 ## Example: Customer Address Update Execution
 
@@ -780,20 +961,25 @@ Execution Agent → [Execution Results] → Context Agent → [State Management]
 
 ## Performance Metrics & Optimization
 
-**Execution Performance Metrics**:
+**Execution Performance Metrics** (Protocol-Level KPIs — see [Performance SLA/SLO and KPIs](../../overview/performance-sla-slo-kpi.md) for full catalog and targets):
 
-- **Orchestration Efficiency**: Workflow completion time vs. optimal time
-- **Resource Utilization**: CPU, memory, and network usage optimization
-- **Cost Efficiency**: Actual costs vs. budgeted costs
+- **Orchestration Efficiency**: Workflow completion time vs. optimal time (`phase_latency_p99_ms`)
+- **Resource Utilization**: CPU, memory, and network usage optimization (`agent_queue_depth`)
+- **Cost Efficiency**: Actual costs vs. budgeted costs (`acu_budget_adherence_rate`, `cost_overrun_rate`)
 - **Quality Metrics**: Result accuracy and completeness scores
-- **SLA Compliance**: Service level agreement adherence rates
+- **SLA Compliance**: `sla_compliance_rate` — fraction of executions where `overall_sla_status = "met"` ≥ 0.95 target
+- **Reliability**: `circuit_breaker_trip_rate` ≤ 0.01 (1%); `fallback_activation_rate` ≤ 0.05 (5%)
+- **Phase Success Rate**: `phase_success_rate` ≥ 0.99 for Phase 4 executions
+
+All metrics MUST be exported via OpenTelemetry traces and Prometheus metrics scrape endpoint. KPI data MUST be available for query within 60 seconds of measurement.
 
 **Optimization Techniques**:
 
 - **Predictive Scaling**: Anticipate resource needs based on task patterns
-- **Intelligent Routing**: Select optimal agents based on real-time performance
+- **Intelligent Routing**: Select optimal agents based on real-time performance and SLA compliance history
 - **Adaptive Orchestration**: Modify execution patterns based on performance feedback
 - **Machine Learning**: Improve orchestration decisions based on historical data
+- **SLA-Aware Scheduling**: Prioritize tasks approaching SLO `at_risk` thresholds
 
 ## Error Handling & Resilience
 

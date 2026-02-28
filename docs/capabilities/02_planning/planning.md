@@ -939,6 +939,131 @@ def optimize_execution_costs(plan, cost_constraints):
     return optimization_actions
 ```
 
+### 5. SLA/SLO Negotiation Sub-Phase
+
+The Planning Agent MUST execute this sub-phase as the **final step** of Phase 2 before forwarding the execution plan to Phase 3. This sub-phase operationalizes the SLA/SLO feasibility check required by SPECIFICATION.md Section 4.2. See also [Performance SLA/SLO and KPIs](../../overview/performance-sla-slo-kpi.md) for the canonical `sla_guarantees` schema and SLO objective definitions.
+
+**Feasibility Check Algorithm**:
+
+```python
+def sla_slo_negotiation_check(execution_plan, agent_registry):
+    """
+    Required Phase 2 sub-phase: verify all four SLO objective types for every
+    selected agent before forwarding the plan to Phase 3 (Validation).
+    Returns negotiation_result with status 'accepted' or 'rejected'.
+    """
+    feasibility_results = []
+    
+    for agent_ref in execution_plan["selected_agents"]:
+        agent = agent_registry.get_agent(agent_ref["agent_id"])
+        sla = agent["sla_guarantees"]
+        requirement = execution_plan["performance_requirements"].get(agent_ref["agent_id"], {})
+        
+        checks = {
+            "latency_p99_ms": {
+                "required": requirement.get("latency_p99_ms", float("inf")),
+                "provided": sla["latency"]["p99_ms"],
+                "met": sla["latency"]["p99_ms"] <= requirement.get("latency_p99_ms", float("inf"))
+            },
+            "availability_pct": {
+                "required": requirement.get("availability_pct", 0.9900),
+                "provided": sla["availability"]["availability_pct"],
+                "met": sla["availability"]["availability_pct"] >= requirement.get("availability_pct", 0.9900)
+            },
+            "throughput_rps": {
+                "required": requirement.get("throughput_rps", 0),
+                "provided": sla["throughput"]["throughput_rps"],
+                "met": sla["throughput"]["throughput_rps"] >= requirement.get("throughput_rps", 0)
+            },
+            "error_rate_max": {
+                "required": requirement.get("error_rate_max", 0.05),
+                "provided": sla["error_rate"]["error_rate_max"],
+                "met": sla["error_rate"]["error_rate_max"] <= requirement.get("error_rate_max", 0.05)
+            }
+        }
+        
+        # Derive sla_breach_probability from historical variance
+        sla_breach_probability = calculate_breach_probability(
+            agent["performance_metrics"]["reliability_score"],
+            agent["performance_metrics"]["historical_sli_variance"]
+        )
+        
+        agent_feasible = all(c["met"] for c in checks.values())
+        
+        feasibility_results.append({
+            "agent_id": agent_ref["agent_id"],
+            "feasible": agent_feasible,
+            "sla_breach_probability": sla_breach_probability,
+            "at_risk": sla_breach_probability > 0.20,
+            "checks": checks
+        })
+        
+        # If at-risk, verify fallback is available
+        if sla_breach_probability > 0.20 and not execution_plan.get("fallback_options"):
+            agent_feasible = False  # Cannot accept without fallback
+    
+    all_feasible = all(r["feasible"] for r in feasibility_results)
+    
+    return {
+        "status": "accepted" if all_feasible else "rejected",
+        "reason": None if all_feasible else "sla_slo_infeasible",
+        "checks": ["capability_fit", "policy_constraints", "sla_slo", "acu_thresholds", "data_residency"],
+        "sla_feasibility_details": feasibility_results,
+        "negotiation_timestamp": datetime.utcnow().isoformat() + "Z"
+    }
+```
+
+**SLA/SLO Feasibility Output**:
+
+```json
+{
+  "negotiation": {
+    "status": "accepted",
+    "checks": [
+      "capability_fit",
+      "policy_constraints",
+      "sla_slo",
+      "acu_thresholds",
+      "data_residency"
+    ],
+    "sla_feasibility_summary": {
+      "all_agents_feasible": true,
+      "agents_evaluated": 3,
+      "agents_at_sla_risk": 0,
+      "fallback_agents_verified": true
+    },
+    "sla_feasibility_details": [
+      {
+        "agent_id": "pii-validation-agent-uk-01",
+        "feasible": true,
+        "sla_breach_probability": 0.03,
+        "at_risk": false,
+        "checks": {
+          "latency_p99_ms": {"required": 800, "provided": 420, "met": true},
+          "availability_pct": {"required": 0.9900, "provided": 0.9987, "met": true},
+          "throughput_rps": {"required": 10, "provided": 50, "met": true},
+          "error_rate_max": {"required": 0.05, "provided": 0.008, "met": true}
+        }
+      }
+    ]
+  }
+}
+```
+
+**Agent Registry Performance Scoring Integration**:
+
+The Phase 2 scoring algorithm MUST incorporate SLA compliance history as a weighted component. The existing scoring weights are updated to include SLA compliance:
+
+| Scoring Dimension | Weight | Data Source |
+| --- | --- | --- |
+| Capability fit | 25% | Registry capability index |
+| Compliance certification | 30% | Registry compliance profiles |
+| Reliability score | 20% | Registry `performance_metrics.reliability_score` |
+| Performance (latency, throughput) | 15% | Registry `sla_guarantees` + historical SLI data |
+| **SLA compliance history** | **10%** | **Registry `sla_compliance_rate` (rolling 30d)** |
+
+> **Note**: This updates the planning scoring weights to explicitly include SLA compliance history as a distinct dimension from raw performance metrics, reflecting that an agent with good latency but a history of SLA breach events should be scored lower than one with comparable latency and a clean SLA record.
+
 ## LLM-Enhanced Planning Architecture
 
 The Planning Agent integrates Large Language Models (LLMs) at every critical decision point to enhance validation, optimization, and confidence in the planning process. This multi-LLM approach combines deterministic algorithms with intelligent reasoning to deliver superior planning outcomes.
