@@ -181,7 +181,7 @@ graph TD
 ```
 
 | Security Aspect | Traditional TLS | SPIRE mTLS |
-|-----------------|-----------------|------------|
+| ----------------- | ----------------- | ------------ |
 | **Server Authentication** | ✓ (DNS + Public CA) | ✓ (SPIFFE ID + Private CA) |
 | **Client Authentication** | ✗ (or API keys) | ✓ (X.509 certificate) |
 | **Identity Type** | DNS hostname | SPIFFE URI |
