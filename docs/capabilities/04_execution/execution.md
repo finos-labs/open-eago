@@ -58,10 +58,10 @@ Validation Agent → [Validation Decision] → Execution Agent → [Orchestrated
     "record_metadata": {
       "created_by": "validation_agent",
       "created_at": "2026-02-06T10:30:18.789Z",
-      "version": "1.0.0",
+      "version": "0.1.0",
       "source_plan_id": "PLAN_F5B2C7"
     },
-    "emcp_version": "1.0.0",
+    "emcp_version": "0.1.0",
     "message_type": "validation_decision",
     "validation_id": "VALIDATION_G6C3B8",
     "plan_id": "PLAN_F5B2C7",
@@ -652,10 +652,10 @@ Completion Results:
     "record_metadata": {
       "created_by": "execution_agent",
       "created_at": "2026-02-06T10:30:25.789Z",
-      "version": "1.0.0",
+      "version": "0.1.0",
       "source_validation_id": "VALIDATION_G6C3B8"
     },
-    "emcp_version": "1.0.0",
+    "emcp_version": "0.1.0",
     "message_type": "execution_results",
     "execution_id": "EXECUTION_H7D4C9",
     "validation_id": "VALIDATION_G6C3B8",

@@ -10,8 +10,8 @@ The Communication capability converts context and execution outcomes into delive
 
 - Detailed specification: [communication.md](./communication.md)
 - Normative protocol behavior: [../../../SPECIFICATION.md](../../../SPECIFICATION.md)
-- Machine model: [../../../spec/v1.0.0/spec.json](../../../spec/v1.0.0/spec.json)
-- Phase schema: [../../../spec/v1.0.0/schemas/communication-delivery.schema.json](../../../spec/v1.0.0/schemas/communication-delivery.schema.json)
+- Machine model: [../../../spec/v0.1.0/spec.json](../../../spec/v0.1.0/spec.json)
+- Phase schema: [../../../spec/v0.1.0/schemas/communication-delivery.schema.json](../../../spec/v0.1.0/schemas/communication-delivery.schema.json)
 
 ## Inputs and Outputs
 

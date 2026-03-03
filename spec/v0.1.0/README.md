@@ -9,7 +9,7 @@ Implementations SHOULD treat this folder as the canonical location for JSON Sche
 
 ## Available Schema Sets
 
-### v1.0.0
+### v0.1.0
 
 - [schemas/base-envelope.schema.json](schemas/base-envelope.schema.json)
 - [schemas/contract-management.schema.json](schemas/contract-management.schema.json)

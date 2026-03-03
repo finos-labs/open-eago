@@ -206,10 +206,10 @@ External Request → Contract Agent → [Phase 1 Complete] → Planning Agent �
     "record_metadata": {
       "created_by": "EXAMPLE_CRM_SYSTEM",
       "created_at": "2026-02-06T10:30:15.234Z",
-      "version": "1.0.0",
+      "version": "0.1.0",
       "source_system": "EXAMPLE_CRM_SYSTEM"
     },
-    "emcp_version": "1.0.0",
+    "emcp_version": "0.1.0",
     "message_type": "contract_request", 
     "contract_id": "CONTRACT_E7D3A1",
     "timestamp": "2026-02-06T10:30:15.234Z",

@@ -58,10 +58,10 @@ Context Agent → [Context State] → Communication Agent → [Multi-Channel Res
     "record_metadata": {
       "created_by": "context_agent",
       "created_at": "2026-02-06T10:30:26.123Z",
-      "version": "1.0.0",
+      "version": "0.1.0",
       "source_execution_id": "EXECUTION_H7D4C9"
     },
-    "emcp_version": "1.0.0",
+    "emcp_version": "0.1.0",
     "message_type": "context_state",
     "context_id": "CONTEXT_I8E5D0",
     "execution_id": "EXECUTION_H7D4C9",
@@ -588,10 +588,10 @@ class NotificationManager:
     "record_metadata": {
       "created_by": "communication_agent",
       "created_at": "2026-02-06T10:30:27.234Z",
-      "version": "1.0.0",
+      "version": "0.1.0",
       "source_context_id": "CONTEXT_I8E5D0"
     },
-    "emcp_version": "1.0.0",
+    "emcp_version": "0.1.0",
     "message_type": "communication_results",
     "communication_id": "COMMUNICATION_J9F6E1",
     "context_id": "CONTEXT_I8E5D0",

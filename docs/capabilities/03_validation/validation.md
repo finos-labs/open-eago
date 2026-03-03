@@ -58,10 +58,10 @@ Planning Agent → [Execution Plan] → Validation Agent → [Validation Decisio
     "record_metadata": {
       "created_by": "planning_agent",
       "created_at": "2026-02-06T10:30:17.456Z",
-      "version": "1.0.0",
+      "version": "0.1.0",
       "source_contract_id": "CONTRACT_E7D3A1"
     },
-    "emcp_version": "1.0.0",
+    "emcp_version": "0.1.0",
     "message_type": "execution_plan",
     "plan_id": "PLAN_F5B2C7",
     "contract_id": "CONTRACT_E7D3A1",
@@ -668,10 +668,10 @@ This comprehensive LLM enhancement transforms the Validation Agent from a rule-b
     "record_metadata": {
       "created_by": "validation_agent",
       "created_at": "2026-02-06T10:30:18.789Z",
-      "version": "1.0.0",
+      "version": "0.1.0",
       "source_plan_id": "PLAN_F5B2C7"
     },
-    "emcp_version": "1.0.0",
+    "emcp_version": "0.1.0",
     "message_type": "validation_decision",
     "validation_id": "VALIDATION_G6C3B8",
     "plan_id": "PLAN_F5B2C7",

@@ -10,8 +10,8 @@ The Execution capability orchestrates approved plans at runtime, coordinates age
 
 - Detailed specification: [execution.md](./execution.md)
 - Normative protocol behavior: [../../../SPECIFICATION.md](../../../SPECIFICATION.md)
-- Machine model: [../../../spec/v1.0.0/spec.json](../../../spec/v1.0.0/spec.json)
-- Phase schema: [../../../spec/v1.0.0/schemas/execution-resilience.schema.json](../../../spec/v1.0.0/schemas/execution-resilience.schema.json)
+- Machine model: [../../../spec/v0.1.0/spec.json](../../../spec/v0.1.0/spec.json)
+- Phase schema: [../../../spec/v0.1.0/schemas/execution-resilience.schema.json](../../../spec/v0.1.0/schemas/execution-resilience.schema.json)
 
 ## Inputs and Outputs
 

@@ -10,8 +10,8 @@ The Validation capability evaluates plans against policy, risk, compliance, and 
 
 - Detailed specification: [validation.md](./validation.md)
 - Normative protocol behavior: [../../../SPECIFICATION.md](../../../SPECIFICATION.md)
-- Machine model: [../../../spec/v1.0.0/spec.json](../../../spec/v1.0.0/spec.json)
-- Phase schema: [../../../spec/v1.0.0/schemas/validation-compliance.schema.json](../../../spec/v1.0.0/schemas/validation-compliance.schema.json)
+- Machine model: [../../../spec/v0.1.0/spec.json](../../../spec/v0.1.0/spec.json)
+- Phase schema: [../../../spec/v0.1.0/schemas/validation-compliance.schema.json](../../../spec/v0.1.0/schemas/validation-compliance.schema.json)
 
 ## Inputs and Outputs
 

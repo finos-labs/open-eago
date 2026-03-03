@@ -35,7 +35,7 @@
   },
 
   "schema_catalog": {
-    "version": "v1.0.0",
+    "version": "v0.1.0",
     "base": "schemas/base-envelope.schema.json",
     "phases": {
       "contract_management": "schemas/contract-management.schema.json",
@@ -560,8 +560,8 @@
       "cross_border_governance": true
     },
     "compatibility": {
-      "oracle_agent_spec": "1.0.0",
-      "json_agents_pam": "1.0.0",
+      "oracle_agent_spec": "0.1.0",
+      "json_agents_pam": "0.1.0",
       "oasf_schema": "compatible"
     },
     "regulatory_frameworks": [
