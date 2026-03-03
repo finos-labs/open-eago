@@ -190,7 +190,7 @@ When the breach state machine transitions to `breached` or beyond, implementatio
 
 These are the KPIs the OpenEMCP protocol itself MUST track and emit. They are protocol-level observability requirements — distinct from business-level KPIs defined by individual implementations.
 
-All implementations MUST expose these KPIs via the declared observability stack (OpenTelemetry + Prometheus per `spec/v1.0.0/spec.json`). KPI data MUST be available for query by authorized monitoring systems.
+All implementations MUST expose these KPIs via the declared observability stack (OpenTelemetry + Prometheus per `spec/v0.1.0/spec.json`). KPI data MUST be available for query by authorized monitoring systems.
 
 ### Reliability KPIs
 
@@ -296,4 +296,4 @@ Performance accountability in OpenEMCP is enforced through three concrete mechan
 
 For the risk model that incorporates SLA breach probability into the Operational Risk dimension, see [Risk Management Framework](./risk-management.md).
 
-For machine-readable schema definitions of `sla_guarantees` and `sla_compliance_status`, see [spec/v1.0.0/schemas/planning-negotiation.schema.json](../../spec/v1.0.0/schemas/planning-negotiation.schema.json) and [spec/v1.0.0/schemas/execution-resilience.schema.json](../../spec/v1.0.0/schemas/execution-resilience.schema.json).
+For machine-readable schema definitions of `sla_guarantees` and `sla_compliance_status`, see [spec/v0.1.0/schemas/planning-negotiation.schema.json](../../spec/v0.1.0/schemas/planning-negotiation.schema.json) and [spec/v0.1.0/schemas/execution-resilience.schema.json](../../spec/v0.1.0/schemas/execution-resilience.schema.json).

@@ -62,10 +62,10 @@ Contract Agent → [OASF Contract] → Planning Agent → [Execution Plan] → V
     "record_metadata": {
       "created_by": "EXAMPLE_CRM_SYSTEM",
       "created_at": "2026-02-06T10:30:15.234Z",
-      "version": "1.0.0",
+      "version": "0.1.0",
       "source_system": "EXAMPLE_CRM_SYSTEM"
     },
-    "emcp_version": "1.0.0",
+    "emcp_version": "0.1.0",
     "message_type": "contract_request", 
     "contract_id": "CONTRACT_E7D3A1",
     "timestamp": "2026-02-06T10:30:15.234Z",
@@ -691,7 +691,7 @@ Agent Selection → Dependency Analysis → Workflow Design → Resource Allocat
 {
   "execution_plan": {
     "plan_id": "plan_a7b8c9d2e3f4",
-    "plan_version": "1.0.0",
+    "plan_version": "0.1.0",
     "created_timestamp": "2026-02-06T10:30:16.245Z",
     "contract_reference": "CONTRACT_E7D3A1",
     "execution_id": "exec_a7b8c9d2",

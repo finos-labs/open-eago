@@ -421,7 +421,7 @@ mod tests {
         {
             let mut reg = registry.lock().unwrap();
             let mut d = AgentDetails::new(now);
-            d.version = Some("1.0.0".to_string());
+            d.version = Some("0.1.0".to_string());
             reg.insert(addr.clone(), d);
         }
         let info = AddressInfo {

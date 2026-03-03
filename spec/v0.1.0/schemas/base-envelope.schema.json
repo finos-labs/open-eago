@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://finos-labs.github.io/open-emcp/spec/v1.0.0/schemas/base-envelope.schema.json",
+  "$id": "https://finos-labs.github.io/open-emcp/spec/v0.1.0/schemas/base-envelope.schema.json",
   "title": "OpenEMCP Base Envelope",
   "type": "object",
   "required": ["message_id", "phase", "timestamp", "payload"],

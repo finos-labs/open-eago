@@ -247,7 +247,7 @@ curl -s -X POST https://localhost:8443/register \
       "data_center": "dc1",
       "compliance": ["SOC2"],
       "reliability": 0.99,
-      "version": "1.0.0",
+      "version": "0.1.0",
       "health_status": "healthy",
       "uptime_percentage": 99.9
     }

@@ -267,4 +267,4 @@ Risk management in OpenEMCP is a first-class protocol concern, not an advisory f
 
 For SLA/SLO definitions and the KPI catalog (including the `sla_breach_probability` component of Operational Risk), see [Performance SLA/SLO and KPIs](./performance-sla-slo-kpi.md).
 
-For the machine-readable schema definitions of `risk_context`, see [spec/v1.0.0/schemas/validation-compliance.schema.json](../../spec/v1.0.0/schemas/validation-compliance.schema.json) and [spec/v1.0.0/spec.json](../../spec/v1.0.0/spec.json).
+For the machine-readable schema definitions of `risk_context`, see [spec/v0.1.0/schemas/validation-compliance.schema.json](../../spec/v0.1.0/schemas/validation-compliance.schema.json) and [spec/v0.1.0/spec.json](../../spec/v0.1.0/spec.json).
