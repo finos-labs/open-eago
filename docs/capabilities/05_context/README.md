@@ -9,7 +9,7 @@ The Context capability consolidates workflow state across phases, preserves hier
 ## Canonical Reference
 
 - Detailed specification: [context.md](./context.md)
-- Normative protocol behavior: [../../../SPECIFICATION.md](../../../SPECIFICATION.md)
+- Normative specification behavior: [../../../SPECIFICATION.md](../../../SPECIFICATION.md)
 - Machine model: [../../../spec/v0.1.0/spec.json](../../../spec/v0.1.0/spec.json)
 - Phase schema: [../../../spec/v0.1.0/schemas/context-state-management.schema.json](../../../spec/v0.1.0/schemas/context-state-management.schema.json)
 

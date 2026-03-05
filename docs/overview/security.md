@@ -60,7 +60,7 @@ sequenceDiagram
    participant Server as SPIRE Server
    participant CA as CA Private Key
    Registry->>Agent: 1. Fetch SVID via Workload API<br/>(Unix socket request)
-   Note over Agent: 2. Workload Attestation<br/>Check process attributes:<br/>- UID: 1000 ✓<br/>- GID: 1000 ✓<br/>- Process path: /target/release/openEAGO-registry ✓
+   Note over Agent: 2. Workload Attestation<br/>Check process attributes:<br/>- UID: 1000 ✓<br/>- GID: 1000 ✓<br/>- Process path: /target/release/OpenEAGO-registry ✓
    Agent->>Server: 3. Request SVID for<br/>unix:uid:1000
    Server->>Server: 4. Lookup registration entry<br/>unix:uid:1000 → spiffe://example.org/registry
    Server->>CA: 5. Generate & sign certificate<br/>Subject: CN=registry<br/>SAN URI: spiffe://example.org/registry

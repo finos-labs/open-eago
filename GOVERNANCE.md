@@ -1,10 +1,10 @@
-# openEAGO Governance
+# OpenEAGO Governance
 
-This document defines project governance for openEAGO in alignment with standard FINOS project governance practices.
+This document defines project governance for OpenEAGO in alignment with standard FINOS project governance practices.
 
 ## 1. Scope
 
-openEAGO is an open specification and related artifacts for enterprise multi-agent communication and orchestration. This governance covers technical direction, release management, contribution process, and project operations.
+OpenEAGO is an open specification and related artifacts for enterprise multi-agent communication and orchestration. This governance covers technical direction, release management, contribution process, and project operations.
 
 ## 2. Project Roles
 
@@ -50,7 +50,7 @@ Contributors participate through issues, pull requests, documentation, testing, 
 
 ### 2.4 Working Groups
 
-The TSC may charter working groups for focused areas (for example: core protocol, security, compliance, interoperability). Each working group reports decisions and recommendations to the TSC.
+The TSC may charter working groups for focused areas (for example: core specification, security, compliance, interoperability). Each working group reports decisions and recommendations to the TSC.
 
 ## 3. Decision-Making and Voting
 
@@ -78,8 +78,8 @@ Maintainer decisions may be appealed to the TSC by opening a documented issue. T
 
 ## 4. Releases and Versioning
 
-- openEAGO uses Semantic Versioning (`MAJOR.MINOR.PATCH`).
-- Breaking normative protocol changes require explicit migration guidance.
+- OpenEAGO uses Semantic Versioning (`MAJOR.MINOR.PATCH`).
+- Breaking normative specification changes require explicit migration guidance.
 - Release candidates may be published for community review before final release.
 
 ## 5. Intellectual Property, Licensing, and Compliance

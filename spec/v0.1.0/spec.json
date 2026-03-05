@@ -4,8 +4,8 @@
   "spec_version": "0.1.0",
   
   "metadata": {
-    "name": "openEAGO",
-    "description": "Enterprise Multi-Agent Communication & Orchestration Protocol - Core specification for secure, scalable, and compliant multi-agent collaboration across enterprise environments",
+    "name": "OpenEAGO",
+    "description": "Open Enterprise Agent Governance & Orchestration Specification",
     "version": "0.1.0",
     "authors": [
       "Jan Rock <jan.rock@citi.com>",
@@ -16,7 +16,7 @@
     "created": "2026-02-18T00:00:00Z",
     "organization": "FINOS Labs",
     "tags": ["enterprise", "multi-agent", "orchestration", "compliance", "security", "blockchain"],
-    "emcp_phases": [
+    "eago_phases": [
       "contract_management",
       "planning_negotiation",
       "validation_compliance",
@@ -55,7 +55,7 @@
         "phase": "contract_management",
         "pattern": "generator-evaluator-optimizer",
         "llm": "$ref:enterprise-llm",
-        "system_prompt": "You are an enterprise contract management agent responsible for validating and processing incoming workflow requests according to EMCP standards.",
+        "system_prompt": "You are an enterprise contract management agent responsible for validating and processing incoming workflow requests according to EAGO standards.",
         "capabilities": ["input_validation", "security_check", "compliance_validation", "oasf_enrichment"],
         "security_level": "enterprise"
       },
@@ -334,7 +334,7 @@
   "flows": [
     {
       "id": "eago-six-phase-workflow",
-      "description": "Complete openEAGO six-phase workflow execution",
+      "description": "Complete OpenEAGO six-phase workflow execution",
       "nodes": [
         {"id": "contract_management", "ref": "$ref:contract-agent"},
         {"id": "planning_negotiation", "ref": "$ref:planning-agent"},
@@ -362,7 +362,7 @@
   ],
 
   "orchestration": {
-    "type": "emcp_six_phase_graph",
+    "type": "eago_six_phase_graph",
     "phases": [
       {"id": "contract_management", "ref": "$ref:contract-agent", "required": true},
       {"id": "planning_negotiation", "ref": "$ref:planning-agent", "required": true},
@@ -388,10 +388,10 @@
     }
   },
 
-  "protocol": {
+  "specification": {
     "version": "0.1.0",
-    "name": "openEAGO",
-    "description": "Enterprise Multi-Agent Communication & Orchestration Protocol",
+    "name": "OpenEAGO",
+    "description": "Open Enterprise Agent Governance & Orchestration",
     "transport": ["http", "grpc", "nats"],
     "security": {
       "authentication": ["mtls", "spire_spiffe", "oauth2"],
@@ -428,7 +428,7 @@
     {
       "id": "agent-registry-service",
       "type": "RemoteTool",
-      "name": "openEAGO Agent Registry",
+      "name": "OpenEAGO Agent Registry",
       "description": "Central registry for agent discovery and capability matching",
       "openapi_spec": {
         "paths": {
@@ -527,7 +527,7 @@
   ],
 
   "runtime": {
-    "target": "emcp_compliant",
+    "target": "eago_compliant",
     "supported_frameworks": ["langgraph", "autogen", "crewai", "custom"],
     "adapters": ["oracle-agent-spec", "json-agents-pam", "eago-native"],
     "scaling": {
@@ -551,7 +551,7 @@
   },
 
   "extensions": {
-    "emcp_specific": {
+    "eago_specific": {
       "six_phase_workflow": true,
       "blockchain_audit": true,
       "spire_spiffe_identity": true,
@@ -629,7 +629,7 @@
     "$comment": "Normative SLA/SLO framework — full design in docs/overview/performance-sla-slo-kpi.md",
     "vocabulary": {
       "sla": "Contractual performance commitment agreed in Phase 2 Negotiation",
-      "slo": "Internal protocol target for a measurable property at a defined percentile",
+      "slo": "Internal target for a measurable property at a defined percentile",
       "sli": "Raw measured value of a specific property, compared against SLO targets at runtime"
     },
     "slo_objective_types": ["latency", "availability", "throughput", "error_rate"],
@@ -660,7 +660,7 @@
   },
 
   "kpi_catalog": {
-    "$comment": "Protocol-level KPIs — full catalog in docs/overview/performance-sla-slo-kpi.md. All KPIs MUST be exported via OpenTelemetry and Prometheus.",
+    "$comment": "Specification-level KPIs — full catalog in docs/overview/performance-sla-slo-kpi.md. All KPIs MUST be exported via OpenTelemetry and Prometheus.",
     "reliability": {
       "phase_success_rate":           {"target": ">=0.99", "phase": "each_phase"},
       "workflow_e2e_success_rate":    {"target": ">=0.95", "phase": "all_phases"},

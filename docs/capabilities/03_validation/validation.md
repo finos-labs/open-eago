@@ -6,9 +6,9 @@ Category: Core Agent - Governance
 
 The Validation Agent receives **execution plans** from the Planning Agent, performs comprehensive policy compliance validation, risk assessment, cost approval, and regulatory framework verification. It acts as the governance gatekeeper that ensures all execution plans meet organizational policies, regulatory requirements, and risk tolerance before proceeding to execution.
 
-## openEAGO Protocol Integration
+## OpenEAGO Specification Integration
 
-The Validation Agent implements **Phase 3 (Validation/Evaluation)** of the six-phase openEAGO architecture:
+The Validation Agent implements **Phase 3 (Validation/Evaluation)** of the six-phase OpenEAGO architecture:
 
 1. Contract Management → Enriched contracts processed
 2. Planning & Negotiation → **Execution plans received**
@@ -943,7 +943,7 @@ Validation Agent → [Validation Decision] → Execution Agent → [Orchestrated
 
 ## Summary
 
-The Validation Agent serves as the governance and compliance gatekeeper of the openEAGO system:
+The Validation Agent serves as the governance and compliance gatekeeper of the OpenEAGO system:
 
 **Core Responsibilities**:
 
@@ -968,4 +968,4 @@ The Validation Agent serves as the governance and compliance gatekeeper of the o
 - **Context**: Enhanced validation context for execution tracking
 - **Security**: Multi-level approval workflows and audit trail maintenance
 
-The Validation Agent ensures that all execution plans meet organizational governance requirements, regulatory compliance standards, and risk tolerance levels before proceeding to execution, maintaining the integrity and compliance of the openEAGO system.
+The Validation Agent ensures that all execution plans meet organizational governance requirements, regulatory compliance standards, and risk tolerance levels before proceeding to execution, maintaining the integrity and compliance of the OpenEAGO system.

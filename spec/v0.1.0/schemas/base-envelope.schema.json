@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://finos-labs.github.io/open-eago/spec/v0.1.0/schemas/base-envelope.schema.json",
-  "title": "openEAGO Base Envelope",
+  "title": "OpenEAGO Base Envelope",
   "type": "object",
   "required": ["message_id", "phase", "timestamp", "payload"],
   "properties": {

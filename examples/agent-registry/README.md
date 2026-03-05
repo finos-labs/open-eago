@@ -1,6 +1,6 @@
-# openEAGO Agent Registry
+# OpenEAGO Agent Registry
 
-A reference implementation of a distributed agent registry for the [openEAGO](../../README.md) architecture. Agents register themselves, exchange capability metadata, and discover peers through bootstrap servers — all over mutual TLS enforced by [SPIRE](https://spiffe.io/docs/latest/spire-about/).
+A reference implementation of a distributed agent registry for the [OpenEAGO](../../README.md) architecture. Agents register themselves, exchange capability metadata, and discover peers through bootstrap servers — all over mutual TLS enforced by [SPIRE](https://spiffe.io/docs/latest/spire-about/).
 
 > **Reference implementation only.** Not intended for production use.
 
@@ -170,7 +170,7 @@ cargo build --release
 cargo run --release -- --config config.bootstrap.yaml
 
 # stop
-pkill -f openEAGO-registry
+pkill -f OpenEAGO-registry
 ```
 
 ---

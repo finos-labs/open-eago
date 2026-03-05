@@ -13,7 +13,7 @@ Once the specification reaches stable v1.0 (targeted December 2026), this table 
 
 ## Reporting a Vulnerability
 
-openEAGO is a FINOS-hosted project. Security vulnerabilities should **not** be reported as public GitHub issues.
+OpenEAGO is a FINOS-hosted project. Security vulnerabilities should **not** be reported as public GitHub issues.
 
 ### Preferred Channel: GitHub Private Vulnerability Reporting
 
@@ -52,7 +52,7 @@ Reporters are kept informed throughout the process. If a report is assessed as n
 
 ### Coordinated Disclosure
 
-openEAGO follows [coordinated vulnerability disclosure](https://vuls.cert.org/confluence/display/CVD). Maintainers ask reporters to allow a reasonable remediation window — typically 90 days from confirmation — before public disclosure. Expedited timelines can be negotiated for high-severity issues under active exploitation.
+OpenEAGO follows [coordinated vulnerability disclosure](https://vuls.cert.org/confluence/display/CVD). Maintainers ask reporters to allow a reasonable remediation window — typically 90 days from confirmation — before public disclosure. Expedited timelines can be negotiated for high-severity issues under active exploitation.
 
 A public security advisory will be published via GitHub Security Advisories once a fix is available, crediting the reporter unless anonymity is requested.
 
@@ -60,7 +60,7 @@ A public security advisory will be published via GitHub Security Advisories once
 
 ### In Scope
 
-- Normative protocol specification language that could enable authentication bypass, privilege escalation, or data exposure in compliant implementations.
+- Normative specification language that could enable authentication bypass, privilege escalation, or data exposure in compliant implementations.
 - JSON schema definitions under `spec/` that fail to enforce stated security invariants.
 - The reference agent registry implementation under `examples/agent-registry` (Rust/actix-web), including TLS configuration, mTLS certificate handling, SPIFFE/SPIRE integration, and authentication logic.
 - Documented security guidance (under `docs/overview/security.md`) that is materially incorrect or misleading.
@@ -74,7 +74,7 @@ A public security advisory will be published via GitHub Security Advisories once
 
 ## Security Considerations for Implementers
 
-openEAGO is designed for enterprise environments with strong security requirements. Implementers are expected to follow the guidance in [docs/overview/security.md](docs/overview/security.md), including:
+OpenEAGO is designed for enterprise environments with strong security requirements. Implementers are expected to follow the guidance in [docs/overview/security.md](docs/overview/security.md), including:
 
 - **Mutual TLS (mTLS)** for all inter-agent communication using SPIFFE/SPIRE-issued SVIDs.
 - **OAuth 2.0 / SAML** for external authentication at the contract boundary.

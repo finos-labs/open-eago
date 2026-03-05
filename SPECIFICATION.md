@@ -1,12 +1,12 @@
-# openEAGO Specification
+# OpenEAGO Specification
 
 ## 1. Abstract and Scope
 
-openEAGO (Enterprise Multi-Agent Communication & Orchestration Protocol) defines a normative protocol for secure, compliant, and resilient multi-agent orchestration in enterprise environments.
+OpenEAGO (Enterprise Multi-Agent Communication & Orchestration Specification) defines a normative specification for secure, compliant, and resilient multi-agent orchestration in enterprise environments.
 
 This document is the **single source of truth for human-readable normative behavior**. Machine-readable artifacts are maintained in [spec/v0.1.0/spec.json](spec/v0.1.0/spec.json) and in [spec/v0.1.0/schemas/](spec/v0.1.0/schemas/).
 
-openEAGO standardizes exactly six protocol phases, required security controls, identity constraints, and conformance expectations for implementations operating in regulated contexts.
+OpenEAGO standardizes exactly six specification phases, required security controls, identity constraints, and conformance expectations for implementations operating in regulated contexts.
 
 ## 2. Terminology and Glossary
 
@@ -16,8 +16,8 @@ The keywords **MUST**, **MUST NOT**, **REQUIRED**, **SHOULD**, **SHOULD NOT**, a
 
 ### 2.2 Core Terms
 
-- **openEAGO**: The open standard protocol and governance umbrella.
-- ****: Protocol shorthand used in technical fields and payload labels.
+- **OpenEAGO**: The open standard specification and governance umbrella.
+- ****: Specification shorthand used in technical fields and payload labels.
 - **OASF**: Open Agent Schema Framework.
 - **ACU**: Assumed Cost Unit, a normalized non-currency planning unit for comparative cost/risk estimation.
 - **Context Hierarchy**: Ordered context levels: `session` → `conversation` → `agent` → `task`.
@@ -25,12 +25,12 @@ The keywords **MUST**, **MUST NOT**, **REQUIRED**, **SHOULD**, **SHOULD NOT**, a
 - **Validation**: Formal checks and approvals against policy, compliance, and risk thresholds.
 - **Human-in-the-Loop (HITL)**: Mandatory human approval gate for high-impact workflows in Phase 3.
 - **SLA** (Service Level Agreement): A contractual performance commitment agreed between an agent provider and consumer during Phase 2 Negotiation. See [docs/overview/performance-sla-slo-kpi.md](docs/overview/performance-sla-slo-kpi.md).
-- **SLO** (Service Level Objective): An internal protocol target for a specific measurable property at a defined percentile, operationalizing an SLA. SLOs MUST cover latency, availability, throughput, and error rate.
+- **SLO** (Service Level Objective): An internal specification target for a specific measurable property at a defined percentile, operationalizing an SLA. SLOs MUST cover latency, availability, throughput, and error rate.
 - **SLI** (Service Level Indicator): The raw measured value of a specific property, compared against SLO targets at runtime.
 - **Risk Tier**: A classification (`low`, `medium`, `high`, `critical`) derived from the composite risk score computed in Phase 3. See [docs/overview/risk-management.md](docs/overview/risk-management.md).
 - **Composite Risk Score**: A weighted score `∈ [0.0, 1.0]` aggregating four risk dimensions (financial, operational, compliance, security) assessed during Phase 3.
 - **Circuit Breaker**: A resilience control in Phase 4 that halts execution when two or more runtime risk indicators simultaneously breach their thresholds.
-- **KPI** (Key Performance Indicator): A protocol-level metric that implementations MUST track and expose. The normative KPI catalog is defined in [docs/overview/performance-sla-slo-kpi.md](docs/overview/performance-sla-slo-kpi.md).
+- **KPI** (Key Performance Indicator): A specification-level metric that implementations MUST track and expose. The normative KPI catalog is defined in [docs/overview/performance-sla-slo-kpi.md](docs/overview/performance-sla-slo-kpi.md).
 
 ## 3. Normative References
 
@@ -48,14 +48,14 @@ The keywords **MUST**, **MUST NOT**, **REQUIRED**, **SHOULD**, **SHOULD NOT**, a
 
 ### 3A.1 OASF Version Target
 
-- openEAGO v0.1 targets **OASF major version 1.x** (minimum baseline: **0.1.0**).
-- Each openEAGO release MUST declare its exact OASF target in release notes and conformance artifacts.
+- OpenEAGO v0.1 targets **OASF major version 1.x** (minimum baseline: **0.1.0**).
+- Each OpenEAGO release MUST declare its exact OASF target in release notes and conformance artifacts.
 
 ### 3A.2 Compatibility Policy
 
-- openEAGO implementations MUST remain compatible with the declared OASF target version for the same release line.
-- openEAGO MAY add extension fields, but MUST NOT change the normative meaning of mapped OASF concepts.
-- Additive openEAGO changes SHOULD preserve backward compatibility for at least one minor release.
+- OpenEAGO implementations MUST remain compatible with the declared OASF target version for the same release line.
+- OpenEAGO MAY add extension fields, but MUST NOT change the normative meaning of mapped OASF concepts.
+- Additive OpenEAGO changes SHOULD preserve backward compatibility for at least one minor release.
 
 ### 3A.3 Breaking-Change Rules
 
@@ -71,15 +71,15 @@ Breaking changes MUST include migration guidance and updated traceability eviden
 
 Conformance outcomes are tied to schema validation and mapping evidence:
 
-- **pass**: all required openEAGO schemas validate and all mandatory OASF-mapped requirements have passing evidence.
+- **pass**: all required OpenEAGO schemas validate and all mandatory OASF-mapped requirements have passing evidence.
 - **conditional**: core schemas validate, but one or more non-blocking OASF-mapped requirements are pending remediation.
 - **fail**: any required schema validation fails, or any mandatory OASF-mapped requirement lacks passing evidence.
 
 ### 3A.5 OASF Traceability Matrix
 
-This matrix links protocol requirements to OASF requirement IDs, machine schema paths, and test/audit evidence.
+This matrix links specification requirements to OASF requirement IDs, machine schema paths, and test/audit evidence.
 
-| openEAGO requirement | OASF requirement ID | Schema path | Test evidence |
+| OpenEAGO requirement | OASF requirement ID | Schema path | Test evidence |
 | --- | --- | --- | --- |
 | Six standardized phase identifiers are enforced | OASF-PHASE-001 | `spec/v0.1.0/schemas/base-envelope.schema.json` | `tests/conformance/phase-enum.json` (or equivalent CI evidence) |
 | Planning includes explicit negotiation sub-step | OASF-PLAN-NEG-001 | `spec/v0.1.0/schemas/planning-negotiation.schema.json` | `tests/conformance/planning-negotiation.json` |
@@ -92,7 +92,7 @@ This matrix links protocol requirements to OASF requirement IDs, machine schema 
 
 ## 4. Architecture and Phases
 
-openEAGO implementations MUST expose and process the following **exact six phases**:
+OpenEAGO implementations MUST expose and process the following **exact six phases**:
 
 1. **Contract Management**
 2. **Planning & Negotiation**
@@ -159,7 +159,7 @@ Implementations MUST support deterministic orchestration behavior with resilienc
 - Implementations MUST implement the **SLA breach state machine** defined in [docs/overview/performance-sla-slo-kpi.md](docs/overview/performance-sla-slo-kpi.md), including all state transition requirements and event emission.
 - Implementations MUST monitor and emit events for the following runtime risk indicators: `agent_failure_rate`, `cost_overrun_ratio`, `sla_breach_indicator`, `anomaly_score`. Threshold definitions are in Appendix E.
 - Implementations MUST include `sla_compliance_status` (with `breach_state` and per-SLO status) in execution result outputs. See Appendix D.
-- Implementations MUST emit all protocol-level KPIs defined in [docs/overview/performance-sla-slo-kpi.md](docs/overview/performance-sla-slo-kpi.md) via the declared observability stack (OpenTelemetry + Prometheus).
+- Implementations MUST emit all specification-level KPIs defined in [docs/overview/performance-sla-slo-kpi.md](docs/overview/performance-sla-slo-kpi.md) via the declared observability stack (OpenTelemetry + Prometheus).
 
 ### 4.5 Phase 5: Context & State Management
 
@@ -173,7 +173,7 @@ Implementations MUST support secure message exchange, routing integrity, and del
 
 Machine-readable schema artifacts are defined in:
 
-- [spec/v0.1.0/spec.json](spec/v0.1.0/spec.json) (protocol-level machine model)
+- [spec/v0.1.0/spec.json](spec/v0.1.0/spec.json) (specification-level machine model)
 - [spec/v0.1.0/schemas/](spec/v0.1.0/schemas/) (versioned schema set)
 
 The human-readable normative interpretation in this document governs in case of ambiguity; schemas MUST be updated to remain aligned.
@@ -222,7 +222,7 @@ An implementation is conformant only if it:
 5. Preserves auditable records of planning, validation, execution, and delivery outcomes.
 6. Aligns machine artifacts in [spec/v0.1.0/spec.json](spec/v0.1.0/spec.json) and [spec/v0.1.0/schemas/](spec/v0.1.0/schemas/) with this document.
 7. Implements the SLA breach state machine, circuit breaker, and runtime risk indicator monitoring defined in Appendices D and E.
-8. Emits all protocol-level KPIs defined in [docs/overview/performance-sla-slo-kpi.md](docs/overview/performance-sla-slo-kpi.md) via OpenTelemetry and Prometheus.
+8. Emits all specification-level KPIs defined in [docs/overview/performance-sla-slo-kpi.md](docs/overview/performance-sla-slo-kpi.md) via OpenTelemetry and Prometheus.
 9. Propagates `risk_context` across all six phase transition payloads.
 
 Conformance claims SHOULD declare supported profile(s), auth level(s), and known limitations.
@@ -245,7 +245,7 @@ Implementations SHOULD document threats and mitigations including identity spoof
 
 ### Appendix C: Examples
 
-Protocol examples SHOULD include at least:
+Specification examples SHOULD include at least:
 
 - One end-to-end 6-phase flow.
 - One negotiation-to-validation modification flow.
@@ -282,7 +282,7 @@ Execution result outputs MUST include a `sla_compliance_status` object with:
 - `overall_sla_status`: `"met"` if all SLOs remained in `active` or `completed` state throughout execution; `"breached"` otherwise.
 - Per-SLO observed values and met/breached status.
 
-**D.4 Protocol-Level KPI Emission**:
+**D.4 Specification-Level KPI Emission**:
 
 Implementations MUST expose the following KPI categories via OpenTelemetry and Prometheus:
 
@@ -324,7 +324,7 @@ Implementations MUST monitor these indicators during Phase 4 and emit a `risk_ev
 
 **E.4 Circuit Breaker Requirement**:
 
-Implementations MUST implement a circuit breaker that trips when **two or more** runtime risk indicators simultaneously breach their thresholds. On activation, implementations MUST: (1) pause execution, (2) emit a `circuit_breaker_trip` event to the audit trail, and (3) escalate to the HITL protocol.
+Implementations MUST implement a circuit breaker that trips when **two or more** runtime risk indicators simultaneously breach their thresholds. On activation, implementations MUST: (1) pause execution, (2) emit a `circuit_breaker_trip` event to the audit trail, and (3) escalate to the HITL.
 
 **E.5 Risk Context Propagation**:
 

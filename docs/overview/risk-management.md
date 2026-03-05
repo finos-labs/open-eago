@@ -1,23 +1,23 @@
 # Risk Management Framework
 
-Category: Cross-Cutting Concern — Applies to all six openEAGO protocol phases
+Category: Cross-Cutting Concern — Applies to all six OpenEAGO specification phases
 
 ## Overview
 
-Risk management is a **first-class protocol goal** in openEAGO, not an optional quality measure. Every request processed by an openEAGO-compliant implementation MUST traverse a documented risk lifecycle that spans all six phases, from initial risk identification at Phase 1 (Contract Management) through runtime risk monitoring at Phase 4 (Execution & Resilience) and final risk reporting at Phase 6 (Communication & Delivery).
+Risk management is a **first-class specification goal** in OpenEAGO, not an optional quality measure. Every request processed by an OpenEAGO-compliant implementation MUST traverse a documented risk lifecycle that spans all six phases, from initial risk identification at Phase 1 (Contract Management) through runtime risk monitoring at Phase 4 (Execution & Resilience) and final risk reporting at Phase 6 (Communication & Delivery).
 
-openEAGO targets regulated enterprise environments — primarily financial services — where unmanaged risk directly translates to regulatory fines (DORA, BCBS 239, EU AI Act), operational failures, and reputational harm. The risk management framework defined here provides:
+OpenEAGO targets regulated enterprise environments — primarily financial services — where unmanaged risk directly translates to regulatory fines (DORA, BCBS 239, EU AI Act), operational failures, and reputational harm. The risk management framework defined here provides:
 
 - A normative four-dimension **risk taxonomy** with quantitative thresholds
 - A **cross-phase risk lifecycle** ensuring risk context is propagated and re-evaluated at every phase transition
-- A normative **risk escalation protocol** defining automatic rejection, Human-in-the-Loop (HITL), and monitoring trigger conditions
+- A normative **risk escalation process** defining automatic rejection, Human-in-the-Loop (HITL), and monitoring trigger conditions
 - Alignment mappings to key regulatory frameworks (SR 11-7, EU AI Act, NIST AI RMF, BCBS 239)
 
 This document is the canonical cross-phase reference for risk. Per-phase implementation details are covered in the individual capability documents; this document governs the shared vocabulary, thresholds, and lifecycle rules that all phases MUST comply with.
 
 ## Risk Taxonomy
 
-openEAGO defines exactly **four primary risk dimensions**. Every risk score and tier label used in the protocol MUST reference this taxonomy.
+OpenEAGO defines exactly **four primary risk dimensions**. Every risk score and tier label used in the specification MUST reference this taxonomy.
 
 ### Dimension Definitions
 
@@ -28,7 +28,7 @@ openEAGO defines exactly **four primary risk dimensions**. Every risk score and 
 | **Compliance Risk** | Probability of regulatory violation, policy breach, audit finding, or jurisdiction non-compliance | Phase 3 (Validation), Phase 6 (Communication) | 0.30 |
 | **Security Risk** | Probability of unauthorized data access, identity spoofing, secret leakage, or integrity compromise | Phase 1 (Contract), Phase 4 (Execution) | 0.25 |
 
-> **Note on Availability Risk**: Availability risk (SLA violation probability) was historically tracked as a fifth dimension. In openEAGO v0.1, availability risk is **subsumed into Operational Risk** with an explicit `sla_breach_probability` sub-field. See [Performance SLA/SLO and KPIs](./performance-sla-slo-kpi.md) for the full SLA model.
+> **Note on Availability Risk**: Availability risk (SLA violation probability) was historically tracked as a fifth dimension. In OpenEAGO v0.1, availability risk is **subsumed into Operational Risk** with an explicit `sla_breach_probability` sub-field. See [Performance SLA/SLO and KPIs](./performance-sla-slo-kpi.md) for the full SLA model.
 
 The default weights above reflect a compliance-first posture appropriate for regulated financial services. Implementations **MAY** adjust weights to match their organizational risk appetite by declaring the adjusted weights in their conformance profile, but MUST document any deviation and MUST NOT reduce `compliance_risk` weight below **0.25**.
 
@@ -119,7 +119,7 @@ This is the **authoritative checkpoint** for all four risk dimensions.
 - High and critical risk events MUST trigger stakeholder notifications per the communication routing rules.
 - Risk audit records MUST be anchored to the blockchain audit trail.
 
-## Risk Escalation Protocol
+## Risk Escalation Process
 
 The following state machine governs risk escalation decisions. All implementations MUST implement this state machine as the authoritative source for "proceed vs. pause vs. reject" decisions.
 
@@ -153,7 +153,7 @@ stateDiagram-v2
 
 ### Escalation Decision Table
 
-| Trigger | Tier | Protocol Response | MUST / SHOULD |
+| Trigger | Tier | Response | MUST / SHOULD |
 | --- | --- | --- | --- |
 | `composite_risk_score ≥ 0.80` | `critical` | Automatic rejection before Phase 4 | **MUST** |
 | `composite_risk_score ∈ [0.60, 0.80)` | `high` | HITL gate; require named human approver | **MUST** |
@@ -166,9 +166,9 @@ stateDiagram-v2
 
 ## Regulatory Framework Alignment
 
-openEAGO's risk management framework is designed to satisfy or directly support compliance with the following regulatory and governance frameworks.
+OpenEAGO's risk management framework is designed to satisfy or directly support compliance with the following regulatory and governance frameworks.
 
-| Framework | Relevant Requirements | openEAGO Mapping |
+| Framework | Relevant Requirements | OpenEAGO Mapping |
 | --- | --- | --- |
 | **SR 11-7** (Federal Reserve — Model Risk Management) | Model validation, governance, ongoing monitoring | Phase 3 composite risk score, HITL gate, Phase 4 runtime monitoring |
 | **EU AI Act** (High-Risk AI classification) | Risk assessment before deployment; human oversight; incident reporting | Phase 1 risk identification, Phase 3 critical/high tier controls, Phase 6 risk reporting |
@@ -179,7 +179,7 @@ openEAGO's risk management framework is designed to satisfy or directly support 
 
 ### Operational Resilience and Continuity Planning
 
-DORA Article 5 requires financial entities to have ICT risk management frameworks that cover identification, protection, detection, response, and recovery. openEAGO maps these to:
+DORA Article 5 requires financial entities to have ICT risk management frameworks that cover identification, protection, detection, response, and recovery. OpenEAGO maps these to:
 
 - **Identification** → Phase 1 risk identification (`risk_flags`) and Phase 3 four-dimension assessment
 - **Protection** → Phase 3 rejection and HITL controls; agent registry minimum reliability bar
@@ -189,7 +189,7 @@ DORA Article 5 requires financial entities to have ICT risk management framework
 
 ### Model Risk Management (SR 11-7)
 
-SR 11-7 requires documented model risk management encompassing model development, validation, and ongoing governance. openEAGO addresses this as follows:
+SR 11-7 requires documented model risk management encompassing model development, validation, and ongoing governance. OpenEAGO addresses this as follows:
 
 - **Pre-execution validation** → Phase 3 authoritative risk assessment with audit trail
 - **Runtime monitoring** → Phase 4 `agent_failure_rate`, `anomaly_score` tracking
@@ -257,13 +257,13 @@ The `risk_context` object is a **first-class field** in all phase transition pay
 
 ## Summary
 
-Risk management in openEAGO is a first-class protocol concern, not an advisory feature:
+Risk management in OpenEAGO is a first-class specification concern, not an advisory feature:
 
 - **Every execution MUST carry a `risk_context`** propagated across all six phases
 - **Phase 3 is the authoritative risk checkpoint** — composite scores govern automatic rejection (`critical`) and HITL gating (`high`)
 - **Phase 4 monitors risk in real time** — circuit breakers trip when multiple indicators breach simultaneously
 - **Risk data is immutably persisted** — 7-year minimum in regulated profiles; blockchain-anchored audit records in Phase 6
-- **Regulatory alignment is explicit** — SR 11-7, EU AI Act, NIST AI RMF, BCBS 239, DORA all mapped to specific protocol controls
+- **Regulatory alignment is explicit** — SR 11-7, EU AI Act, NIST AI RMF, BCBS 239, DORA all mapped to defined specification controls
 
 For SLA/SLO definitions and the KPI catalog (including the `sla_breach_probability` component of Operational Risk), see [Performance SLA/SLO and KPIs](./performance-sla-slo-kpi.md).
 
