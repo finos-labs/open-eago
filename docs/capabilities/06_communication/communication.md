@@ -6,9 +6,9 @@ Category: Core Agent - Communication
 
 The Communication Agent receives **context state** from the Context Agent, generates intelligent responses, manages multi-channel communication delivery, handles notifications and alerts, and provides comprehensive audit trails. It acts as the final phase that transforms executed workflows into user-friendly responses while maintaining compliance, personalization, and communication preferences.
 
-## OpenEMCP Protocol Integration
+## openEAGO Protocol Integration
 
-The Communication Agent implements **Phase 6 (Communication)** of the six-phase OpenEMCP architecture:
+The Communication Agent implements **Phase 6 (Communication)** of the six-phase openEAGO architecture:
 
 1. Contract Management → Workflow initiation completed
 2. Planning & Negotiation → Agent orchestration completed  
@@ -51,7 +51,7 @@ Context Agent → [Context State] → Communication Agent → [Multi-Channel Res
 ```json
 {
   "execution_id": "exec_a7b8c9d2",
-  "emcp_context_state": {
+  "eago_context_state": {
     "record_id": "REC_CONTEXT_E5F6G7",
     "record_type": "context_state",
     "record_status": "updated",
@@ -61,7 +61,7 @@ Context Agent → [Context State] → Communication Agent → [Multi-Channel Res
       "version": "0.1.0",
       "source_execution_id": "EXECUTION_H7D4C9"
     },
-    "emcp_version": "0.1.0",
+    "eago_version": "0.1.0",
     "message_type": "context_state",
     "context_id": "CONTEXT_I8E5D0",
     "execution_id": "EXECUTION_H7D4C9",
@@ -74,7 +74,7 @@ Context Agent → [Context State] → Communication Agent → [Multi-Channel Res
         "client_id": "EXAMPLE_CRM_SYSTEM",
         "authentication": {
           "method": "mtls_spiffe",
-          "spiffe_id": "spiffe://emcp.example.com/workload/crm-service",
+          "spiffe_id": "spiffe://eago.example.com/workload/crm-service",
           "security_level": "high",
           "groups": ["customer_service", "address_updaters", "uk_operations"]
         },
@@ -373,7 +373,7 @@ class NotificationManager:
 ```json
 {
   "execution_id": "exec_a7b8c9d2",
-  "emcp_context_state": {
+  "eago_context_state": {
     // ...complete context state structure from above...
   }
 }
@@ -570,7 +570,7 @@ class NotificationManager:
             <li>Consider optimization recommendations for future workflows</li>
         </ol>
         
-        <p>Best regards,<br>OpenEMCP System</p>
+        <p>Best regards,<br>openEAGO System</p>
     </div>
 </body>
 </html>
@@ -581,7 +581,7 @@ class NotificationManager:
 ```json
 {
   "execution_id": "exec_a7b8c9d2",
-  "emcp_communication_results": {
+  "eago_communication_results": {
     "record_id": "REC_COMMUNICATION_F6G7H8",
     "record_type": "communication_results",
     "record_status": "delivered",
@@ -591,7 +591,7 @@ class NotificationManager:
       "version": "0.1.0",
       "source_context_id": "CONTEXT_I8E5D0"
     },
-    "emcp_version": "0.1.0",
+    "eago_version": "0.1.0",
     "message_type": "communication_results",
     "communication_id": "COMMUNICATION_J9F6E1",
     "context_id": "CONTEXT_I8E5D0",
@@ -833,7 +833,7 @@ The Communication Agent produces the final system response that includes:
 
 ## Summary
 
-The Communication Agent serves as the final phase of the OpenEMCP system:
+The Communication Agent serves as the final phase of the openEAGO system:
 
 **Core Responsibilities**:
 
@@ -858,4 +858,4 @@ The Communication Agent serves as the final phase of the OpenEMCP system:
 - **Analytics**: Communication effectiveness and user engagement measurement
 - **Compliance**: Audit trails and regulatory reporting for communication activities
 
-The Communication Agent completes the OpenEMCP workflow by transforming executed results into personalized, compliant, and effective communications, ensuring users receive relevant, timely, and actionable information while maintaining the highest standards of security, compliance, and user experience.
+The Communication Agent completes the openEAGO workflow by transforming executed results into personalized, compliant, and effective communications, ensuring users receive relevant, timely, and actionable information while maintaining the highest standards of security, compliance, and user experience.

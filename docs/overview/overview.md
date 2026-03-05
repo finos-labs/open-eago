@@ -1,4 +1,4 @@
-# OpenEMCP - Protocol Overview
+# openEAGO - Protocol Overview
 
 ## 1. The Need for Enterprise Agentic AI Protocol
 
@@ -52,7 +52,7 @@ Each step involves:
 
 ### 1.3 Why MCP Doesn't Work for Enterprise
 
-While the Model Context Protocol (MCP) provides valuable capabilities for feeding external context into language models, it falls critically short for enterprise agentic systems. Our comprehensive analysis in the [OpenEMCP Proposal](openemcp_proposal.md) identifies fundamental gaps:
+While the Model Context Protocol (MCP) provides valuable capabilities for feeding external context into language models, it falls critically short for enterprise agentic systems. Our comprehensive analysis in the [openEAGO Proposal](openEAGO_proposal.md) identifies fundamental gaps:
 
 **MCP's Design Limitations:**
 
@@ -72,9 +72,9 @@ While the Model Context Protocol (MCP) provides valuable capabilities for feedin
 - Immutable audit trails for regulatory examination
 - Dynamic service discovery and load balancing across agent ecosystems
 
-## 2. OpenEMCP: Born from Enterprise Necessity
+## 2. openEAGO: Born from Enterprise Necessity
 
-OpenEMCP emerges to fill this critical gap, providing enterprise-grade capabilities that enable secure, compliant, and scalable multi-agent systems for regulated industries.
+openEAGO emerges to fill this critical gap, providing enterprise-grade capabilities that enable secure, compliant, and scalable multi-agent systems for regulated industries.
 
 ### 2.1 Core Enterprise Capabilities
 
@@ -114,7 +114,7 @@ graph TB
 
 ### 2.2 How Capabilities Interconnect
 
-OpenEMCP's architecture creates a cohesive ecosystem where enterprise capabilities reinforce each other:
+openEAGO's architecture creates a cohesive ecosystem where enterprise capabilities reinforce each other:
 
 1. **Security Foundation**: Authentication and authorization enable trusted agent discovery
 2. **Compliance Integration**: Data governance policies drive workflow planning decisions
@@ -122,7 +122,7 @@ OpenEMCP's architecture creates a cohesive ecosystem where enterprise capabiliti
 4. **Audit Continuity**: Blockchain trails provide immutable records across all interactions
 5. **Context Preservation**: Hierarchical context ensures compliance metadata flows with business data
 
-## 3. OpenEMCP Agent Classifications
+## 3. openEAGO Agent Classifications
 
 ### 3.1 Framework Agents
 
@@ -206,7 +206,7 @@ OpenEMCP's architecture creates a cohesive ecosystem where enterprise capabiliti
 
 ## 4. Enterprise Benefits
 
-OpenEMCP delivers transformative capabilities for regulated industries:
+openEAGO delivers transformative capabilities for regulated industries:
 
 - **Eliminates manual coordination** through automated agent discovery and optimal execution planning
 - **Reduces operational overhead** with self-organizing agent ecosystems and dynamic workflow orchestration  
@@ -216,6 +216,6 @@ OpenEMCP delivers transformative capabilities for regulated industries:
 
 ## 5. Conclusion
 
-OpenEMCP represents the evolution from simple AI assistants to enterprise-grade agentic systems capable of handling the complexity, compliance, and reliability demands of modern financial services. By providing a universal standard that works across all agent types—from framework implementations to specialized flow orchestrators—OpenEMCP enables the next generation of banking innovation while maintaining the strict governance required in regulated environments.
+openEAGO represents the evolution from simple AI assistants to enterprise-grade agentic systems capable of handling the complexity, compliance, and reliability demands of modern financial services. By providing a universal standard that works across all agent types—from framework implementations to specialized flow orchestrators—openEAGO enables the next generation of banking innovation while maintaining the strict governance required in regulated environments.
 
 The protocol's design recognizes that enterprise AI is not about individual agents, but about ecosystems of specialized capabilities working together to deliver business outcomes that would be impossible to achieve manually or through traditional automation approaches.

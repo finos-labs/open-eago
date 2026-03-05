@@ -1,4 +1,4 @@
-# OpenEMCP Roadmap (March-December 2026)
+# openEAGO Roadmap (March-December 2026)
 
 Timeline aligned to the original roadmap themes, simplified for manual review.
 
@@ -17,7 +17,7 @@ Timeline aligned to the original roadmap themes, simplified for manual review.
 
 ## Phase 1 Plan (Foundation - Q1 2026)
 
-**Objective:** Establish OpenEMCP as a FINOS incubating project with a stable core specification aligned with OASF and agntcy.org standards.
+**Objective:** Establish openEAGO as a FINOS incubating project with a stable core specification aligned with OASF and agntcy.org standards.
 
 ### Specification
 

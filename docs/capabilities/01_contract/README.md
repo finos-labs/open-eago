@@ -4,7 +4,7 @@ Phase: 1 - Contract Management
 
 ## Purpose
 
-The Contract capability is the protocol entry point. It accepts incoming requests, validates security/compliance context, enriches the request into OpenEMCP/OASF-aligned contract structures, and routes output to Planning.
+The Contract capability is the protocol entry point. It accepts incoming requests, validates security/compliance context, enriches the request into openEAGO/OASF-aligned contract structures, and routes output to Planning.
 
 ## Canonical Reference
 
