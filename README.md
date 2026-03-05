@@ -18,7 +18,7 @@
 
 ---
 
-**Enterprise Agent Governance and Orhcestration (OpenEAGO)** is an open standard for secure, scalable, and compliant communication and orchestration among AI agents in enterprise environments.
+**Enterprise Agent Governance and Orchestration (OpenEAGO)** is an open standard for secure, scalable, and compliant communication and orchestration among AI agents in enterprise environments.
 
 - Authors: Jan Rock (<jan.rock@citi.com>), Denis Urusov (<denis.urusov@citi.com>), Paul Groves (<paul.groves@citi.com>)
 - Date: 18/02/2026 - Version: 0.1
