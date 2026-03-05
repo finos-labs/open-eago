@@ -1,3 +1,3 @@
-# Code of Conduct for OpenEMCP
+# Code of Conduct for openEAGO
 
 Please see the [Community Code of Conduct](https://www.finos.org/code-of-conduct).

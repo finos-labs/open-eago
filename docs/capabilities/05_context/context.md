@@ -4,11 +4,11 @@ Category: Core Agent - State Management
 
 ## Overview
 
-The Context Agent receives **execution results** from the Execution Agent, manages hierarchical context state across the entire OpenEMCP lifecycle, maintains session continuity, enables conversation resumption, and provides state persistence. It acts as the memory and state management system that preserves context across multi-phase workflows and enables complex multi-turn interactions.
+The Context Agent receives **execution results** from the Execution Agent, manages hierarchical context state across the entire openEAGO lifecycle, maintains session continuity, enables conversation resumption, and provides state persistence. It acts as the memory and state management system that preserves context across multi-phase workflows and enables complex multi-turn interactions.
 
-## OpenEMCP Protocol Integration
+## openEAGO Protocol Integration
 
-The Context Agent implements **Phase 5 (Context Management)** of the six-phase OpenEMCP architecture:
+The Context Agent implements **Phase 5 (Context Management)** of the six-phase openEAGO architecture:
 
 1. Contract Management → Session and Conversation context initialization
 2. Planning & Negotiation → Plan context creation and management  
@@ -51,7 +51,7 @@ Execution Agent → [Execution Results] → Context Agent → [Updated Context S
 ```json
 {
   "execution_id": "exec_a7b8c9d2",
-  "emcp_execution_results": {
+  "eago_execution_results": {
     "record_id": "REC_EXECUTION_D4E5F6",
     "record_type": "execution_results",
     "record_status": "completed",
@@ -61,7 +61,7 @@ Execution Agent → [Execution Results] → Context Agent → [Updated Context S
       "version": "0.1.0",
       "source_validation_id": "VALIDATION_G6C3B8"
     },
-    "emcp_version": "0.1.0",
+    "eago_version": "0.1.0",
     "message_type": "execution_results",
     "execution_id": "EXECUTION_H7D4C9",
     "validation_id": "VALIDATION_G6C3B8",
@@ -76,7 +76,7 @@ Execution Agent → [Execution Results] → Context Agent → [Updated Context S
         "client_id": "EXAMPLE_CRM_SYSTEM",
         "authentication": {
           "method": "mtls_spiffe",
-          "spiffe_id": "spiffe://emcp.example.com/workload/crm-service",
+          "spiffe_id": "spiffe://eago.example.com/workload/crm-service",
           "security_level": "high",
           "groups": ["customer_service", "address_updaters", "uk_operations"]
         }
@@ -368,7 +368,7 @@ class SessionContinuityManager:
 ```json
 {
   "execution_id": "exec_a7b8c9d2",
-  "emcp_execution_results": {
+  "eago_execution_results": {
     // ...complete execution results structure from above...
   }
 }
@@ -517,7 +517,7 @@ class SessionContinuityManager:
 ```json
 {
   "execution_id": "exec_a7b8c9d2",
-  "emcp_context_state": {
+  "eago_context_state": {
     "record_id": "REC_CONTEXT_E5F6G7",
     "record_type": "context_state",
     "record_status": "updated",
@@ -527,7 +527,7 @@ class SessionContinuityManager:
       "version": "0.1.0",
       "source_execution_id": "EXECUTION_H7D4C9"
     },
-    "emcp_version": "0.1.0",
+    "eago_version": "0.1.0",
     "message_type": "context_state",
     "context_id": "CONTEXT_I8E5D0",
     "execution_id": "EXECUTION_H7D4C9",
@@ -541,7 +541,7 @@ class SessionContinuityManager:
         "client_id": "EXAMPLE_CRM_SYSTEM",
         "authentication": {
           "method": "mtls_spiffe",
-          "spiffe_id": "spiffe://emcp.example.com/workload/crm-service",
+          "spiffe_id": "spiffe://eago.example.com/workload/crm-service",
           "security_level": "high",
           "groups": ["customer_service", "address_updaters", "uk_operations"]
         },
@@ -806,7 +806,7 @@ Context Agent → [Context State] → Communication Agent → [Context-Aware Res
 
 ## Summary
 
-The Context Agent serves as the memory and state management system of the OpenEMCP:
+The Context Agent serves as the memory and state management system of the openEAGO:
 
 **Core Responsibilities**:
 
@@ -828,7 +828,7 @@ The Context Agent serves as the memory and state management system of the OpenEM
 
 - **Input**: Execution results and state updates from Execution Agent
 - **Output**: Comprehensive context state for Communication Agent
-- **Context**: Central repository for all OpenEMCP workflow context and state information
+- **Context**: Central repository for all openEAGO workflow context and state information
 - **Intelligence**: Behavioral analysis and optimization recommendations for system improvement
 
-The Context Agent enables intelligent, personalized, and continuous multi-agent interactions by maintaining comprehensive state awareness and providing context-driven insights throughout the OpenEMCP workflow lifecycle.
+The Context Agent enables intelligent, personalized, and continuous multi-agent interactions by maintaining comprehensive state awareness and providing context-driven insights throughout the openEAGO workflow lifecycle.

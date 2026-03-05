@@ -1,8 +1,8 @@
-# OpenEMCP - Architecture
+# openEAGO - Architecture
 
 ## Overview
 
-The OpenEMCP (Open Enterprise Multi-Agent Communication Protocol) implements a six-phase logical architecture that enables secure, scalable, and compliant multi-agent collaboration across enterprise environments. This architecture presents the logical view of the system architecture, focusing on component responsibilities, data flow, and integration patterns.
+The openEAGO (Open Enterprise Multi-Agent Communication Protocol) implements a six-phase logical architecture that enables secure, scalable, and compliant multi-agent collaboration across enterprise environments. This architecture presents the logical view of the system architecture, focusing on component responsibilities, data flow, and integration patterns.
 
 ## External Interface (Request)
 
@@ -213,7 +213,7 @@ The architecture depends on a shared security and governance baseline; detailed 
 
 **Common Requirements**:
 
-- EMCP message format compliance
+- EAGO message format compliance
 - Authentication and authorization support
 - Data classification and encryption
 - Blockchain audit event generation
@@ -291,7 +291,7 @@ sequenceDiagram
     participant Context as Context Agent
     participant Communication as Communication Agent
 
-        Note over Contract, Communication: All agents registered in the OpenEMCP registry with real-time state update and context propagation
+        Note over Contract, Communication: All agents registered in the openEAGO registry with real-time state update and context propagation
 
     Client->>Contract: Initiate cross-border data request
     Contract-->>Contract: Validate input completeness, formatting and quality
@@ -458,7 +458,7 @@ sequenceDiagram
 
 ## Summary
 
-The OpenEMCP logical architecture provides a comprehensive six-phase framework for enterprise multi-agent systems:
+The openEAGO logical architecture provides a comprehensive six-phase framework for enterprise multi-agent systems:
 
 **Core Six-Phases**:
 

@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://finos-labs.github.io/open-emcp/spec/v0.1.0/schemas/communication-delivery.schema.json",
-  "title": "OpenEMCP Communication and Delivery",
+  "$id": "https://finos-labs.github.io/open-eago/spec/v0.1.0/schemas/communication-delivery.schema.json",
+  "title": "openEAGO Communication and Delivery",
   "type": "object",
   "required": ["message_id", "sender", "recipient", "delivery_status", "security"],
   "properties": {

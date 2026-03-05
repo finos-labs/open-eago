@@ -4,11 +4,11 @@ Category: Core Agent - Utility
 
 ## Overview
 
-The Contract Agent accepts **any task** in structured or natural language format, validates input, reviews security and compliance details, detects task type, determines workflow patterns, and enriches to OASF-compliant contracts. It acts as the universal entry point for all task types in the EMCP system.
+The Contract Agent accepts **any task** in structured or natural language format, validates input, reviews security and compliance details, detects task type, determines workflow patterns, and enriches to OASF-compliant contracts. It acts as the universal entry point for all task types in the eago system.
 
-## OpenEMCP Protocol Integration
+## openEAGO Protocol Integration
 
-The Contract Agent implements **Phase 1 (Contract Management)** of the six-phase OpenEMCP architecture:
+The Contract Agent implements **Phase 1 (Contract Management)** of the six-phase openEAGO architecture:
 
 1. **Contract Management** ← **Contract Agent (This Component)**
 2. Planning & Negotiation ← Enriched contracts sent to Planner Agent
@@ -27,7 +27,7 @@ External Request → Contract Agent → [Phase 1 Complete] → Planning Agent �
 
 - Implements Level 2 authentication (User/Application-to-Framework)
 - Validates SPIRE/SPIFFE certificates and mTLS connections
-- Enforces OpenEMCP security policies before contract enrichment
+- Enforces openEAGO security policies before contract enrichment
 
 **Context Integration**:
 
@@ -64,7 +64,7 @@ External Request → Contract Agent → [Phase 1 Complete] → Planning Agent �
       "auth_token": "string (required)", // with authentication details e.g., user_id, group/role
       // Authentication Metadata (POST-mTLS verification)
       "authenticated_identity": {
-        "spiffe_id": "spiffe://emcp.example.com/workload/crm-service",
+        "spiffe_id": "spiffe://eago.example.com/workload/crm-service",
         "certificate_subject": "CN=EXAMPLE-CRM-Service,OU=Example-Systems,O=EXAMPLE",
         "certificate_serial": "4A:B2:C8:D9:E1:F7:33:44",
         "authentication_method": "mtls_spiffe", 
@@ -113,7 +113,7 @@ External Request → Contract Agent → [Phase 1 Complete] → Planning Agent �
       "auth_token": "string (required)",
       // Authentication Metadata (POST-mTLS verification)
       "authenticated_identity": {
-        "spiffe_id": "spiffe://emcp.example.com/workload/crm-service",
+        "spiffe_id": "spiffe://eago.example.com/workload/crm-service",
         "certificate_subject": "CN=EXAMPLE-CRM-Service,OU=Example-Systems,O=EXAMPLE",
         "certificate_serial": "4A:B2:C8:D9:E1:F7:33:44",
         "authentication_method": "mtls_spiffe", 
@@ -166,7 +166,7 @@ External Request → Contract Agent → [Phase 1 Complete] → Planning Agent �
       "group_id": ["customer_service", "address_updaters", "uk_operations"],
       "session_id": "sess_20260206_1030_001",
       "authenticated_identity": {
-        "spiffe_id": "spiffe://emcp.example.com/workload/crm-service",
+        "spiffe_id": "spiffe://eago.example.com/workload/crm-service",
         "certificate_subject": "CN=EXAMPLE-CRM-Service,OU=Example-Systems,O=EXAMPLE",
         "certificate_serial": "4A:B2:C8:D9:E1:F7:33:44",
         "authentication_method": "mtls_spiffe", 
@@ -199,7 +199,7 @@ External Request → Contract Agent → [Phase 1 Complete] → Planning Agent �
 ```json
 {
   "execution_id": "exec_a7b8c9d2",
-  "emcp_contract_request": {
+  "eago_contract_request": {
     "record_id": "REC_CONTRACT_F4A8B2",
     "record_type": "contract_request",
     "record_status": "pending",
@@ -209,7 +209,7 @@ External Request → Contract Agent → [Phase 1 Complete] → Planning Agent �
       "version": "0.1.0",
       "source_system": "EXAMPLE_CRM_SYSTEM"
     },
-    "emcp_version": "0.1.0",
+    "eago_version": "0.1.0",
     "message_type": "contract_request", 
     "contract_id": "CONTRACT_E7D3A1",
     "timestamp": "2026-02-06T10:30:15.234Z",
@@ -221,7 +221,7 @@ External Request → Contract Agent → [Phase 1 Complete] → Planning Agent �
       // Enhanced Authentication Context
       "authentication": {
         "method": "mtls_spiffe",
-        "spiffe_id": "spiffe://emcp.example.com/workload/crm-service",
+        "spiffe_id": "spiffe://eago.example.com/workload/crm-service",
         "certificate_serial": "4A:B2:C8:D9:E1:F7:33:44",
         "authenticated_at": "2026-02-06T10:30:14.123Z",
         "security_level": "high",
@@ -399,4 +399,4 @@ External Request → Contract Agent → [Phase 1 Complete] → Planning Agent �
 Raw Input → Validation → Task Detection → Skill Mapping → Regulatory Analysis → OASF Enrichment → Planning Agent
 ```
 
-The Contract Agent successfully transforms diverse input formats into standardized, compliant OASF contracts ready for execution by the OpenEMCP planning and orchestration system.
+The Contract Agent successfully transforms diverse input formats into standardized, compliant OASF contracts ready for execution by the openEAGO planning and orchestration system.

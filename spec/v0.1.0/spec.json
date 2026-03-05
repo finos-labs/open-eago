@@ -4,7 +4,7 @@
   "spec_version": "0.1.0",
   
   "metadata": {
-    "name": "OpenEMCP",
+    "name": "openEAGO",
     "description": "Enterprise Multi-Agent Communication & Orchestration Protocol - Core specification for secure, scalable, and compliant multi-agent collaboration across enterprise environments",
     "version": "0.1.0",
     "authors": [
@@ -333,8 +333,8 @@
 
   "flows": [
     {
-      "id": "emcp-six-phase-workflow",
-      "description": "Complete OpenEMCP six-phase workflow execution",
+      "id": "eago-six-phase-workflow",
+      "description": "Complete openEAGO six-phase workflow execution",
       "nodes": [
         {"id": "contract_management", "ref": "$ref:contract-agent"},
         {"id": "planning_negotiation", "ref": "$ref:planning-agent"},
@@ -390,7 +390,7 @@
 
   "protocol": {
     "version": "0.1.0",
-    "name": "OpenEMCP",
+    "name": "openEAGO",
     "description": "Enterprise Multi-Agent Communication & Orchestration Protocol",
     "transport": ["http", "grpc", "nats"],
     "security": {
@@ -428,7 +428,7 @@
     {
       "id": "agent-registry-service",
       "type": "RemoteTool",
-      "name": "OpenEMCP Agent Registry",
+      "name": "openEAGO Agent Registry",
       "description": "Central registry for agent discovery and capability matching",
       "openapi_spec": {
         "paths": {
@@ -529,7 +529,7 @@
   "runtime": {
     "target": "emcp_compliant",
     "supported_frameworks": ["langgraph", "autogen", "crewai", "custom"],
-    "adapters": ["oracle-agent-spec", "json-agents-pam", "emcp-native"],
+    "adapters": ["oracle-agent-spec", "json-agents-pam", "eago-native"],
     "scaling": {
       "min_replicas": 1,
       "max_replicas": 100,

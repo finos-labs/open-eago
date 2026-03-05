@@ -1,9 +1,9 @@
-# OpenEMCP - Enterprise Multi-Agent Communication & Orchestration Protocol
+# openEAGO - Enterprise Multi-Agent Communication & Orchestration Protocol
 
 <p align="center">
   <br />
-  <a href="https://finos-labs.github.io/open-emcp/">
-    <img src="./docs/images/emcp_logo_dark.png" alt="OpenEMCP Logo" width="600px">
+  <a href="https://finos-labs.github.io/open-eago/">
+    
   </a>
   <br />
 </p>
@@ -12,21 +12,21 @@
 
 <div align="center" style="display: flex; gap: 10px; justify-content: center;">
   <img src="https://user-images.githubusercontent.com/327285/230928932-7c75f8ed-e57b-41db-9fb7-a292a13a1e58.svg" alt="badge-labs">
-  <img src="https://img.shields.io/github/commit-activity/m/finos-labs/open-emcp?style=flat-square" alt="commit activity">
-  <img src="https://img.shields.io/github/last-commit/finos-labs/open-emcp?style=flat-square" alt="last commit">
-  <img src="https://img.shields.io/github/license/finos-labs/open-emcp?style=flat-square" alt="license">
+  <img src="https://img.shields.io/github/commit-activity/m/finos-labs/open-eago?style=flat-square" alt="commit activity">
+  <img src="https://img.shields.io/github/last-commit/finos-labs/open-eago?style=flat-square" alt="last commit">
+  <img src="https://img.shields.io/github/license/finos-labs/open-eago?style=flat-square" alt="license">
 </div>
 
 ---
 
-**Enterprise Multi-Agent Communication & Orchestration Protocol (OpenEMCP)** is an open standard for secure, scalable, and compliant communication and orchestration among AI agents in enterprise environments.
+**Enterprise Multi-Agent Communication & Orchestration Protocol (openEAGO)** is an open standard for secure, scalable, and compliant communication and orchestration among AI agents in enterprise environments.
 
 - Authors: Jan Rock (<jan.rock@citi.com>), Denis Urusov (<denis.urusov@citi.com>), Paul Groves (<paul.groves@citi.com>)
 - Date: 18/02/2026 - Version: 0.1
 
 ## Overview
 
-OpenEMCP addresses the critical gap in enterprise AI infrastructure by providing a universal standard for AI agent interoperability that operates within regulatory boundaries and enterprise security requirements.
+openEAGO addresses the critical gap in enterprise AI infrastructure by providing a universal standard for AI agent interoperability that operates within regulatory boundaries and enterprise security requirements.
 
 The protocol enables:
 
@@ -41,7 +41,7 @@ The protocol enables:
 
 ## Protocol Architecture
 
-OpenEMCP orchestrates multi-agent workflows through a comprehensive protocol architecture:
+openEAGO orchestrates multi-agent workflows through a comprehensive protocol architecture:
 
 **Client Interface:**
 
@@ -58,7 +58,7 @@ OpenEMCP orchestrates multi-agent workflows through a comprehensive protocol arc
 
 ## Prerequisites
 
-In the OpenEMCP framework, **Agent Identity** serves as a **core building block** for ensuring secure and reliable communication between AI agents. The identity management system, in conjunction with the **Agent Registry**, establishes a robust foundation for trust and security. By leveraging advanced mechanisms such as mutual TLS (mTLS), certificate-based authentication, and continuous monitoring, the framework ensures that only verified agents can participate in the ecosystem.
+In the openEAGO framework, **Agent Identity** serves as a **core building block** for ensuring secure and reliable communication between AI agents. The identity management system, in conjunction with the **Agent Registry**, establishes a robust foundation for trust and security. By leveraging advanced mechanisms such as mutual TLS (mTLS), certificate-based authentication, and continuous monitoring, the framework ensures that only verified agents can participate in the ecosystem.
 
 The **Agent Registry** acts as a centralized service discovery and capability management hub, enabling seamless integration and orchestration of AI agents. Together, the identity and registry components form a secure and scalable infrastructure that prevents unauthorized access, ensures compliance with regulatory requirements, and fosters trust in multi-agent interactions.
 
@@ -82,20 +82,20 @@ The **Agent Registry** acts as a centralized service discovery and capability ma
 
 ### Advanced Topics
 
-- [OpenEMCP Proposal](docs/overview/openemcp_proposal.md) - Detailed proposal with distinctive features
+- [openEAGO Proposal](docs/overview/openEAGO_proposal.md) - Detailed proposal with distinctive features
 - [Identity Management](docs/overview/identity.md) - Agent identity and trust establishment
 
-## Why OpenEMCP
+## Why openEAGO
 
-OpenEMCP addresses the critical gap in enterprise AI infrastructure by providing a universal communication standard that preserves framework choice while enabling seamless integration across regulatory boundaries. As organizations scale their AI deployments beyond single agents to complex multi-agent systems, OpenEMCP provides the foundation for secure, observable, and compliant agent ecosystems that operate within the constraints of global data protection and privacy regulations.
+openEAGO addresses the critical gap in enterprise AI infrastructure by providing a universal communication standard that preserves framework choice while enabling seamless integration across regulatory boundaries. As organizations scale their AI deployments beyond single agents to complex multi-agent systems, openEAGO provides the foundation for secure, observable, and compliant agent ecosystems that operate within the constraints of global data protection and privacy regulations.
 
-The protocol's design prioritizes real-world enterprise requirements—regulatory compliance, data sovereignty, cross-border governance, security, and operational resilience—while maintaining the flexibility needed to support diverse implementation approaches and evolving AI technologies. By incorporating data localization, consent management, and automated compliance validation into its core architecture, OpenEMCP enables organizations to deploy AI agents globally while meeting local regulatory requirements.
+The protocol's design prioritizes real-world enterprise requirements—regulatory compliance, data sovereignty, cross-border governance, security, and operational resilience—while maintaining the flexibility needed to support diverse implementation approaches and evolving AI technologies. By incorporating data localization, consent management, and automated compliance validation into its core architecture, openEAGO enables organizations to deploy AI agents globally while meeting local regulatory requirements.
 
-By adopting OpenEMCP, organizations can build agent networks that transcend departmental, vendor, and jurisdictional boundaries while maintaining strict compliance with data protection regulations.
+By adopting openEAGO, organizations can build agent networks that transcend departmental, vendor, and jurisdictional boundaries while maintaining strict compliance with data protection regulations.
 
 ## Philosophy
 
-OpenEMCP is built on the principles of transparency, collaboration, and user empowerment. We believe in creating an open ecosystem where AI agents can interact seamlessly while respecting user privacy and data sovereignty. Our approach emphasizes the importance of regulatory compliance and ethical considerations in AI development and deployment.
+openEAGO is built on the principles of transparency, collaboration, and user empowerment. We believe in creating an open ecosystem where AI agents can interact seamlessly while respecting user privacy and data sovereignty. Our approach emphasizes the importance of regulatory compliance and ethical considerations in AI development and deployment.
 
 **Our goal is to create an enterprise-grade protocol for AI agent interoperability that fosters innovation while ensuring security and regulatory compliance, building upon existing open source projects and industry standards.**
 
@@ -152,4 +152,4 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed contribution guidelines.
 
 - **Project Team** - <jan.rock@citi.com> / <rock@linux.com>
 - **FINOS** - [finos.org](https://www.finos.org/)
-- **GitHub** - [github.com/finos-labs/open-emcp](https://github.com/finos-labs/open-emcp)
+- **GitHub** - [github.com/finos-labs/open-eago](https://github.com/finos-labs/open-eago)

@@ -1,6 +1,6 @@
-# OpenEMCP Schemas
+# openEAGO Schemas
 
-This directory contains versioned machine-readable schema artifacts for OpenEMCP.
+This directory contains versioned machine-readable schema artifacts for openEAGO.
 
 - Human-readable normative source: [../../SPECIFICATION.md](../../SPECIFICATION.md)
 - Protocol-level machine model: [./spec.json](./spec.json)

@@ -1,10 +1,10 @@
 # Performance SLA, SLO, and KPI Framework
 
-Category: Cross-Cutting Concern — Applies to all six OpenEMCP protocol phases
+Category: Cross-Cutting Concern — Applies to all six openEAGO protocol phases
 
 ## Overview
 
-Performance accountability is a **first-class protocol goal** in OpenEMCP. Regulated enterprise environments require measurable, contractually-enforceable service commitments, not aspirational guidelines. This document defines:
+Performance accountability is a **first-class protocol goal** in openEAGO. Regulated enterprise environments require measurable, contractually-enforceable service commitments, not aspirational guidelines. This document defines:
 
 - The normative distinction between **SLA** and **SLO** as used throughout the protocol
 - A formal **SLO objective taxonomy** covering the four dimensions that MUST be specified for every execution plan
@@ -17,9 +17,9 @@ This document is the canonical cross-phase reference for performance. For the ri
 
 ## SLA vs. SLO — Normative Definitions
 
-OpenEMCP uses these terms with precise, distinct meanings throughout all protocol documents and schemas. Implementations MUST NOT use them interchangeably.
+openEAGO uses these terms with precise, distinct meanings throughout all protocol documents and schemas. Implementations MUST NOT use them interchangeably.
 
-| Term | OpenEMCP Definition |
+| Term | openEAGO Definition |
 | --- | --- |
 | **SLA** (Service Level Agreement) | A contractual commitment made between an agent provider and its consumer, agreed during Phase 2 (Planning & Negotiation). Breaching an SLA is a reportable event requiring escalation per the breach state machine. |
 | **SLO** (Service Level Objective) | An internal protocol target for a specific measurable property at a defined percentile. SLOs are the mechanism by which SLA commitments are operationalized. An SLA is only met when all constituent SLOs are met. |
@@ -188,7 +188,7 @@ When the breach state machine transitions to `breached` or beyond, implementatio
 
 ## Protocol-Level KPI Catalog
 
-These are the KPIs the OpenEMCP protocol itself MUST track and emit. They are protocol-level observability requirements — distinct from business-level KPIs defined by individual implementations.
+These are the KPIs the openEAGO protocol itself MUST track and emit. They are protocol-level observability requirements — distinct from business-level KPIs defined by individual implementations.
 
 All implementations MUST expose these KPIs via the declared observability stack (OpenTelemetry + Prometheus per `spec/v0.1.0/spec.json`). KPI data MUST be available for query by authorized monitoring systems.
 
@@ -243,7 +243,7 @@ All implementations MUST expose these KPIs via the declared observability stack 
 
 ## Agent Registry Minimum Performance Bar
 
-Every agent registered in the OpenEMCP Agent Registry MUST meet the following minimum performance bar. The Planning Agent MUST NOT select an agent that fails any of these minimums for an execution plan, regardless of cost or capability fit score.
+Every agent registered in the openEAGO Agent Registry MUST meet the following minimum performance bar. The Planning Agent MUST NOT select an agent that fails any of these minimums for an execution plan, regardless of cost or capability fit score.
 
 | Property | Minimum Required Value | Eviction Rule |
 | --- | --- | --- |
@@ -286,7 +286,7 @@ Negotiation checks MUST include `"sla_slo"` in the `checks` array. A negotiation
 
 ## Summary
 
-Performance accountability in OpenEMCP is enforced through three concrete mechanisms:
+Performance accountability in openEAGO is enforced through three concrete mechanisms:
 
 1. **SLA Negotiation (Phase 2)**: Every execution plan MUST pass a formal four-dimension SLO feasibility check. Plans where agent SLOs cannot be met are rejected at negotiation, not discovered at runtime.
 

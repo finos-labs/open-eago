@@ -6,9 +6,9 @@ Category: Core Agent - Orchestration
 
 The Execution Agent receives **validated execution plans** from the Validation Agent, orchestrates multi-agent workflows, manages task execution, monitors performance, and handles failures. It acts as the runtime orchestration engine that transforms approved plans into executed results while maintaining compliance, monitoring, and audit requirements.
 
-## OpenEMCP Protocol Integration
+## openEAGO Protocol Integration
 
-The Execution Agent implements **Phase 4 (Execution)** of the six-phase OpenEMCP architecture:
+The Execution Agent implements **Phase 4 (Execution)** of the six-phase openEAGO architecture:
 
 1. Contract Management → Contract processing completed
 2. Planning & Negotiation → Plan generation completed  
@@ -51,7 +51,7 @@ Validation Agent → [Validation Decision] → Execution Agent → [Orchestrated
 ```json
 {
   "execution_id": "exec_a7b8c9d2",
-  "emcp_validation_decision": {
+  "eago_validation_decision": {
     "record_id": "REC_VALIDATION_C9D3E4",
     "record_type": "validation_decision",
     "record_status": "approved",
@@ -61,7 +61,7 @@ Validation Agent → [Validation Decision] → Execution Agent → [Orchestrated
       "version": "0.1.0",
       "source_plan_id": "PLAN_F5B2C7"
     },
-    "emcp_version": "0.1.0",
+    "eago_version": "0.1.0",
     "message_type": "validation_decision",
     "validation_id": "VALIDATION_G6C3B8",
     "plan_id": "PLAN_F5B2C7",
@@ -75,7 +75,7 @@ Validation Agent → [Validation Decision] → Execution Agent → [Orchestrated
         "client_id": "EXAMPLE_CRM_SYSTEM",
         "authentication": {
           "method": "mtls_spiffe",
-          "spiffe_id": "spiffe://emcp.example.com/workload/crm-service",
+          "spiffe_id": "spiffe://eago.example.com/workload/crm-service",
           "security_level": "high",
           "groups": ["customer_service", "address_updaters", "uk_operations"]
         }
@@ -544,7 +544,7 @@ All execution result outputs MUST include an `sla_compliance_status` object:
 ```json
 {
   "execution_id": "exec_a7b8c9d2",
-  "emcp_validation_decision": {
+  "eago_validation_decision": {
     // ...complete validation decision structure from above...
   }
 }
@@ -645,7 +645,7 @@ Completion Results:
 ```json
 {
   "execution_id": "exec_a7b8c9d2",
-  "emcp_execution_results": {
+  "eago_execution_results": {
     "record_id": "REC_EXECUTION_D4E5F6",
     "record_type": "execution_results",
     "record_status": "completed",
@@ -655,7 +655,7 @@ Completion Results:
       "version": "0.1.0",
       "source_validation_id": "VALIDATION_G6C3B8"
     },
-    "emcp_version": "0.1.0",
+    "eago_version": "0.1.0",
     "message_type": "execution_results",
     "execution_id": "EXECUTION_H7D4C9",
     "validation_id": "VALIDATION_G6C3B8",
@@ -671,7 +671,7 @@ Completion Results:
         "client_id": "EXAMPLE_CRM_SYSTEM",
         "authentication": {
           "method": "mtls_spiffe",
-          "spiffe_id": "spiffe://emcp.example.com/workload/crm-service",
+          "spiffe_id": "spiffe://eago.example.com/workload/crm-service",
           "security_level": "high",
           "groups": ["customer_service", "address_updaters", "uk_operations"]
         }
@@ -1001,7 +1001,7 @@ All metrics MUST be exported via OpenTelemetry traces and Prometheus metrics scr
 
 ## Summary
 
-The Execution Agent serves as the runtime orchestration engine of the OpenEMCP system:
+The Execution Agent serves as the runtime orchestration engine of the openEAGO system:
 
 **Core Responsibilities**:
 
@@ -1026,4 +1026,4 @@ The Execution Agent serves as the runtime orchestration engine of the OpenEMCP s
 - **Context**: Runtime execution state and inter-agent communication tracking
 - **Security**: Continuous security monitoring and breach detection
 
-The Execution Agent transforms validated plans into executed results through intelligent orchestration, monitoring, and failure management, ensuring reliable and compliant multi-agent workflow execution in the OpenEMCP architecture.
+The Execution Agent transforms validated plans into executed results through intelligent orchestration, monitoring, and failure management, ensuring reliable and compliant multi-agent workflow execution in the openEAGO architecture.
