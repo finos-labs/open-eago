@@ -13,13 +13,13 @@ Once the specification reaches stable v1.0 (targeted December 2026), this table 
 
 ## Reporting a Vulnerability
 
-OpenEMCP is a FINOS-hosted project. Security vulnerabilities should **not** be reported as public GitHub issues.
+openEAGO is a FINOS-hosted project. Security vulnerabilities should **not** be reported as public GitHub issues.
 
 ### Preferred Channel: GitHub Private Vulnerability Reporting
 
 Use GitHub's built-in private security advisory feature:
 
-1. Navigate to the [Security tab](https://github.com/finos-labs/open-emcp/security) of the repository.
+1. Navigate to the [Security tab](https://github.com/finos-labs/open-eago/security) of the repository.
 2. Click **"Report a vulnerability"**.
 3. Fill in the advisory form with as much detail as possible (see below).
 
@@ -52,7 +52,7 @@ Reporters are kept informed throughout the process. If a report is assessed as n
 
 ### Coordinated Disclosure
 
-OpenEMCP follows [coordinated vulnerability disclosure](https://vuls.cert.org/confluence/display/CVD). Maintainers ask reporters to allow a reasonable remediation window — typically 90 days from confirmation — before public disclosure. Expedited timelines can be negotiated for high-severity issues under active exploitation.
+openEAGO follows [coordinated vulnerability disclosure](https://vuls.cert.org/confluence/display/CVD). Maintainers ask reporters to allow a reasonable remediation window — typically 90 days from confirmation — before public disclosure. Expedited timelines can be negotiated for high-severity issues under active exploitation.
 
 A public security advisory will be published via GitHub Security Advisories once a fix is available, crediting the reporter unless anonymity is requested.
 
@@ -74,7 +74,7 @@ A public security advisory will be published via GitHub Security Advisories once
 
 ## Security Considerations for Implementers
 
-OpenEMCP is designed for enterprise environments with strong security requirements. Implementers are expected to follow the guidance in [docs/overview/security.md](docs/overview/security.md), including:
+openEAGO is designed for enterprise environments with strong security requirements. Implementers are expected to follow the guidance in [docs/overview/security.md](docs/overview/security.md), including:
 
 - **Mutual TLS (mTLS)** for all inter-agent communication using SPIFFE/SPIRE-issued SVIDs.
 - **OAuth 2.0 / SAML** for external authentication at the contract boundary.

@@ -6,9 +6,9 @@ Category: Core Agent - Governance
 
 The Validation Agent receives **execution plans** from the Planning Agent, performs comprehensive policy compliance validation, risk assessment, cost approval, and regulatory framework verification. It acts as the governance gatekeeper that ensures all execution plans meet organizational policies, regulatory requirements, and risk tolerance before proceeding to execution.
 
-## OpenEMCP Protocol Integration
+## openEAGO Protocol Integration
 
-The Validation Agent implements **Phase 3 (Validation/Evaluation)** of the six-phase OpenEMCP architecture:
+The Validation Agent implements **Phase 3 (Validation/Evaluation)** of the six-phase openEAGO architecture:
 
 1. Contract Management → Enriched contracts processed
 2. Planning & Negotiation → **Execution plans received**
@@ -51,7 +51,7 @@ Planning Agent → [Execution Plan] → Validation Agent → [Validation Decisio
 ```json
 {
   "execution_id": "exec_a7b8c9d2",
-  "emcp_execution_plan": {
+  "eago_execution_plan": {
     "record_id": "REC_PLAN_B8C9D3",
     "record_type": "execution_plan",
     "record_status": "pending_validation",
@@ -61,7 +61,7 @@ Planning Agent → [Execution Plan] → Validation Agent → [Validation Decisio
       "version": "0.1.0",
       "source_contract_id": "CONTRACT_E7D3A1"
     },
-    "emcp_version": "0.1.0",
+    "eago_version": "0.1.0",
     "message_type": "execution_plan",
     "plan_id": "PLAN_F5B2C7",
     "contract_id": "CONTRACT_E7D3A1",
@@ -74,7 +74,7 @@ Planning Agent → [Execution Plan] → Validation Agent → [Validation Decisio
         "client_id": "EXAMPLE_CRM_SYSTEM",
         "authentication": {
           "method": "mtls_spiffe",
-          "spiffe_id": "spiffe://emcp.example.com/workload/crm-service",
+          "spiffe_id": "spiffe://eago.example.com/workload/crm-service",
           "security_level": "high",
           "groups": ["customer_service", "address_updaters", "uk_operations"]
         }
@@ -555,7 +555,7 @@ This comprehensive LLM enhancement transforms the Validation Agent from a rule-b
 ```json
 {
   "execution_id": "exec_a7b8c9d2",
-  "emcp_execution_plan": {
+  "eago_execution_plan": {
     // ...complete execution plan structure from above...
   }
 }
@@ -661,7 +661,7 @@ This comprehensive LLM enhancement transforms the Validation Agent from a rule-b
 ```json
 {
   "execution_id": "exec_a7b8c9d2",
-  "emcp_validation_decision": {
+  "eago_validation_decision": {
     "record_id": "REC_VALIDATION_C9D3E4",
     "record_type": "validation_decision",
     "record_status": "approved",
@@ -671,7 +671,7 @@ This comprehensive LLM enhancement transforms the Validation Agent from a rule-b
       "version": "0.1.0",
       "source_plan_id": "PLAN_F5B2C7"
     },
-    "emcp_version": "0.1.0",
+    "eago_version": "0.1.0",
     "message_type": "validation_decision",
     "validation_id": "VALIDATION_G6C3B8",
     "plan_id": "PLAN_F5B2C7",
@@ -686,7 +686,7 @@ This comprehensive LLM enhancement transforms the Validation Agent from a rule-b
         "client_id": "EXAMPLE_CRM_SYSTEM",
         "authentication": {
           "method": "mtls_spiffe",
-          "spiffe_id": "spiffe://emcp.example.com/workload/crm-service",
+          "spiffe_id": "spiffe://eago.example.com/workload/crm-service",
           "security_level": "high",
           "groups": ["customer_service", "address_updaters", "uk_operations"]
         }
@@ -943,7 +943,7 @@ Validation Agent → [Validation Decision] → Execution Agent → [Orchestrated
 
 ## Summary
 
-The Validation Agent serves as the governance and compliance gatekeeper of the OpenEMCP system:
+The Validation Agent serves as the governance and compliance gatekeeper of the openEAGO system:
 
 **Core Responsibilities**:
 
@@ -968,4 +968,4 @@ The Validation Agent serves as the governance and compliance gatekeeper of the O
 - **Context**: Enhanced validation context for execution tracking
 - **Security**: Multi-level approval workflows and audit trail maintenance
 
-The Validation Agent ensures that all execution plans meet organizational governance requirements, regulatory compliance standards, and risk tolerance levels before proceeding to execution, maintaining the integrity and compliance of the OpenEMCP system.
+The Validation Agent ensures that all execution plans meet organizational governance requirements, regulatory compliance standards, and risk tolerance levels before proceeding to execution, maintaining the integrity and compliance of the openEAGO system.

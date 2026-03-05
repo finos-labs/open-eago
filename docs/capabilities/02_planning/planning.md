@@ -10,9 +10,9 @@ The Planning Agent receives **OASF-compliant contracts** from the Contract Agent
 
 The Planning Agent relies on an external Agent Registry component. Agent Registry provides the necessary agent metadata and capabilities for discovery and selection.
 
-## OpenEMCP Protocol Integration
+## openEAGO Protocol Integration
 
-The Planning Agent implements **Phase 2 (Planning & Negotiation)** of the six-phase OpenEMCP architecture:
+The Planning Agent implements **Phase 2 (Planning & Negotiation)** of the six-phase openEAGO architecture:
 
 1. Contract Management → **Enriched contracts received**
 2. **Planning & Negotiation** ← **Planning Agent (This Component)**
@@ -55,7 +55,7 @@ Contract Agent → [OASF Contract] → Planning Agent → [Execution Plan] → V
 ```json
 {
   "execution_id": "exec_a7b8c9d2",
-  "emcp_contract_request": {
+  "eago_contract_request": {
     "record_id": "REC_CONTRACT_F4A8B2",
     "record_type": "contract_request",
     "record_status": "pending",
@@ -65,7 +65,7 @@ Contract Agent → [OASF Contract] → Planning Agent → [Execution Plan] → V
       "version": "0.1.0",
       "source_system": "EXAMPLE_CRM_SYSTEM"
     },
-    "emcp_version": "0.1.0",
+    "eago_version": "0.1.0",
     "message_type": "contract_request", 
     "contract_id": "CONTRACT_E7D3A1",
     "timestamp": "2026-02-06T10:30:15.234Z",
@@ -75,7 +75,7 @@ Contract Agent → [OASF Contract] → Planning Agent → [Execution Plan] → V
       "session_id": "sess_20260206_1030_001",
       "authentication": {
         "method": "mtls_spiffe",
-        "spiffe_id": "spiffe://emcp.example.com/workload/crm-service",
+        "spiffe_id": "spiffe://eago.example.com/workload/crm-service",
         "certificate_serial": "4A:B2:C8:D9:E1:F7:33:44",
         "authenticated_at": "2026-02-06T10:30:14.123Z",
         "security_level": "high",
@@ -175,7 +175,7 @@ Skill Requirements → Registry Query → Capability Matching → Compliance Fil
 
 **Enhanced Agent Registry Integration**:
 
-The Planning Agent integrates with the comprehensive OpenEMCP Agent Registry system to provide intelligent agent discovery and selection capabilities. The registry maintains detailed metadata about all registered agents including capabilities, compliance certifications, performance metrics, and geographic locations.
+The Planning Agent integrates with the comprehensive openEAGO Agent Registry system to provide intelligent agent discovery and selection capabilities. The registry maintains detailed metadata about all registered agents including capabilities, compliance certifications, performance metrics, and geographic locations.
 
 **Registry Architecture**:
 
@@ -279,8 +279,8 @@ Each agent in the registry maintains a comprehensive registration profile:
     "operational_details": {
       "health_status": "healthy",
       "security_level": "high",
-      "spiffe_id": "spiffe://emcp.uk.com/workload/address-validator",
-      "certificate_subject": "CN=Address-Validator-UK,OU=Validation-Services,O=EMCP-UK",
+      "spiffe_id": "spiffe://eago.uk.com/workload/address-validator",
+      "certificate_subject": "CN=Address-Validator-UK,OU=Validation-Services,O=eago-UK",
       "max_concurrent_requests": 200,
       "heartbeat_interval_sec": 30,
       "registration_timestamp": "2026-03-15T09:30:00Z",

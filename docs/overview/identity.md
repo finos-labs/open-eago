@@ -1,10 +1,10 @@
-# Defining Agent Identity for OpenEMCP
+# Defining Agent Identity for openEAGO
 
-This document serves as a proposed baseline standard for identity in OpenEMCP deployments.
+This document serves as a proposed baseline standard for identity in openEAGO deployments.
 
 In the rapidly evolving landscape of agentic AI, autonomous systems powered by advanced models perform complex tasks such as planning and decision-making. For regulated enterprises like banks, establishing a robust agent identity framework is critical to fostering trust, security, and compliance. Agent identity serves as the foundational "code" enabling reliability, traceability, and adherence to regulations including BSA/AML, GLBA, and GDPR.
 
-The agent identity framework within the Open Enterprise Multi-agent Communication Protocol (OpenEMCP) leverages open-source contributions from the AGNTCY project under the Linux Foundation (<https://agntcy.org>). This framework promotes verifiable, secure identities to support interoperable multi-agent systems, forming the basis for secured enterprise and hybrid agents suitable for high-stakes environments such as intra/inter-banking or cross-industry collaborations for services like fraud detection and credit risk assessment.
+The agent identity framework within the Open Enterprise Multi-agent Communication Protocol (openEAGO) leverages open-source contributions from the AGNTCY project under the Linux Foundation (<https://agntcy.org>). This framework promotes verifiable, secure identities to support interoperable multi-agent systems, forming the basis for secured enterprise and hybrid agents suitable for high-stakes environments such as intra/inter-banking or cross-industry collaborations for services like fraud detection and credit risk assessment.
 
 ## Introduction: Foundations of Agent Identity in Agentic AI
 
@@ -12,11 +12,11 @@ Agentic AI represents a paradigm shift from reactive tools to proactive systems 
 
 Agent identity encapsulates a unique, verifiable profile for each agent, analogous to a digital passport. This approach ensures traceability of actions back to authenticated sources, which is vital given the machine-scale speed and volume of agent operations involving sensitive data. Prioritizing identity addresses key challenges in multi-agent systems: secure interactions across internal systems, alignment with legal standards, and prevention of issues such as unauthorized access or accidental data misplacement.
 
-OpenEMCP adopts a decentralized approach to identity management, avoiding single points of failure. This approach is essential for scalable banking deployments spanning multiple organizations. The framework embeds identity as a trust layer, facilitating secure discovery, communication, and transparency. The Identity component supports onboarding, creation, and verification of identities for agents, Model Context Protocol (MCP) servers, and Multi-Agent Systems (MASs), leveraging decentralized technologies for trustworthy interactions.
+openEAGO adopts a decentralized approach to identity management, avoiding single points of failure. This approach is essential for scalable banking deployments spanning multiple organizations. The framework embeds identity as a trust layer, facilitating secure discovery, communication, and transparency. The Identity component supports onboarding, creation, and verification of identities for agents, Model Context Protocol (MCP) servers, and Multi-Agent Systems (MASs), leveraging decentralized technologies for trustworthy interactions.
 
 ## Three-Level Authentication Architecture
 
-The OpenEMCP framework implements a comprehensive three-level authentication system to ensure security and prevent malicious access at different layers, aligning with the enterprise-grade security requirements outlined in the overall architecture.
+The openEAGO framework implements a comprehensive three-level authentication system to ensure security and prevent malicious access at different layers, aligning with the enterprise-grade security requirements outlined in the overall architecture.
 
 ### Level 1: Agent-to-Registry Authentication
 
@@ -30,7 +30,7 @@ The OpenEMCP framework implements a comprehensive three-level authentication sys
 
 **Purpose**: Prevent malicious applications from accessing the framework
 
-- **What it protects**: The entire OpenEMCP framework from unauthorized client access
+- **What it protects**: The entire openEAGO framework from unauthorized client access
 - **Threat prevention**: Prevents malicious applications, unauthorized users, or compromised clients from making requests
 - **Authentication method**: OAuth2/OIDC with JWT tokens, role-based access control (RBAC), and client certificate validation
 
@@ -50,7 +50,7 @@ flowchart TD
     end
     
     subgraph "Level 2: User/App-to-Framework" 
-        D[Malicious App Blocked] -.->|X| E[OpenEMCP Framework]
+        D[Malicious App Blocked] -.->|X| E[openEAGO Framework]
         F[Authorized Client] -->|JWT + RBAC| E
     end
     
@@ -78,7 +78,7 @@ flowchart TD
     A[Central Authority] -->|Issues Certificate| B[AI Agent]
     B -->|Level 1: Agent Auth| C[Agent Registry]
     C -->|Provides Service Discovery| D[Client Application]
-    D -->|Level 2: App Auth| E[OpenEMCP Framework]
+    D -->|Level 2: App Auth| E[openEAGO Framework]
     E -->|Level 3: Task Auth| B
     D -->|User Auth| F[User]
     F -->|Provides Credentials to| D
@@ -86,7 +86,7 @@ flowchart TD
 
 ## Rule-Based Definition of Agent Identity
 
-Agent identity in OpenEMCP is defined as a unique, verifiable identifier assigned to each agent, drawing from standards like Decentralized Identifiers (DIDs) or equivalent mechanisms in the Identity system. This identifier links to credentials specifying the agent's origins, capabilities, and constraints, preventing collisions and enabling cryptographic verification.
+Agent identity in openEAGO is defined as a unique, verifiable identifier assigned to each agent, drawing from standards like Decentralized Identifiers (DIDs) or equivalent mechanisms in the Identity system. This identifier links to credentials specifying the agent's origins, capabilities, and constraints, preventing collisions and enabling cryptographic verification.
 
 **Rules for Definition:**
 
@@ -99,23 +99,23 @@ These rules are fundamental because they mitigate security risks in multi-agent 
 
 ## Integration with Standards and Protocols
 
-OpenEMCP integrates agent identity with established protocols to ensure secure interactions, building upon the AGNTCY project (Linux Foundation, <https://agntcy.org>) — an open-source Internet of Agents (IoA) infrastructure initiated by Outshift by Cisco and donated to the Linux Foundation in July 2025 with founding members including Cisco, Dell Technologies, Google Cloud, Oracle, and Red Hat. The protocol emphasizes interoperability via common protocols, security through authentication, authorization, and encryption, scalability with cloud-native architecture, and standardization of data models and schemas. This decentralized approach avoids single points of failure, making it ideal for regulated environments like banking where secure, verifiable interactions are paramount.
+openEAGO integrates agent identity with established protocols to ensure secure interactions, building upon the AGNTCY project (Linux Foundation, <https://agntcy.org>) — an open-source Internet of Agents (IoA) infrastructure initiated by Outshift by Cisco and donated to the Linux Foundation in July 2025 with founding members including Cisco, Dell Technologies, Google Cloud, Oracle, and Red Hat. The protocol emphasizes interoperability via common protocols, security through authentication, authorization, and encryption, scalability with cloud-native architecture, and standardization of data models and schemas. This decentralized approach avoids single points of failure, making it ideal for regulated environments like banking where secure, verifiable interactions are paramount.
 
-For the Model Context Protocol (MCP)—a standard for connecting AI models to external tools and data—OpenEMCP embeds identity checks in every invocation, such as during tool calls. MCP integration leverages Identity and Directory components, using verifiable credentials for authorization. Recommendations include OAuth-based tokens bound to agent identities, preventing data leaks in sensitive banking operations like querying transaction histories. The Identity Service facilitates this by connecting to identity providers, creating agentic service identities, verifying them, and enforcing policies, all while utilizing Decentralized Identifiers (DIDs) and verifiable credentials. This includes badges for agents and MCP servers, ensuring trusted assertions that align with compliance and traceability requirements.
+For the Model Context Protocol (MCP)—a standard for connecting AI models to external tools and data—openEAGO embeds identity checks in every invocation, such as during tool calls. MCP integration leverages Identity and Directory components, using verifiable credentials for authorization. Recommendations include OAuth-based tokens bound to agent identities, preventing data leaks in sensitive banking operations like querying transaction histories. The Identity Service facilitates this by connecting to identity providers, creating agentic service identities, verifying them, and enforcing policies, all while utilizing Decentralized Identifiers (DIDs) and verifiable credentials. This includes badges for agents and MCP servers, ensuring trusted assertions that align with compliance and traceability requirements.
 
-A key enabler of this integration is the Open Agent Schema Framework (OASF), which provides a standardized schema system for defining and managing AI agent capabilities, interactions, and metadata. OASF uses a core "record object" as the primary data structure, annotated with skills, domains, and extensible modules to describe agent attributes in a consistent, validated manner. Protocol Buffer definitions ensure language-agnostic interoperability, with versioning policies maintaining backward compatibility. In OpenEMCP, OASF standardizes agent descriptions within identity profiles, allowing seamless validation and refinement of records. For instance, OASF integrates with the Directory component for LLM-assisted schema discovery, record generation from codebases, and format conversions (e.g., from MCP or A2A to OASF), enabling agents to be registered and discovered reliably.
+A key enabler of this integration is the Open Agent Schema Framework (OASF), which provides a standardized schema system for defining and managing AI agent capabilities, interactions, and metadata. OASF uses a core "record object" as the primary data structure, annotated with skills, domains, and extensible modules to describe agent attributes in a consistent, validated manner. Protocol Buffer definitions ensure language-agnostic interoperability, with versioning policies maintaining backward compatibility. In openEAGO, OASF standardizes agent descriptions within identity profiles, allowing seamless validation and refinement of records. For instance, OASF integrates with the Directory component for LLM-assisted schema discovery, record generation from codebases, and format conversions (e.g., from MCP or A2A to OASF), enabling agents to be registered and discovered reliably.
 
-This deep integration extends to multi-agent communication via the Secure Low-Latency Interactive Messaging (SLIM) protocol, which mandates identity presentation in sessions. SLIM, implemented in Rust and extending gRPC with MLS and quantum-safe encryption, supports patterns like pub/sub, request/reply, streaming, and fire-and-forget, facilitating secure handoffs such as fraud alerts in banking. OpenEMCP binds identities to messages, ensuring low-latency, reliable communication without exposing raw data. OASF further enhances this by providing metadata for agent capabilities, allowing validation of compatibility during interactions.
+This deep integration extends to multi-agent communication via the Secure Low-Latency Interactive Messaging (SLIM) protocol, which mandates identity presentation in sessions. SLIM, implemented in Rust and extending gRPC with MLS and quantum-safe encryption, supports patterns like pub/sub, request/reply, streaming, and fire-and-forget, facilitating secure handoffs such as fraud alerts in banking. openEAGO binds identities to messages, ensuring low-latency, reliable communication without exposing raw data. OASF further enhances this by providing metadata for agent capabilities, allowing validation of compatibility during interactions.
 
-Alignment with governance frameworks, such as NIST AI Risk Management, involves ongoing identity verification through the underlying API, SDK, and protofiles, which interconnect Identity, Directory, SLIM, and OASF. In regulated sectors, this unified stack promotes proactive risk mitigation, turning fragmented systems into resilient, interoperable ones. By embedding OASF's extensible schemas into the identity layer, OpenEMCP supports custom extensions for banking-specific needs while maintaining core standards, fostering an adaptive IoA ecosystem.
+Alignment with governance frameworks, such as NIST AI Risk Management, involves ongoing identity verification through the underlying API, SDK, and protofiles, which interconnect Identity, Directory, SLIM, and OASF. In regulated sectors, this unified stack promotes proactive risk mitigation, turning fragmented systems into resilient, interoperable ones. By embedding OASF's extensible schemas into the identity layer, openEAGO supports custom extensions for banking-specific needs while maintaining core standards, fostering an adaptive IoA ecosystem.
 
 ## Framework for Multi-Agent Protocols, Compliance, and Risk Mitigation in Banking
 
-In OpenEMCP, multi-agent protocols begin with discovery, where agents use directories to locate partners, verifying identities first through the Agent Directory. This aligns with zero-trust models, essential for banking scenarios like KYC agents interfacing with risk assessors.
+In openEAGO, multi-agent protocols begin with discovery, where agents use directories to locate partners, verifying identities first through the Agent Directory. This aligns with zero-trust models, essential for banking scenarios like KYC agents interfacing with risk assessors.
 
 During interactions, SLIM provides secure, low-latency messaging with embedded identities, minimizing data exposure. For execution, actions are bound to identities for traceability, logging contributions in workflows like loan processing. This framework enables coordinated efficiency in regulated environments, leveraging interoperable tools to prevent breaches and ensure compliance.
 
-OpenEMCP mandates KYA through verifiable credentials, extending AML/KYC to AI via the decentralized identity system. This ensures action attribution for audits, reducing regulatory fines. For data protection (e.g., GDPR), ephemeral tokens limit exposure in agent data sharing, supported by robust authentication, authorization, and encryption.
+openEAGO mandates KYA through verifiable credentials, extending AML/KYC to AI via the decentralized identity system. This ensures action attribution for audits, reducing regulatory fines. For data protection (e.g., GDPR), ephemeral tokens limit exposure in agent data sharing, supported by robust authentication, authorization, and encryption.
 
 Proactive monitoring via the Observability SDK detects anomalies, aligning with NIST guidelines. This mitigates threats like privilege abuse, building trust in autonomous banking systems.
 
@@ -223,7 +223,7 @@ Proactive monitoring via the Observability SDK detects anomalies, aligning with 
            "max_cpu": "2cores",
            "max_execution_time": "300s"
          },
-         "network_policy": ["registry.emcp.local", "auth.emcp.local"]
+         "network_policy": ["registry.eago.local", "auth.eago.local"]
        }
      }
 ```
@@ -383,7 +383,7 @@ Proactive monitoring via the Observability SDK detects anomalies, aligning with 
 #### Step 6: Framework-Level Authorization (Malicious App Detection)
 
 ```text
-6.1. OpenEMCP Framework receives signed request at Level 2 gateway
+6.1. openEAGO Framework receives signed request at Level 2 gateway
 6.2. Framework performs malicious application detection:
      - Validates client application certificate against trusted CA
      - Verifies client certificate is not in revocation list
@@ -606,9 +606,9 @@ Proactive monitoring via the Observability SDK detects anomalies, aligning with 
 | Data Exfiltration | Agent network policies | User data access controls | Document-level permissions |
 | Resource Abuse | Agent resource limits | Rate limiting | Execution time/memory limits |
 
-## OpenEMCP Agent Identity Model (Extended)
+## openEAGO Agent Identity Model (Extended)
 
-OpenEMCP defines agent identity as a layered model with five required elements, enhanced with three-level authentication:
+openEAGO defines agent identity as a layered model with five required elements, enhanced with three-level authentication:
 
 - **Identifier Layer**: A globally unique identifier (SPIFFE ID) bound to cryptographic key material and managed by SPIRE infrastructure.
 - **Credential Layer**: Verifiable credentials asserting ownership, operator, environment, role, and compliance attributes with automatic rotation.
@@ -620,7 +620,7 @@ This model ensures identity is not a static label but an operational control pla
 
 ## Normative Identity Requirements (Enhanced)
 
-The following requirements are intended as normative language for OpenEMCP identity compliance:
+The following requirements are intended as normative language for openEAGO identity compliance:
 
 - **Identity issuance**: Every production agent MUST have a unique SPIFFE identifier and at least one active signing key managed by SPIRE.
 - **Proof of control**: Agents MUST prove control of identity keys during registration and session establishment using mTLS.
@@ -635,7 +635,7 @@ The following requirements are intended as normative language for OpenEMCP ident
 
 ## Standard Claims Profile for Agent Identity (Enhanced)
 
-To standardize interoperability across the three authentication levels, OpenEMCP adopts a common claims profile grouped as follows:
+To standardize interoperability across the three authentication levels, openEAGO adopts a common claims profile grouped as follows:
 
 - **Core claims (required)**: `agent_id` (SPIFFE ID), `issuer`, `subject`, `key_fingerprint`, `issued_at`, `expires_at`, `status`.
 - **Trust claims (required)**: `assurance_level`, `verification_method`, `attestation_type`, `certificate_chain`.
@@ -673,10 +673,10 @@ Validity: 48 hours (automatic rotation)
 Extensions:
   - Subject Alternative Name (SAN): 
     * URI: spiffe://example.org/agent/contract/001
-    * DNS: localhost, agent-contract-001.emcp.local
+    * DNS: localhost, agent-contract-001.eago.local
   - Key Usage: Digital Signature, Key Encipherment
   - Extended Key Usage: Client Authentication, Server Authentication
-  - Certificate Policies: OpenEMCP Agent Identity Policy
+  - Certificate Policies: openEAGO Agent Identity Policy
 Public Key: RSA 2048-bit or ECDSA P-256
 Signature Algorithm: SHA256withRSA or SHA256withECDSA
 ```
@@ -684,7 +684,7 @@ Signature Algorithm: SHA256withRSA or SHA256withECDSA
 ### SPIRE Agent Integration Flow
 
 ```text
-1. SPIRE Server acts as Certificate Authority for OpenEMCP agents
+1. SPIRE Server acts as Certificate Authority for openEAGO agents
 2. SPIRE Agent runs on each node, attests workload identity
 3. Workload API provides certificates via Unix domain socket
 4. Automatic certificate rotation every 48 hours
@@ -695,7 +695,7 @@ Signature Algorithm: SHA256withRSA or SHA256withECDSA
 
 ## Threat Model and Required Controls (Extended)
 
-OpenEMCP identity controls explicitly address common threats through the three-level authentication system:
+openEAGO identity controls explicitly address common threats through the three-level authentication system:
 
 - **Impersonation**: Mitigate with mutual authentication (Level 1), signed challenges (Level 2), and key-bound credentials (Level 3).
 - **Credential replay**: Mitigate with nonce checks, short token TTLs (48h max), and audience scoping across all levels.
@@ -709,7 +709,7 @@ OpenEMCP identity controls explicitly address common threats through the three-l
 
 ## Conformance Profiles for Implementers (Enhanced)
 
-To accelerate adoption, OpenEMCP defines three conformance profiles aligned with the three-level authentication architecture:
+To accelerate adoption, openEAGO defines three conformance profiles aligned with the three-level authentication architecture:
 
 ### Foundation Profile
 
@@ -745,7 +745,7 @@ Each profile includes protocol test vectors for:
 
 ### Security Architecture Integration
 
-The identity standard integrates with OpenEMCP's comprehensive security architecture:
+The identity standard integrates with openEAGO's comprehensive security architecture:
 
 - **SPIRE/SPIFFE Foundation**: Provides zero-trust identity verification with automatic X.509 certificate management
 - **Multi-Tier Context Security**: Hierarchical context management with session-level encryption and agent-level isolation
@@ -768,7 +768,7 @@ The identity standard integrates with OpenEMCP's comprehensive security architec
 
 ## Conclusion
 
-This comprehensive agent identity standard positions identity as the essential foundation for secure, compliant multi-agent systems in banking and other regulated industries under OpenEMCP. By implementing a three-level authentication architecture built on SPIRE/SPIFFE foundations and integrated with OASF schemas, SLIM messaging, and blockchain audit trails, the standard enables enterprise-grade agentic AI deployment while maintaining strict governance and compliance requirements.
+This comprehensive agent identity standard positions identity as the essential foundation for secure, compliant multi-agent systems in banking and other regulated industries under openEAGO. By implementing a three-level authentication architecture built on SPIRE/SPIFFE foundations and integrated with OASF schemas, SLIM messaging, and blockchain audit trails, the standard enables enterprise-grade agentic AI deployment while maintaining strict governance and compliance requirements.
 
 The framework leverages open-source standards and infrastructure from the AGNTCY project (Linux Foundation) to enable innovation while mitigating risks through defense-in-depth security architecture. The three conformance profiles ensure scalable adoption from development environments to cross-organizational production deployments.
 

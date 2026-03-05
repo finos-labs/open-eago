@@ -1,10 +1,10 @@
-# OpenEMCP Governance
+# openEAGO Governance
 
-This document defines project governance for OpenEMCP in alignment with standard FINOS project governance practices.
+This document defines project governance for openEAGO in alignment with standard FINOS project governance practices.
 
 ## 1. Scope
 
-OpenEMCP is an open specification and related artifacts for enterprise multi-agent communication and orchestration. This governance covers technical direction, release management, contribution process, and project operations.
+openEAGO is an open specification and related artifacts for enterprise multi-agent communication and orchestration. This governance covers technical direction, release management, contribution process, and project operations.
 
 ## 2. Project Roles
 
@@ -78,7 +78,7 @@ Maintainer decisions may be appealed to the TSC by opening a documented issue. T
 
 ## 4. Releases and Versioning
 
-- OpenEMCP uses Semantic Versioning (`MAJOR.MINOR.PATCH`).
+- openEAGO uses Semantic Versioning (`MAJOR.MINOR.PATCH`).
 - Breaking normative protocol changes require explicit migration guidance.
 - Release candidates may be published for community review before final release.
 

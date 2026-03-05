@@ -1,12 +1,12 @@
-# OpenEMCP Specification
+# openEAGO Specification
 
 ## 1. Abstract and Scope
 
-OpenEMCP (Enterprise Multi-Agent Communication & Orchestration Protocol) defines a normative protocol for secure, compliant, and resilient multi-agent orchestration in enterprise environments.
+openEAGO (Enterprise Multi-Agent Communication & Orchestration Protocol) defines a normative protocol for secure, compliant, and resilient multi-agent orchestration in enterprise environments.
 
 This document is the **single source of truth for human-readable normative behavior**. Machine-readable artifacts are maintained in [spec/v0.1.0/spec.json](spec/v0.1.0/spec.json) and in [spec/v0.1.0/schemas/](spec/v0.1.0/schemas/).
 
-OpenEMCP standardizes exactly six protocol phases, required security controls, identity constraints, and conformance expectations for implementations operating in regulated contexts.
+openEAGO standardizes exactly six protocol phases, required security controls, identity constraints, and conformance expectations for implementations operating in regulated contexts.
 
 ## 2. Terminology and Glossary
 
@@ -16,8 +16,8 @@ The keywords **MUST**, **MUST NOT**, **REQUIRED**, **SHOULD**, **SHOULD NOT**, a
 
 ### 2.2 Core Terms
 
-- **OpenEMCP**: The open standard protocol and governance umbrella.
-- **EMCP**: Protocol shorthand used in technical fields and payload labels.
+- **openEAGO**: The open standard protocol and governance umbrella.
+- ****: Protocol shorthand used in technical fields and payload labels.
 - **OASF**: Open Agent Schema Framework.
 - **ACU**: Assumed Cost Unit, a normalized non-currency planning unit for comparative cost/risk estimation.
 - **Context Hierarchy**: Ordered context levels: `session` → `conversation` → `agent` → `task`.
@@ -48,14 +48,14 @@ The keywords **MUST**, **MUST NOT**, **REQUIRED**, **SHOULD**, **SHOULD NOT**, a
 
 ### 3A.1 OASF Version Target
 
-- OpenEMCP v0.1 targets **OASF major version 1.x** (minimum baseline: **0.1.0**).
-- Each OpenEMCP release MUST declare its exact OASF target in release notes and conformance artifacts.
+- openEAGO v0.1 targets **OASF major version 1.x** (minimum baseline: **0.1.0**).
+- Each openEAGO release MUST declare its exact OASF target in release notes and conformance artifacts.
 
 ### 3A.2 Compatibility Policy
 
-- OpenEMCP implementations MUST remain compatible with the declared OASF target version for the same release line.
-- OpenEMCP MAY add extension fields, but MUST NOT change the normative meaning of mapped OASF concepts.
-- Additive OpenEMCP changes SHOULD preserve backward compatibility for at least one minor release.
+- openEAGO implementations MUST remain compatible with the declared OASF target version for the same release line.
+- openEAGO MAY add extension fields, but MUST NOT change the normative meaning of mapped OASF concepts.
+- Additive openEAGO changes SHOULD preserve backward compatibility for at least one minor release.
 
 ### 3A.3 Breaking-Change Rules
 
@@ -71,7 +71,7 @@ Breaking changes MUST include migration guidance and updated traceability eviden
 
 Conformance outcomes are tied to schema validation and mapping evidence:
 
-- **pass**: all required OpenEMCP schemas validate and all mandatory OASF-mapped requirements have passing evidence.
+- **pass**: all required openEAGO schemas validate and all mandatory OASF-mapped requirements have passing evidence.
 - **conditional**: core schemas validate, but one or more non-blocking OASF-mapped requirements are pending remediation.
 - **fail**: any required schema validation fails, or any mandatory OASF-mapped requirement lacks passing evidence.
 
@@ -79,7 +79,7 @@ Conformance outcomes are tied to schema validation and mapping evidence:
 
 This matrix links protocol requirements to OASF requirement IDs, machine schema paths, and test/audit evidence.
 
-| OpenEMCP requirement | OASF requirement ID | Schema path | Test evidence |
+| openEAGO requirement | OASF requirement ID | Schema path | Test evidence |
 | --- | --- | --- | --- |
 | Six standardized phase identifiers are enforced | OASF-PHASE-001 | `spec/v0.1.0/schemas/base-envelope.schema.json` | `tests/conformance/phase-enum.json` (or equivalent CI evidence) |
 | Planning includes explicit negotiation sub-step | OASF-PLAN-NEG-001 | `spec/v0.1.0/schemas/planning-negotiation.schema.json` | `tests/conformance/planning-negotiation.json` |
@@ -92,7 +92,7 @@ This matrix links protocol requirements to OASF requirement IDs, machine schema 
 
 ## 4. Architecture and Phases
 
-OpenEMCP implementations MUST expose and process the following **exact six phases**:
+openEAGO implementations MUST expose and process the following **exact six phases**:
 
 1. **Contract Management**
 2. **Planning & Negotiation**
