@@ -1,5 +1,5 @@
 #!/bin/bash
-# Quick Start Script for SPIRE-integrated openEAGO Registry
+# Quick Start Script for SPIRE-integrated OpenEAGO Registry
 
 set -e
 
@@ -14,7 +14,7 @@ BLUE='\033[0;34m'
 NC='\033[0m'
 
 echo -e "${BLUE}╔════════════════════════════════════════════════╗${NC}"
-echo -e "${BLUE}║  openEAGO Registry + SPIRE Quick Start        ║${NC}"
+echo -e "${BLUE}║  OpenEAGO Registry + SPIRE Quick Start        ║${NC}"
 echo -e "${BLUE}╚════════════════════════════════════════════════╝${NC}"
 echo ""
 

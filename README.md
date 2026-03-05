@@ -1,13 +1,4 @@
-# OpenEAGO - Enterprise Agent Governance and Orchestration Protocol
-
-<p align="center">
-  <br />
-  <a href="https://finos-labs.github.io/open-eago/">    
-  </a>
-  <br />
-</p>
-
----
+# OpenEAGO - Enterprise Agent Governance and Orchestration (Specification)
 
 <div align="center" style="display: flex; gap: 10px; justify-content: center;">
   <img src="https://user-images.githubusercontent.com/327285/230928932-7c75f8ed-e57b-41db-9fb7-a292a13a1e58.svg" alt="badge-labs">
@@ -18,7 +9,7 @@
 
 ---
 
-**Enterprise Agent Governance and Orchestration Protocol (OpenEAGO)** is an open standard for secure, scalable, and compliant communication and orchestration among AI agents in enterprise environments.
+**Enterprise Agent Governance & Orchestration (OpenEAGO)** is an open standard for secure, scalable, and compliant communication and orchestration among AI agents in enterprise environments.
 
 - Authors: Jan Rock (<jan.rock@citi.com>), Denis Urusov (<denis.urusov@citi.com>), Paul Groves (<paul.groves@citi.com>)
 - Date: 18/02/2026 - Version: 0.1
@@ -27,7 +18,7 @@
 
 OpenEAGO addresses the critical gap in enterprise AI infrastructure by providing a universal standard for AI agent interoperability that operates within regulatory boundaries and enterprise security requirements.
 
-The protocol enables:
+The specification enables:
 
 - **Framework-Agnostic Integration** - Support for LangChain, LangGraph, custom agents, and legacy system wrappers
 - **Enterprise-Grade Security** - Built-in authentication (OAuth2, SAML, mTLS), authorization (RBAC/ABAC), and encryption
@@ -38,22 +29,22 @@ The protocol enables:
 - **Cross-Border Data Governance** - Automated compliance with data sovereignty and localization requirements
 - **Agent Farms** - Dynamic agent discovery, registration (with mTLS), bi-directional communication, and reliability scoring
 
-## Protocol Architecture
+## Architecture
 
-OpenEAGO orchestrates multi-agent workflows through a comprehensive protocol architecture:
+OpenEAGO orchestrates multi-agent workflows through a comprehensive architecture:
 
 **Client Interface:**
 
 - **Request** - Client applications (API, CLI, SDK) submit business requests to work contracts
 
-**Protocol:**
+**Specification:**
 
 - **Contract** - The contract validates inputs, establishes terms, and manages agent capabilities.
 - **Planning** - The system discovers optimal agents, determines the execution pattern, and creates a comprehensive execution plan.
 - **Negotiation** - Plan validation with required Authorization, SLA/SLO, Cross-border Data Clearance, KYC Check, AML Check, Policy Compliance, Credit Risk etc.
 - **Execution** - The orchestrator runs tasks according to the plan, managing dependencies and context propagation.
 - **Context** - Agents' progress and states are captured and maintained across session, conversation, and agent layers.
-- **Communication** - Agents communicate using standardized protocols, ensuring interoperability and context sharing.
+- **Communication** - Agents communicate using standardized formats, ensuring interoperability and context sharing.
 
 ## Prerequisites
 
@@ -65,8 +56,8 @@ The **Agent Registry** acts as a centralized service discovery and capability ma
 
 ### Getting Started
 
-- [Documentation Index](docs/README.md) - Protocol introduction and navigation
-- [Overview](docs/overview/overview.md) - Comprehensive protocol overview
+- [Documentation Index](docs/README.md) - Specification introduction and navigation
+- [Overview](docs/overview/overview.md) - Comprehensive specification overview
 - [Architecture](docs/overview/architecture.md) - High-level architecture overview
 - [Security Considerations](docs/overview/security.md) - Security architecture and requirements
 
@@ -77,18 +68,18 @@ The **Agent Registry** acts as a centralized service discovery and capability ma
 - [Validation Capability](docs/capabilities/03_validation/validation.md) - Validation and compliance checking
 - [Execution Capability](docs/capabilities/04_execution/execution.md) - Task execution and orchestration
 - [Context Capability](docs/capabilities/05_context/context.md) - Context management and sharing
-- [Communication Capability](docs/capabilities/06_communication/communication.md) - Agent communication protocols
+- [Communication Capability](docs/capabilities/06_communication/communication.md) - Agent communication standards
 
 ### Advanced Topics
 
-- [OpenEAGO Proposal](docs/overview/OpenEAGO_proposal.md) - Detailed proposal with distinctive features
+- [OpenEAGO Proposal](docs/overview/openeago_proposal.md) - Detailed proposal with distinctive features
 - [Identity Management](docs/overview/identity.md) - Agent identity and trust establishment
 
 ## Why OpenEAGO
 
 OpenEAGO addresses the critical gap in enterprise AI infrastructure by providing a universal communication standard that preserves framework choice while enabling seamless integration across regulatory boundaries. As organizations scale their AI deployments beyond single agents to complex multi-agent systems, OpenEAGO provides the foundation for secure, observable, and compliant agent ecosystems that operate within the constraints of global data protection and privacy regulations.
 
-The protocol's design prioritizes real-world enterprise requirements—regulatory compliance, data sovereignty, cross-border governance, security, and operational resilience—while maintaining the flexibility needed to support diverse implementation approaches and evolving AI technologies. By incorporating data localization, consent management, and automated compliance validation into its core architecture, OpenEAGO enables organizations to deploy AI agents globally while meeting local regulatory requirements.
+The specification's design prioritizes real-world enterprise requirements—regulatory compliance, data sovereignty, cross-border governance, security, and operational resilience—while maintaining the flexibility needed to support diverse implementation approaches and evolving AI technologies. By incorporating data localization, consent management, and automated compliance validation into its core architecture, OpenEAGO enables organizations to deploy AI agents globally while meeting local regulatory requirements.
 
 By adopting OpenEAGO, organizations can build agent networks that transcend departmental, vendor, and jurisdictional boundaries while maintaining strict compliance with data protection regulations.
 
@@ -96,7 +87,7 @@ By adopting OpenEAGO, organizations can build agent networks that transcend depa
 
 OpenEAGO is built on the principles of transparency, collaboration, and user empowerment. We believe in creating an open ecosystem where AI agents can interact seamlessly while respecting user privacy and data sovereignty. Our approach emphasizes the importance of regulatory compliance and ethical considerations in AI development and deployment.
 
-**Our goal is to create an enterprise-grade protocol for AI agent interoperability that fosters innovation while ensuring security and regulatory compliance, building upon existing open source projects and industry standards.**
+**Our goal is to create an enterprise-grade specification for AI agent interoperability that fosters innovation while ensuring security and regulatory compliance, building upon existing open source projects and industry standards.**
 
 ## Linked Projects
 

@@ -1,28 +1,28 @@
 # Performance SLA, SLO, and KPI Framework
 
-Category: Cross-Cutting Concern — Applies to all six openEAGO protocol phases
+Category: Cross-Cutting Concern — Applies to all six OpenEAGO specification phases
 
 ## Overview
 
-Performance accountability is a **first-class protocol goal** in openEAGO. Regulated enterprise environments require measurable, contractually-enforceable service commitments, not aspirational guidelines. This document defines:
+Performance accountability is a **first-class specification goal** in OpenEAGO. Regulated enterprise environments require measurable, contractually-enforceable service commitments, not aspirational guidelines. This document defines:
 
-- The normative distinction between **SLA** and **SLO** as used throughout the protocol
+- The normative distinction between **SLA** and **SLO** as used throughout the specification
 - A formal **SLO objective taxonomy** covering the four dimensions that MUST be specified for every execution plan
 - The canonical **`sla_guarantees` schema** — the single normative definition that unifies all per-phase references
 - A normative **SLA breach state machine** governing the lifecycle of a breach from detection to resolution
-- The protocol-level **KPI catalog** — what the protocol itself MUST track and emit, grouped by category
+- The specification-level **KPI catalog** — what the specification itself MUST track and emit, grouped by category
 - The **agent registry minimum performance bar** that every registered agent MUST meet
 
 This document is the canonical cross-phase reference for performance. For the risk scoring model that incorporates SLA breach probability into Operational Risk, see [Risk Management Framework](./risk-management.md).
 
 ## SLA vs. SLO — Normative Definitions
 
-openEAGO uses these terms with precise, distinct meanings throughout all protocol documents and schemas. Implementations MUST NOT use them interchangeably.
+OpenEAGO uses these terms with precise, distinct meanings throughout all specification documents and schemas. Implementations MUST NOT use them interchangeably.
 
-| Term | openEAGO Definition |
+| Term | OpenEAGO Definition |
 | --- | --- |
 | **SLA** (Service Level Agreement) | A contractual commitment made between an agent provider and its consumer, agreed during Phase 2 (Planning & Negotiation). Breaching an SLA is a reportable event requiring escalation per the breach state machine. |
-| **SLO** (Service Level Objective) | An internal protocol target for a specific measurable property at a defined percentile. SLOs are the mechanism by which SLA commitments are operationalized. An SLA is only met when all constituent SLOs are met. |
+| **SLO** (Service Level Objective) | An internal specification target for a specific measurable property at a defined percentile. SLOs are the mechanism by which SLA commitments are operationalized. An SLA is only met when all constituent SLOs are met. |
 | **SLI** (Service Level Indicator) | The raw measured value of a specific property (e.g., observed p99 latency in ms). SLIs are compared against SLO targets at runtime to determine SLO status. |
 
 **Relationship**: SLA ⊇ one or more SLOs. Each SLO is backed by one SLI. An SLA is `met` only when all of its constituent SLOs are `met`.
@@ -74,7 +74,7 @@ Measures the sustained rate of requests an agent MUST be capable of handling.
 
 ### 4. Error Rate SLO
 
-Measures the fraction of requests that result in an error response (5xx equivalent or protocol-level failure).
+Measures the fraction of requests that result in an error response (5xx equivalent or specification-level failure).
 
 | Property | Definition |
 | --- | --- |
@@ -84,7 +84,7 @@ Normative maximum: `error_rate_max ≤ 0.05` (5.00%) for all registered agents. 
 
 ## Canonical `sla_guarantees` Schema
 
-This is the single normative definition of `sla_guarantees` used across all protocol phases. All per-phase references (planning.md, execution.md, spec.json, and the schemas) MUST conform to this structure.
+This is the single normative definition of `sla_guarantees` used across all specification phases. All per-phase references (planning.md, execution.md, spec.json, and the schemas) MUST conform to this structure.
 
 ```json
 {
@@ -155,14 +155,14 @@ stateDiagram-v2
 
 ### Breach State Definitions
 
-| State | Definition | Required Protocol Action |
+| State | Definition | Required Action |
 | --- | --- | --- |
 | `active` | All SLIs are within their SLO targets | Continue execution; standard monitoring |
 | `at_risk` | One or more SLIs have exceeded `at_risk_threshold_pct` of their SLO target | Increase monitoring frequency; emit `sla_at_risk` event |
 | `breached` | One or more SLIs have crossed their SLO target | Emit `sla_breach_event`; execute `breach_response` |
 | `pause_and_review` | Execution paused; awaiting human decision | Freeze cost-generating tasks; notify escalation contact |
 | `fallback_activated` | Fallback agent substituted for failing agent | Emit `fallback_activation_event`; re-evaluate SLO feasibility |
-| `escalated` | Breach cannot be resolved automatically | Emit high-priority alert; trigger risk escalation protocol |
+| `escalated` | Breach cannot be resolved automatically | Emit high-priority alert; trigger risk escalation process |
 | `completed` | Execution finished with all SLOs met throughout | Record `sla_compliance_status = "met"` |
 | `terminated` | Execution aborted due to unresolvable breach | Record `sla_compliance_status = "breached"`; include in risk report |
 
@@ -186,9 +186,9 @@ When the breach state machine transitions to `breached` or beyond, implementatio
 }
 ```
 
-## Protocol-Level KPI Catalog
+## Specification-Level KPI Catalog
 
-These are the KPIs the openEAGO protocol itself MUST track and emit. They are protocol-level observability requirements — distinct from business-level KPIs defined by individual implementations.
+These are the KPIs the OpenEAGO specification itself MUST track and emit. They are specification-level observability requirements — distinct from business-level KPIs defined by individual implementations.
 
 All implementations MUST expose these KPIs via the declared observability stack (OpenTelemetry + Prometheus per `spec/v0.1.0/spec.json`). KPI data MUST be available for query by authorized monitoring systems.
 
@@ -243,7 +243,7 @@ All implementations MUST expose these KPIs via the declared observability stack 
 
 ## Agent Registry Minimum Performance Bar
 
-Every agent registered in the openEAGO Agent Registry MUST meet the following minimum performance bar. The Planning Agent MUST NOT select an agent that fails any of these minimums for an execution plan, regardless of cost or capability fit score.
+Every agent registered in the OpenEAGO Agent Registry MUST meet the following minimum performance bar. The Planning Agent MUST NOT select an agent that fails any of these minimums for an execution plan, regardless of cost or capability fit score.
 
 | Property | Minimum Required Value | Eviction Rule |
 | --- | --- | --- |
@@ -286,13 +286,13 @@ Negotiation checks MUST include `"sla_slo"` in the `checks` array. A negotiation
 
 ## Summary
 
-Performance accountability in openEAGO is enforced through three concrete mechanisms:
+Performance accountability in OpenEAGO is enforced through three concrete mechanisms:
 
 1. **SLA Negotiation (Phase 2)**: Every execution plan MUST pass a formal four-dimension SLO feasibility check. Plans where agent SLOs cannot be met are rejected at negotiation, not discovered at runtime.
 
 2. **SLA Monitoring (Phase 4)**: The breach state machine provides a normative lifecycle — `active` → `at_risk` → `breached` → `[pause/fallback/escalate]` — with mandatory event emission at each transition. SLA status is a first-class field in execution outputs.
 
-3. **KPI Catalog (All Phases)**: The protocol mandates 20+ KPIs across reliability, performance, compliance, financial, and security dimensions, exposed via OpenTelemetry/Prometheus. These KPIs are protocol-level requirements, not optional instrumentation.
+3. **KPI Catalog (All Phases)**: The specification mandates 20+ KPIs across reliability, performance, compliance, financial, and security dimensions, exposed via OpenTelemetry/Prometheus. These KPIs are specification-level requirements, not optional instrumentation.
 
 For the risk model that incorporates SLA breach probability into the Operational Risk dimension, see [Risk Management Framework](./risk-management.md).
 

@@ -6,9 +6,9 @@ Category: Core Agent - Utility
 
 The Contract Agent accepts **any task** in structured or natural language format, validates input, reviews security and compliance details, detects task type, determines workflow patterns, and enriches to OASF-compliant contracts. It acts as the universal entry point for all task types in the eago system.
 
-## openEAGO Protocol Integration
+## OpenEAGO Specification Integration
 
-The Contract Agent implements **Phase 1 (Contract Management)** of the six-phase openEAGO architecture:
+The Contract Agent implements **Phase 1 (Contract Management)** of the six-phase OpenEAGO architecture:
 
 1. **Contract Management** ← **Contract Agent (This Component)**
 2. Planning & Negotiation ← Enriched contracts sent to Planner Agent
@@ -27,7 +27,7 @@ External Request → Contract Agent → [Phase 1 Complete] → Planning Agent �
 
 - Implements Level 2 authentication (User/Application-to-Framework)
 - Validates SPIRE/SPIFFE certificates and mTLS connections
-- Enforces openEAGO security policies before contract enrichment
+- Enforces OpenEAGO security policies before contract enrichment
 
 **Context Integration**:
 
@@ -377,26 +377,26 @@ External Request → Contract Agent → [Phase 1 Complete] → Planning Agent �
 
 ## Summary of Input/Output Patterns
 
-### Input Patterns Supported:
+### Input Patterns Supported
 
 1. **Structured API Requests** - Complete JSON with all fields
 2. **Natural Language Requests** - Human-readable descriptions with NLP processing
 3. **Mixed Formats** - Structured data with natural language objectives
 4. **Urgent/Priority Requests** - Time-sensitive with parallel execution patterns
 
-### Output Enrichment Features:
+### Output Enrichment Features
 
-1. **OASF Compliance** - Full record metadata and protocol headers
+1. **OASF Compliance** - Full record metadata and specification headers
 2. **Task Analysis** - Confidence scoring and pattern detection
 3. **Regulatory Mapping** - Automatic compliance framework assignment
 4. **Workflow Optimization** - Sequential vs. parallel execution patterns
 5. **Security Classification** - Risk-based security level assignment
 6. **Skill Decomposition** - Task breakdown into executable agent skills
 
-### Data Flow:
+### Data Flow
 
 ```text
 Raw Input → Validation → Task Detection → Skill Mapping → Regulatory Analysis → OASF Enrichment → Planning Agent
 ```
 
-The Contract Agent successfully transforms diverse input formats into standardized, compliant OASF contracts ready for execution by the openEAGO planning and orchestration system.
+The Contract Agent successfully transforms diverse input formats into standardized, compliant OASF contracts ready for execution by the OpenEAGO planning and orchestration system.

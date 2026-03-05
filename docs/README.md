@@ -1,19 +1,19 @@
-# openEAGO Documentation Index
+# OpenEAGO Documentation Index
 
 ## Overview
 
-- **[Protocol Overview](./overview/overview.md)** - Comprehensive introduction to openEAGO protocol capabilities and enterprise requirements
+- **[Specification Overview](./overview/overview.md)** - Comprehensive introduction to OpenEAGO specification capabilities and enterprise requirements
 - **[Architecture Guide](./overview/architecture.md)** - Detailed six-phase architecture, data flows, and integration patterns
 - **[Security Framework](./overview/security.md)** - Comprehensive security architecture, three-level authentication system, and threat protection mechanisms
 - **[Identity Framework](./overview/identity.md)** - Agent identity standards, three-level authentication architecture, and SPIRE/SPIFFE integration for secure multi-agent systems
-- **[Risk Management Framework](./overview/risk-management.md)** - Cross-phase risk lifecycle, four-dimension risk taxonomy with normative thresholds, escalation protocol, and regulatory alignment (SR 11-7, EU AI Act, NIST AI RMF, BCBS 239, DORA)
-- **[Performance SLA/SLO and KPIs](./overview/performance-sla-slo-kpi.md)** - SLA vs. SLO normative definitions, four-dimension SLO taxonomy, canonical `sla_guarantees` schema, breach state machine, and the protocol-level KPI catalog
-- **[Read the openEAGO Proposal](./overview/openEAGO_proposal.md)** - Start here for a comprehensive understanding of regulatory challenges in AI systems and how openEAGO addresses them. This foundational document maps 35+ banking and financial services regulatory challenges to specific protocol solutions.
-- **[Reference Materials](./overview/reference_materials.md)** - Curated list of key references, standards, and resources relevant to openEAGO design and implementation
+- **[Risk Management Framework](./overview/risk-management.md)** - Cross-phase risk lifecycle, four-dimension risk taxonomy with normative thresholds, escalation process, and regulatory alignment (SR 11-7, EU AI Act, NIST AI RMF, BCBS 239, DORA)
+- **[Performance SLA/SLO and KPIs](./overview/performance-sla-slo-kpi.md)** - SLA vs. SLO normative definitions, four-dimension SLO taxonomy, canonical `sla_guarantees` schema, breach state machine, and the specification-level KPI catalog
+- **[Read the OpenEAGO Proposal](./overview/openeago_proposal.md)** - Start here for a comprehensive understanding of regulatory challenges in AI systems and how OpenEAGO addresses them. This foundational document maps 35+ banking and financial services regulatory challenges to specific specification solutions.
+- **[Reference Materials](./overview/reference_materials.md)** - Curated list of key references, standards, and resources relevant to OpenEAGO design and implementation
 
-## Core Protocol Capabilities
+## Core Specification Capabilities
 
-The openEAGO specification is organized into six core capability domains:
+The OpenEAGO specification is organized into six core capability domains:
 
 ### [01-Contract Capability](./capabilities/01_contract/)
 
@@ -30,7 +30,7 @@ The openEAGO specification is organized into six core capability domains:
 
 ### [04-Execution Capability](./capabilities/04_execution/)
 
-- **[Execution Overview](./capabilities/04_execution/README.md)** - Task execution and orchestration protocols
+- **[Execution Overview](./capabilities/04_execution/README.md)** - Task execution and orchestration specification
 
 ### [05-Context Capability](./capabilities/05_context/)
 
@@ -38,7 +38,7 @@ The openEAGO specification is organized into six core capability domains:
 
 ### [06-Communication Capability](./capabilities/06_communication/)
 
-- **[Communication Overview](./capabilities/06_communication/README.md)** - Agent communication protocols and standards
+- **[Communication Overview](./capabilities/06_communication/README.md)** - Agent communication specification
 
 ## Visual Assets
 

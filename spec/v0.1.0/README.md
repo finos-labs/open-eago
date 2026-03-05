@@ -1,11 +1,11 @@
-# openEAGO Schemas
+# OpenEAGO Schemas
 
-This directory contains versioned machine-readable schema artifacts for openEAGO.
+This directory contains versioned machine-readable schema artifacts for OpenEAGO.
 
 - Human-readable normative source: [../../SPECIFICATION.md](../../SPECIFICATION.md)
-- Protocol-level machine model: [./spec.json](./spec.json)
+- Specification-level machine model: [./spec.json](./spec.json)
 
-Implementations SHOULD treat this folder as the canonical location for JSON Schemas referenced by the protocol.
+Implementations SHOULD treat this folder as the canonical location for JSON Schemas referenced by the specification.
 
 ## Available Schema Sets
 

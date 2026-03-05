@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://finos-labs.github.io/open-eago/spec/v0.1.0/schemas/validation-compliance.schema.json",
-  "title": "openEAGO Validation and Compliance",
+  "title": "OpenEAGO Validation and Compliance",
   "type": "object",
   "required": ["plan_id", "validation_status", "policy_checks", "hitl", "risk_assessment"],
   "properties": {

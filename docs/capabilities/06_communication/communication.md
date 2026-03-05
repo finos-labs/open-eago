@@ -6,9 +6,9 @@ Category: Core Agent - Communication
 
 The Communication Agent receives **context state** from the Context Agent, generates intelligent responses, manages multi-channel communication delivery, handles notifications and alerts, and provides comprehensive audit trails. It acts as the final phase that transforms executed workflows into user-friendly responses while maintaining compliance, personalization, and communication preferences.
 
-## openEAGO Protocol Integration
+## OpenEAGO Specification Integration
 
-The Communication Agent implements **Phase 6 (Communication)** of the six-phase openEAGO architecture:
+The Communication Agent implements **Phase 6 (Communication)** of the six-phase OpenEAGO architecture:
 
 1. Contract Management → Workflow initiation completed
 2. Planning & Negotiation → Agent orchestration completed  
@@ -570,7 +570,7 @@ class NotificationManager:
             <li>Consider optimization recommendations for future workflows</li>
         </ol>
         
-        <p>Best regards,<br>openEAGO System</p>
+        <p>Best regards,<br>OpenEAGO System</p>
     </div>
 </body>
 </html>
@@ -833,7 +833,7 @@ The Communication Agent produces the final system response that includes:
 
 ## Summary
 
-The Communication Agent serves as the final phase of the openEAGO system:
+The Communication Agent serves as the final phase of the OpenEAGO system:
 
 **Core Responsibilities**:
 
@@ -858,4 +858,4 @@ The Communication Agent serves as the final phase of the openEAGO system:
 - **Analytics**: Communication effectiveness and user engagement measurement
 - **Compliance**: Audit trails and regulatory reporting for communication activities
 
-The Communication Agent completes the openEAGO workflow by transforming executed results into personalized, compliant, and effective communications, ensuring users receive relevant, timely, and actionable information while maintaining the highest standards of security, compliance, and user experience.
+The Communication Agent completes the OpenEAGO workflow by transforming executed results into personalized, compliant, and effective communications, ensuring users receive relevant, timely, and actionable information while maintaining the highest standards of security, compliance, and user experience.

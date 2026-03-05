@@ -1,12 +1,12 @@
-# openEAGO - Architecture
+# OpenEAGO - Architecture
 
 ## Overview
 
-The openEAGO (Open Enterprise Multi-Agent Communication Protocol) implements a six-phase logical architecture that enables secure, scalable, and compliant multi-agent collaboration across enterprise environments. This architecture presents the logical view of the system architecture, focusing on component responsibilities, data flow, and integration patterns.
+The OpenEAGO (Open Enterprise Agent Governance & Orchestration) implements a six-phase logical architecture that enables secure, scalable, and compliant multi-agent collaboration across enterprise environments. This architecture presents the logical view of the system architecture, focusing on component responsibilities, data flow, and integration patterns.
 
 ## External Interface (Request)
 
-### Client Interface Layer (External to Protocol)
+### Client Interface Layer (External to Specification)
 
 **Purpose**: Entry point for external applications and services to initiate multi-agent workflows
 
@@ -35,7 +35,7 @@ The openEAGO (Open Enterprise Multi-Agent Communication Protocol) implements a s
 - Support multi-tenancy and data isolation
 - Enable cross-organizational collaboration
 
-## Six-Phases of the Protocol
+## Six-Phases of the Specification
 
 ### Phase 1: Contract Management
 
@@ -167,7 +167,7 @@ Session Context (Global)
 
 **Components**:
 
-- **Message Router**: Protocol-compliant message routing
+- **Message Router**: Specification-compliant message routing
 - **Security Gateway**: Authentication and encryption enforcement
 - **Compliance Monitor**: Regulatory adherence validation
 - **Blockchain Anchor**: Immutable audit trail creation
@@ -223,7 +223,7 @@ The architecture depends on a shared security and governance baseline; detailed 
 
 ### Six-Phase Flow Pattern
 
-**Complete Protocol Flow**:
+**Complete Specification Flow**:
 
 ```text
 Client Request → Contract Validation → Planning → Validation → Execution → Context Update → Communication → Response
@@ -291,7 +291,7 @@ sequenceDiagram
     participant Context as Context Agent
     participant Communication as Communication Agent
 
-        Note over Contract, Communication: All agents registered in the openEAGO registry with real-time state update and context propagation
+        Note over Contract, Communication: All agents registered in the OpenEAGO registry with real-time state update and context propagation
 
     Client->>Contract: Initiate cross-border data request
     Contract-->>Contract: Validate input completeness, formatting and quality
@@ -380,7 +380,7 @@ sequenceDiagram
 
 ### Logical Deployment Units
 
-**Core Protocol Services**:
+**Core Specification Services**:
 
 - Contract Management Service
 - Planning & Discovery Service
@@ -458,7 +458,7 @@ sequenceDiagram
 
 ## Summary
 
-The openEAGO logical architecture provides a comprehensive six-phase framework for enterprise multi-agent systems:
+The OpenEAGO logical architecture provides a comprehensive six-phase framework for enterprise multi-agent systems:
 
 **Core Six-Phases**:
 

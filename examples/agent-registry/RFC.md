@@ -1,9 +1,9 @@
-# RFC: openEAGO - Agent Registry
+# RFC: OpenEAGO - Agent Registry
 
 **Version:** 0.1.0  
 **Status:** Active Development  
 **Last Updated:** 2026-02-24  
-**Authors:** openEAGO Team
+**Authors:** OpenEAGO Team
 
 ---
 
@@ -31,7 +31,7 @@
 
 ## 1. Executive Summary
 
-**openEAGO Registry** is a distributed, decentralised, zero-trust service registry designed for agentic AI workloads. It enables AI agents and MCP/openEAGO workloads to discover, register, and authenticate each other in a dynamic, heterogeneous environment.
+**OpenEAGO Registry** is a distributed, decentralised, zero-trust service registry designed for agentic AI workloads. It enables AI agents and MCP/OpenEAGO workloads to discover, register, and authenticate each other in a dynamic, heterogeneous environment.
 
 The registry uses **SPIFFE/SPIRE** for cryptographic workload identity, so agents authenticate with X.509 certificates rather than API keys or passwords. It supports a **bootstrap/node** topology where a set of well-known bootstrap servers maintain the authoritative registry, and subordinate nodes synchronize state at configurable intervals.
 

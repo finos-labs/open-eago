@@ -6,9 +6,9 @@ Category: Core Agent - Orchestration
 
 The Execution Agent receives **validated execution plans** from the Validation Agent, orchestrates multi-agent workflows, manages task execution, monitors performance, and handles failures. It acts as the runtime orchestration engine that transforms approved plans into executed results while maintaining compliance, monitoring, and audit requirements.
 
-## openEAGO Protocol Integration
+## OpenEAGO Specification Integration
 
-The Execution Agent implements **Phase 4 (Execution)** of the six-phase openEAGO architecture:
+The Execution Agent implements **Phase 4 (Execution)** of the six-phase OpenEAGO architecture:
 
 1. Contract Management → Contract processing completed
 2. Planning & Negotiation → Plan generation completed  
@@ -188,7 +188,7 @@ async def execute_workflow(execution_plan, validation_decision):
 
 ### 2. Agent Communication & Coordination
 
-**Agent Invocation Protocol**:
+**Agent Invocation**:
 
 ```json
 {
@@ -236,7 +236,7 @@ async def execute_workflow(execution_plan, validation_decision):
 }
 ```
 
-**Agent Response Protocol**:
+**Agent Response**:
 
 ```json
 {
@@ -961,7 +961,7 @@ Execution Agent → [Execution Results] → Context Agent → [State Management]
 
 ## Performance Metrics & Optimization
 
-**Execution Performance Metrics** (Protocol-Level KPIs — see [Performance SLA/SLO and KPIs](../../overview/performance-sla-slo-kpi.md) for full catalog and targets):
+**Execution Performance Metrics** (Specification-Level KPIs — see [Performance SLA/SLO and KPIs](../../overview/performance-sla-slo-kpi.md) for full catalog and targets):
 
 - **Orchestration Efficiency**: Workflow completion time vs. optimal time (`phase_latency_p99_ms`)
 - **Resource Utilization**: CPU, memory, and network usage optimization (`agent_queue_depth`)
@@ -1001,7 +1001,7 @@ All metrics MUST be exported via OpenTelemetry traces and Prometheus metrics scr
 
 ## Summary
 
-The Execution Agent serves as the runtime orchestration engine of the openEAGO system:
+The Execution Agent serves as the runtime orchestration engine of the OpenEAGO system:
 
 **Core Responsibilities**:
 
@@ -1026,4 +1026,4 @@ The Execution Agent serves as the runtime orchestration engine of the openEAGO s
 - **Context**: Runtime execution state and inter-agent communication tracking
 - **Security**: Continuous security monitoring and breach detection
 
-The Execution Agent transforms validated plans into executed results through intelligent orchestration, monitoring, and failure management, ensuring reliable and compliant multi-agent workflow execution in the openEAGO architecture.
+The Execution Agent transforms validated plans into executed results through intelligent orchestration, monitoring, and failure management, ensuring reliable and compliant multi-agent workflow execution in the OpenEAGO architecture.

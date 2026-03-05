@@ -10,9 +10,9 @@ The Planning Agent receives **OASF-compliant contracts** from the Contract Agent
 
 The Planning Agent relies on an external Agent Registry component. Agent Registry provides the necessary agent metadata and capabilities for discovery and selection.
 
-## openEAGO Protocol Integration
+## OpenEAGO Specification Integration
 
-The Planning Agent implements **Phase 2 (Planning & Negotiation)** of the six-phase openEAGO architecture:
+The Planning Agent implements **Phase 2 (Planning & Negotiation)** of the six-phase OpenEAGO architecture:
 
 1. Contract Management → **Enriched contracts received**
 2. **Planning & Negotiation** ← **Planning Agent (This Component)**
@@ -175,7 +175,7 @@ Skill Requirements → Registry Query → Capability Matching → Compliance Fil
 
 **Enhanced Agent Registry Integration**:
 
-The Planning Agent integrates with the comprehensive openEAGO Agent Registry system to provide intelligent agent discovery and selection capabilities. The registry maintains detailed metadata about all registered agents including capabilities, compliance certifications, performance metrics, and geographic locations.
+The Planning Agent integrates with the comprehensive OpenEAGO Agent Registry system to provide intelligent agent discovery and selection capabilities. The registry maintains detailed metadata about all registered agents including capabilities, compliance certifications, performance metrics, and geographic locations.
 
 **Registry Architecture**:
 

@@ -22,7 +22,7 @@ use utoipa::OpenApi;
         (name = "Registry", description = "Address registry management")
     ),
     info(
-        title = "openEAGO Registry API",
+        title = "OpenEAGO Registry API",
         version = "0.1.0",
         description = "A distributed registry service for managing and discovering network addresses with bootstrap server support.",
     )
