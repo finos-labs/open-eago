@@ -1,4 +1,10 @@
-# OpenEAGO - Enterprise Agent Governance and Orchestration (Specification)
+# OpenEAGO - Enterprise Agent Governance and Orchestration
+
+<br />
+<div align="center">
+  <img src="docs/images/eago_gs.png" alt="OpenEAGO" width="800">
+</div>
+<br /><br / >
 
 <div align="center" style="display: flex; gap: 10px; justify-content: center;">
   <img src="https://user-images.githubusercontent.com/327285/230928932-7c75f8ed-e57b-41db-9fb7-a292a13a1e58.svg" alt="badge-labs">
@@ -9,10 +15,10 @@
 
 ---
 
-**Enterprise Agent Governance & Orchestration (OpenEAGO)** is an open standard for secure, scalable, and compliant communication and orchestration among AI agents in enterprise environments.
+**Enterprise Agent Governance & Orchestration (OpenEAGO)** is an open specification for secure, scalable, and compliant communication and orchestration among AI agents in enterprise environments.
 
 - Authors: Jan Rock (<jan.rock@citi.com>), Denis Urusov (<denis.urusov@citi.com>), Paul Groves (<paul.groves@citi.com>)
-- Date: 18/02/2026 - Version: 0.1
+- Date: 05/03/2026 - Version: 0.1
 
 ## Overview
 
