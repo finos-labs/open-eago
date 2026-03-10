@@ -1,0 +1,120 @@
+{
+  "identityRegistry": "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512",
+  "reputationRegistry": "0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9",
+  "participantRegistry": "0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9",
+  "onboardingRegistry": "0x5FC8d32690cc91D4c39d9d3abcBD16989F875707",
+  "amlOracle": "0x0165878A594ca255338adfa4d48449f69242Eb8F",
+  "creditRiskOracle": "0xa513E6E4b8f2a923D98304ec87F64353C4D5C853",
+  "legalOracle": "0x2279B7A0a67DB372996a5FaB50D91eAA73d2eBe6",
+  "clientSetupOracle": "0x8A791620dd6260079BF849Dc5567aDC3F2FdC318",
+  "flowAuthorizationRegistry": "0x610178dA211FEF7D417bC0e6FeD39F05609AD788",
+  "reputationGate": "0xB7f8BC63BbcaD18155201308C8f3540b07f84F5e",
+  "autonomyBoundsRegistry": "0xA51c1fc2f0D1a1b8494Ed1FE312d7C3a78Ed91C0",
+  "executionTraceLog": "0x0DCd1Bf9A1b36cE34237eEaFef220932846BCD82",
+  "actionPermitRegistry": "0x9A676e781A523b5d0C0e43731313A708CB607508",
+  "promptRegistry": "0x0B306BF915C4d645ff596e518fAf3F9669b97016",
+  "datasetRegistry": "0x959922bE3CAee4b8Cd9a407cc3ac1C251C2007B1",
+  "deployer": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+  "agents": [
+    {
+      "file": "bank-account-setup-agent.json",
+      "name": "BankAccountSetupAgent",
+      "capabilities": [
+        "setup_account"
+      ],
+      "agentId": "0",
+      "wallet": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+      "cardHash": "0xaa27a1675ed3fdea437ccebd8b8e36dab36aaff2cc34ab1d11c177e5acbc67a0"
+    },
+    {
+      "file": "bank-aml-agent.json",
+      "name": "BankAMLAgent",
+      "capabilities": [
+        "aml_review"
+      ],
+      "agentId": "1",
+      "wallet": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+      "cardHash": "0x4d257dc088eeed85379b542e746d4614f1c8ee86825ef812eaca20953843eedb"
+    },
+    {
+      "file": "bank-credit-risk-agent.json",
+      "name": "BankCreditRiskAgent",
+      "capabilities": [
+        "credit_review"
+      ],
+      "agentId": "2",
+      "wallet": "0x90F79bf6EB2c4f870365E785982E1f101E93b906",
+      "cardHash": "0xe88d3f6ce8bbafa3532da1de68b81214c596220ec87388d6da8093212b79f2e6"
+    },
+    {
+      "file": "bank-legal-agent.json",
+      "name": "BankLegalAgent",
+      "capabilities": [
+        "legal_review"
+      ],
+      "agentId": "3",
+      "wallet": "0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65",
+      "cardHash": "0x108c07dec1da76d34a2cbca214269af123050eddc21ce23930abc2ea8771b36d"
+    },
+    {
+      "file": "bank-legal-entity-setup-agent.json",
+      "name": "BankLegalEntitySetupAgent",
+      "capabilities": [
+        "setup_legal_entity"
+      ],
+      "agentId": "4",
+      "wallet": "0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc",
+      "cardHash": "0x2c2a8ff7255350cf4c861067b4db3abac14ffc58d33c8cb2492cfe7415a6afbf"
+    },
+    {
+      "file": "bank-onboarding-orchestrator.json",
+      "name": "BankOnboardingOrchestrator",
+      "capabilities": [
+        "orchestrate_onboarding"
+      ],
+      "agentId": "5",
+      "wallet": "0x976EA74026E726554dB657fA54763abd0C3a0aa9",
+      "cardHash": "0x41b05db3d7a48cccfe21457571b21c6d963abb7a13d0777e8407aa38216a172a"
+    },
+    {
+      "file": "bank-product-setup-agent.json",
+      "name": "BankProductSetupAgent",
+      "capabilities": [
+        "setup_products"
+      ],
+      "agentId": "6",
+      "wallet": "0x14dC79964da2C08b23698B3D3cc7Ca32193d9955",
+      "cardHash": "0x52ef19eccac895472ba0533a04233d508ef3fee6d73fa5d8dbd44a8a658dbf10"
+    },
+    {
+      "file": "hf-credit-negotiator-agent.json",
+      "name": "HedgeFundCreditNegotiatorAgent",
+      "capabilities": [
+        "credit_negotiation"
+      ],
+      "agentId": "7",
+      "wallet": "0x23618e81E3f5cdF7f54C3d65f7FBc0aBf5B21E8f",
+      "cardHash": "0x8b20e7d2e61639a39fda1e99b6aa8f76a6a5c0a006a6a0decd1c17dfb0c02da1"
+    },
+    {
+      "file": "hf-document-agent.json",
+      "name": "HedgeFundDocumentAgent",
+      "capabilities": [
+        "submit_documents"
+      ],
+      "agentId": "8",
+      "wallet": "0xa0Ee7A142d267C1f36714E4a8F75612F20a79720",
+      "cardHash": "0xa17d81007e064ad23c86666ac2c113badbb113f2985155d096f0b38c89e9087a"
+    },
+    {
+      "file": "hf-legal-agent.json",
+      "name": "HedgeFundLegalAgent",
+      "capabilities": [
+        "legal_negotiation"
+      ],
+      "agentId": "9",
+      "wallet": "0xBcd4042DE499D14e55001CcbB24a551F3b954096",
+      "cardHash": "0x5b3be02c853248f33f83bbfa211371908031bf3dfbddfe367f65ac7ff96d41c5"
+    }
+  ]
+}

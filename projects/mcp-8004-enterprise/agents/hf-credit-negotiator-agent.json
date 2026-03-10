@@ -1,0 +1,9 @@
+{
+  "name": "HedgeFundCreditNegotiatorAgent",
+  "description": "Hedge fund credit negotiation agent. Evaluates bank credit term proposals and submits counter-proposals.",
+  "capabilities": ["credit_negotiation"],
+  "institution": "ACME_HEDGE_FUND",
+  "dmzTier": "CLIENT_EXTERNAL",
+  "endpoint": "http://localhost:8021",
+  "mcpSpec": "./mcp/hf-credit-negotiator.mcp.json"
+}

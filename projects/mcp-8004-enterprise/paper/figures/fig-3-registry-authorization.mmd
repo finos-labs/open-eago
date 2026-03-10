@@ -1,0 +1,27 @@
+flowchart TD
+    subgraph OLD["Pre-ERC-8004: Per-Oracle Whitelist"]
+        direction TB
+        O1["① Admin mints agent NFT"]
+        O2["② Admin calls oracle.addOracle(wallet)\nfor EACH oracle contract"]
+        O3(("Gap: agent exists\nbut is not yet authorized"))
+        O4["③ Oracle maintains local\nmapping(address => bool) isOracle"]
+        O5["④ Agent added/removed?\nRepeat step ② per oracle"]
+        O1 --> O2
+        O2 -.->|window of\ninconsistency| O3
+        O3 -.-> O4
+        O4 --> O5
+    end
+
+    subgraph NEW["ERC-8004: Registry-as-Authorization"]
+        direction TB
+        N1["① Single register( ) transaction"]
+        N2["Mints NFT + binds wallet\n+ binds oracle + stores cardHash"]
+        N3(("Identity triple complete\nAgent can act immediately"))
+        N4["Oracle reads registry on every call:\ngetAgentWallet · getOracleAddress"]
+        N5["Revoke registration once →\nall oracles reflect instantly"]
+        N1 --> N2 --> N3 --> N4
+        N4 --> N5
+    end
+
+    OLD ~~~ NEW
+

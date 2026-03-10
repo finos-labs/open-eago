@@ -1,0 +1,9 @@
+{
+  "name": "BankAMLAgent",
+  "description": "Bank AML screening agent. Performs sanctions/PEP screening for institutional client onboarding.",
+  "capabilities": ["aml_review"],
+  "institution": "ACME_BANK",
+  "dmzTier": "BANK_EXTERNAL",
+  "endpoint": "http://localhost:8010",
+  "mcpSpec": "./mcp/aml-review.mcp.json"
+}

@@ -1,0 +1,9 @@
+{
+  "name": "BankLegalAgent",
+  "description": "Bank legal agent. Drafts, negotiates, and executes institutional onboarding contracts.",
+  "capabilities": ["legal_review"],
+  "institution": "ACME_BANK",
+  "dmzTier": "BANK_EXTERNAL",
+  "endpoint": "http://localhost:8012",
+  "mcpSpec": "./mcp/legal-review.mcp.json"
+}

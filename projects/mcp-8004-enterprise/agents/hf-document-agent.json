@@ -1,0 +1,9 @@
+{
+  "name": "HedgeFundDocumentAgent",
+  "description": "Hedge fund document agent. Assembles and submits KYC/AML and credit documents in response to bank data requests.",
+  "capabilities": ["submit_documents"],
+  "institution": "ACME_HEDGE_FUND",
+  "dmzTier": "CLIENT_EXTERNAL",
+  "endpoint": "http://localhost:8020",
+  "mcpSpec": "./mcp/hf-document.mcp.json"
+}

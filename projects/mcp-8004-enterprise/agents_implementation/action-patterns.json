@@ -1,0 +1,19 @@
+{
+  "_comment": "Action pattern catalogue for the Runtime Action Gateway (Concept 10). Patterns are matched in declaration order; highest tier wins on conflict. patternId is the string whose keccak256 is registered in ActionPermitRegistry.",
+  "patterns": [
+    { "id": "PR:READ",      "regex": "^PR:READ$",                      "tier": 0 },
+    { "id": "PR:COMMENT",   "regex": "^PR:COMMENT$",                   "tier": 1 },
+    { "id": "PR:APPROVE",   "regex": "^PR:APPROVE$",                   "tier": 1 },
+    { "id": "PR:REJECT",    "regex": "^PR:REJECT$",                    "tier": 1 },
+    { "id": "SQL:SELECT",   "regex": "^\\s*SELECT\\b",                 "tier": 0 },
+    { "id": "SQL:INSERT",   "regex": "^\\s*INSERT\\b",                 "tier": 1 },
+    { "id": "SQL:UPDATE",   "regex": "^\\s*UPDATE\\b",                 "tier": 1 },
+    { "id": "SQL:DELETE",   "regex": "^\\s*DELETE\\b",                 "tier": 2 },
+    { "id": "SQL:DROP",     "regex": "^\\s*DROP\\b",                   "tier": 2 },
+    { "id": "SQL:TRUNCATE", "regex": "^\\s*TRUNCATE\\b",               "tier": 2 },
+    { "id": "SHELL:RM_RF",  "regex": "rm\\s+-[^\\s]*r[^\\s]*f",        "tier": 3 },
+    { "id": "SHELL:FORMAT", "regex": "\\bformat\\b.*\\bdisk\\b",        "tier": 3 },
+    { "id": "SHELL:MKFS",   "regex": "\\bmkfs\\b",                     "tier": 3 },
+    { "id": "IAM:REVOKE",   "regex": "\\brevoke\\b.*\\biam\\b",         "tier": 3 }
+  ]
+}

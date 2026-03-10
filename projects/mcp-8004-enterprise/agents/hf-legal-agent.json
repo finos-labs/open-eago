@@ -1,0 +1,9 @@
+{
+  "name": "HedgeFundLegalAgent",
+  "description": "Hedge fund legal agent. Reviews bank contract drafts and submits markup for negotiation rounds.",
+  "capabilities": ["legal_negotiation"],
+  "institution": "ACME_HEDGE_FUND",
+  "dmzTier": "CLIENT_EXTERNAL",
+  "endpoint": "http://localhost:8022",
+  "mcpSpec": "./mcp/hf-legal.mcp.json"
+}

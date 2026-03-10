@@ -1,0 +1,38 @@
+flowchart LR
+    subgraph GOV["Governance Boundary — On-Chain Layers"]
+        direction TB
+        L1["Layer 1: Identity"]
+        L2["Layer 2: Flow Auth"]
+        L3["Layer 3: Reputation"]
+        L4["Layer 4: Prompt Registry"]
+        L5["Layer 5: Dataset Registry"]
+        L6["Layer 6: Autonomy Bounds"]
+        L7["Layer 7: Anomaly Detection"]
+        L8["Layer 8: Card Integrity"]
+        L9["Layer 9: Action Permits"]
+        L1 --- L2 --- L3 --- L4 --- L5 --- L6 --- L7 --- L8 --- L9
+    end
+
+    subgraph OPAQUE["LLM Inference — Opaque"]
+        direction TB
+        LLM["Model Execution\n(not observable by\non-chain governance)"]
+    end
+
+    ATK1(["Prompt Injection\nmalicious system prompt"])
+    ATK2(["Sampling Manipulation\ntemperature / top-p / top-k"])
+    ATK3(["Constrained Decoding\nadversarial grammar / logit bias"])
+    ATK4(["Activation Steering\nfine-tuning / adversarial activations"])
+
+    ATK1 --> OPAQUE
+    ATK2 --> OPAQUE
+    ATK3 --> OPAQUE
+    ATK4 --> OPAQUE
+
+    GOV -- "payloadHash\n+ outcomeCode\n(format verifiable)" --> RESULT(["Fulfillment Output"])
+    OPAQUE -- "produces output\n(process NOT verifiable)" --> RESULT
+
+    RESULT -- "submitted to oracle" --> GOV
+
+    style GOV stroke-dasharray: 5 5
+    style OPAQUE fill:#f5f5f5,stroke:#999,stroke-width:2px
+

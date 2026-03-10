@@ -1,0 +1,41 @@
+flowchart LR
+    subgraph BANKA["Bank A"]
+        direction TB
+        A_INT["Internal Tier\nMCP Servers\nBusiness Logic\nData Stores"]
+        A_DMZ_INT["DMZ Internal Tier\nInternal Bridges\n(submit-only)"]
+        A_DMZ_EXT["DMZ External Tier\nExternal Bridges\n(bidirectional)"]
+        A_INT --- A_DMZ_INT --- A_DMZ_EXT
+    end
+
+    subgraph CHAIN["Consortium Chain"]
+        direction TB
+        IR["IdentityRegistry"]
+        AML["AMLOracle"]
+        CR["CreditRiskOracle"]
+        LO["LegalOracle"]
+        CSO["ClientSetupOracle"]
+        OR["OnboardingRegistry"]
+        ETL["ExecutionTraceLog"]
+    end
+
+    subgraph BANKB["Bank B"]
+        direction TB
+        B_DMZ_EXT["DMZ External Tier\nExternal Bridges\n(bidirectional)"]
+        B_DMZ_INT["DMZ Internal Tier\nInternal Bridges\n(submit-only)"]
+        B_INT["Internal Tier\nMCP Servers\nBusiness Logic\nData Stores"]
+        B_DMZ_EXT --- B_DMZ_INT --- B_INT
+    end
+
+    subgraph HF["Hedge Fund C"]
+        direction TB
+        HF_DMZ["DMZ External Tier\nHF Bridges\n(bidirectional)"]
+        HF_INT["Internal Tier\nDocument Stores\nLegal Systems"]
+        HF_DMZ --- HF_INT
+    end
+
+    A_DMZ_INT -- "TX" --> CHAIN
+    CHAIN -- "EVENT" --> A_DMZ_EXT
+    B_DMZ_INT -- "TX" --> CHAIN
+    CHAIN -- "EVENT" --> B_DMZ_EXT
+    HF_DMZ -- "TX" --> CHAIN
+    CHAIN -- "EVENT" --> HF_DMZ
