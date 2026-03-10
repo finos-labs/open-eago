@@ -1,0 +1,38 @@
+flowchart TD
+    REQ["Oracle Invocation\nfulfillReview(traceId, agentId, ...)"]
+
+    subgraph GA["Group A — Static Authorization"]
+        direction TB
+        L1["Layer 1: Agent Identity\nIdentityRegistryUpgradeable\nonlyRegisteredOracle(agentId)"]
+        L2["Layer 2: Flow Authorization\nFlowAuthorizationRegistry\nisAuthorized(flowId, agentId)"]
+        L3["Layer 3: Reputation Gate\nReputationGate\nmeetsThreshold(agentId, capability)"]
+        L1 --> L2 --> L3
+    end
+
+    subgraph GB["Group B — Dynamic Correction"]
+        direction TB
+        L4["Layer 4: Prompt Governance\nPromptRegistry\npromptHash in approved set"]
+        L5["Layer 5: Dataset Governance\nDatasetRegistry\ndatasetHash approved (global + flow)"]
+        L6["Layer 6: Autonomy Bounds\nAutonomyBoundsRegistry\nisToolEnabled(agentId, toolHash)"]
+        L7["Layer 7: Flow Anomaly Detection\nExecutionTraceLog\nhop count + loop policy"]
+        L4 --> L5 --> L6 --> L7
+    end
+
+    subgraph GC["Group C — Integrity and Action Control"]
+        direction TB
+        L8["Layer 8: Card Integrity\nIdentityRegistry.cardHash\nkeccak256(card) == on-chain hash"]
+        L9["Layer 9: Action-Level Authorization\nActionPermitRegistry\nvalidateAction(flowId, agentId, actionType)"]
+        L8 --> L9
+    end
+
+    FUL(["Fulfillment Accepted\nOutcome recorded on-chain\nCompletion event emitted"])
+
+    REQ --> L1
+    L3 --> L4
+    L7 --> L8
+    L9 --> FUL
+
+    style GA stroke-dasharray: 5 5
+    style GB stroke-dasharray: 5 5
+    style GC stroke-dasharray: 5 5
+

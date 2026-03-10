@@ -1,0 +1,86 @@
+flowchart TD
+    CAL([Caller / Flow Initiator])
+
+    subgraph CHAIN["⛓  On-chain"]
+        subgraph ORACLE["Oracle Contracts — CodeReviewerOracle · CodeApproverOracle"]
+            REQ[/"submitRequest(traceId, payload)"\]
+
+            subgraph GATES["Authorization Gates"]
+                direction TB
+                G1{{①  Identity · onlyRegisteredOracle}}
+                G2{{②  Flow Auth · isAuthorized}}
+                G3{{③  Reputation Gate · meetsThreshold}}
+                G4{{④  Autonomy Bounds · isToolEnabled}}
+                G5{{⑤  Trace Log · hop + loop policy}}
+                G1 --> G2 --> G3 --> G4 --> G5
+            end
+
+            EVT[/"ReviewRequested · ApprovalRequested\n(traceId, agentId, payload)"\]
+            FUL[/"fulfillReview · fulfillApproval"\]
+        end
+
+        subgraph REGS["Registry Layer"]
+            direction LR
+            IR[(IdentityRegistry\nERC-721 · UUPS)]
+            FAR[(FlowAuth\nRegistry)]
+            RG[(ReputationGate)]
+            ABR[(AutonomyBounds\nRegistry)]
+            ETL[(ExecutionTraceLog)]
+            RR[(ReputationRegistry)]
+            PR[(PromptRegistry)]
+            DR[(DatasetRegistry)]
+        end
+    end
+
+    subgraph OFFCHAIN["☁  Off-chain"]
+        subgraph BRIDGES["Bridge Layer"]
+            RB[reviewer-bridge.js]
+            AB[approver-bridge.js]
+        end
+        BM[bounds-monitor.js]
+        subgraph SERVERS["MCP Servers"]
+            RS["reviewer-server.js · :3001"]
+            AS["approver-server.js · :3002"]
+        end
+    end
+
+    CAL -->|on-chain call| REQ
+    REQ --> G1
+    G5 --> EVT
+
+    EVT -->|ReviewRequested| RB
+    EVT -->|ApprovalRequested| AB
+
+    RB -->|POST /mcp tools/call| RS
+    AB -->|POST /mcp tools/call| AS
+
+    RS -->|result| RB
+    AS -->|result| AB
+
+    RB -->|fulfillReview tx| FUL
+    AB -->|fulfillApproval tx| FUL
+    FUL -->|result on-chain| CAL
+
+    G1 -.->|reads| IR
+    G2 -.->|reads| FAR
+    G3 -.->|reads| RG
+    G4 -.->|reads| ABR
+    G5 -.->|writes| ETL
+    RG -.->|reads| RR
+
+    BM -.->|watches| ORACLE
+    BM -.->|disableTool| ABR
+
+    style CHAIN fill:#eef4fb,stroke:#2c5f8a
+    style ORACLE fill:#dce8f5,stroke:#2c5f8a
+    style GATES fill:#fdf3e3,stroke:#c87941
+    style REGS fill:#e8f0e8,stroke:#4a7c59
+    style OFFCHAIN fill:#f0f0f8,stroke:#5a4e8a
+    style BRIDGES fill:#e0dff5,stroke:#5a4e8a
+    style SERVERS fill:#e8e4f8,stroke:#5a4e8a
+    style G1 fill:#f9c784,stroke:#c87941
+    style G2 fill:#f9c784,stroke:#c87941
+    style G3 fill:#f9c784,stroke:#c87941
+    style G4 fill:#f9c784,stroke:#c87941
+    style G5 fill:#f9c784,stroke:#c87941
+    style BM fill:#d8d4f0,stroke:#5a4e8a

@@ -1,0 +1,90 @@
+{
+  "$schema": "https://modelcontextprotocol.io/schema/v1/server.json",
+  "name": "client-setup",
+  "version": "1.0.0",
+  "description": "MCP specification for bank internal client setup agents (legal entity, account, product setup).",
+
+  "tools": [
+    {
+      "name": "setup_legal_entity",
+      "description": "Register the client legal entity in bank internal systems. Called after all three review sub-workflows complete.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "flow_id":  { "type": "string" },
+          "trace_id": { "type": "string" }
+        },
+        "required": ["flow_id"]
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "entity_spec_hash": { "type": "string", "description": "keccak256 of entity configuration committed on-chain" },
+          "entity_ref":       { "type": "string", "description": "Internal entity reference ID (off-chain)" }
+        },
+        "required": ["entity_spec_hash"]
+      },
+      "action_permits": {
+        "classification": "setup_action",
+        "tool_action":    "setup:legal_entity",
+        "default_tier":   1,
+        "violation_threshold": 1
+      }
+    },
+    {
+      "name": "setup_account",
+      "description": "Provision trading accounts for the onboarded client. Called after legal entity setup.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "flow_id":  { "type": "string" },
+          "trace_id": { "type": "string" }
+        },
+        "required": ["flow_id"]
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "account_spec_hash": { "type": "string" },
+          "account_ref":       { "type": "string" }
+        },
+        "required": ["account_spec_hash"]
+      },
+      "action_permits": {
+        "classification": "setup_action",
+        "tool_action":    "setup:account",
+        "default_tier":   1,
+        "violation_threshold": 1
+      }
+    },
+    {
+      "name": "setup_products",
+      "description": "Configure approved financial products for the client. Called after account setup. Completes onboarding.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "flow_id":  { "type": "string" },
+          "trace_id": { "type": "string" }
+        },
+        "required": ["flow_id"]
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "product_spec_hash": { "type": "string" },
+          "products":          { "type": "array", "items": { "type": "string" } }
+        },
+        "required": ["product_spec_hash"]
+      },
+      "action_permits": {
+        "classification": "setup_action",
+        "tool_action":    "setup:products",
+        "default_tier":   1,
+        "violation_threshold": 1
+      }
+    }
+  ],
+
+  "resources": [],
+  "prompts": []
+}

@@ -1,0 +1,49 @@
+flowchart TD
+    subgraph CORE["Base Oracle Pattern"]
+        direction TB
+        ORC["Oracle Request / Fulfillment\nonlyRegisteredOracle modifier\nIdentityRegistry lookup"]
+    end
+
+    subgraph P0["P0 — Foundation Controls"]
+        direction TB
+        PRIV["Payload Privacy\npayloadHash only on-chain\nraw data behind firewalls"]
+        MINT["Permissioned Minting\nParticipantRegistry\nisApprovedMinter check"]
+    end
+
+    subgraph P1["P1 — Key and Governance Infrastructure"]
+        direction TB
+        MSIG["Multi-Signature Governance\nConsortiumGovernance\nM-of-N proposal lifecycle"]
+        HSM["HSM Key Management\nVaultSigner\nEIP-712 key rotation"]
+    end
+
+    subgraph P2["P2 — Cross-Institutional Authorization"]
+        direction TB
+        BILAT["Bilateral Flow Authorization\nparticipantId verification\nN institutions → N auth calls"]
+        CRED["Institution-Credentialed Approvers\nparticipantRegistry.isApprover\nTier 2 quorum per institution"]
+    end
+
+    subgraph P3["P3 — Trust and Audit"]
+        direction TB
+        REPF["Reputation Anti-Gaming\ngetSummaryFiltered\ntrustedParticipantIds only"]
+        AUDIT["Regulatory Audit Exporter\naudit-exporter.js\nMerkle proofs + REST API"]
+    end
+
+    subgraph P4["P4 — Consortium Operations"]
+        direction TB
+        GOV["Consortium Governance\nmember add/remove, upgrades\nemergency pauseCrossBank()"]
+        ASYM["Asymmetric Safety\neasy pause (any member)\nhard unpause (M-of-N vote)"]
+    end
+
+    CORE --> P0
+    P0 --> P1
+    P1 --> P2
+    P2 --> P3
+    P3 --> P4
+
+    style CORE stroke-width:3px
+    style P0 stroke-dasharray: 5 5
+    style P1 stroke-dasharray: 5 5
+    style P2 stroke-dasharray: 5 5
+    style P3 stroke-dasharray: 5 5
+    style P4 stroke-dasharray: 5 5
+

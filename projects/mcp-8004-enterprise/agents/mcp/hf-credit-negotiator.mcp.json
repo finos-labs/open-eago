@@ -1,0 +1,45 @@
+{
+  "$schema": "https://modelcontextprotocol.io/schema/v1/server.json",
+  "name": "hf-credit-negotiator",
+  "version": "1.0.0",
+  "description": "MCP specification for the hedge fund credit negotiation agent. Evaluates bank term proposals and submits counter-proposals.",
+
+  "tools": [
+    {
+      "name": "evaluate_terms",
+      "description": "Evaluate bank-proposed credit terms. Returns either a counter-proposal hash or signals acceptance (counter with same hash).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "flow_id":       { "type": "string" },
+          "request_id":    { "type": "string" },
+          "terms_hash":    { "type": "string", "description": "keccak256 of bank-proposed terms" },
+          "round":         { "type": "integer", "description": "Negotiation round number" },
+          "trace_id":      { "type": "string" }
+        },
+        "required": ["flow_id", "request_id", "terms_hash", "round"]
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "proposal_hash":  { "type": "string", "description": "keccak256 of counter-proposal (may equal terms_hash if accepting)" },
+          "accepting":      { "type": "boolean", "description": "True if the HF is accepting the terms as-is" },
+          "notes":          { "type": "string", "description": "Negotiation notes (off-chain)" }
+        },
+        "required": ["proposal_hash", "accepting"]
+      },
+      "autonomy_bounds": {
+        "flow": { "signal": "flow_anomaly", "max_hops": 40, "loop_detection": true, "max_requests_per_minute": 5, "response_timeout_seconds": 900, "action": "revoke" }
+      },
+      "action_permits": {
+        "classification": "credit_negotiation_action",
+        "tool_action":    "hf:counter_propose",
+        "default_tier":   1,
+        "violation_threshold": 3
+      }
+    }
+  ],
+
+  "resources": [],
+  "prompts": []
+}

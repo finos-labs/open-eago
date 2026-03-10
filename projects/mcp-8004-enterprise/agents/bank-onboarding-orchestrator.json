@@ -1,0 +1,9 @@
+{
+  "name": "BankOnboardingOrchestrator",
+  "description": "Bank onboarding orchestrator. Initiates client onboarding flows and coordinates sub-workflow oracle contracts.",
+  "capabilities": ["orchestrate_onboarding"],
+  "institution": "ACME_BANK",
+  "dmzTier": "BANK_INTERNAL",
+  "endpoint": "http://localhost:8013",
+  "mcpSpec": "./mcp/onboarding-orchestrator.mcp.json"
+}

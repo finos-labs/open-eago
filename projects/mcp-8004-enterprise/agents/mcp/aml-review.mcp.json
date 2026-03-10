@@ -1,0 +1,101 @@
+{
+  "$schema": "https://modelcontextprotocol.io/schema/v1/server.json",
+  "name": "aml-review",
+  "version": "1.0.0",
+  "description": "MCP specification for the bank AML screening agent. Performs sanctions/PEP screening for institutional client onboarding.",
+
+  "tools": [
+    {
+      "name": "screen_client",
+      "description": "Initiate AML screening for a new onboarding client. Returns either a need for additional documents or a screening recommendation.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "flow_id":        { "type": "string", "description": "Onboarding flow identifier (bytes32 hex)" },
+          "request_id":     { "type": "string", "description": "AML request identifier (bytes32 hex)" },
+          "client_agent_id":{ "type": "string", "description": "Hedge fund document agent NFT id" },
+          "trace_id":       { "type": "string", "description": "Distributed trace correlation token" }
+        },
+        "required": ["flow_id", "request_id", "client_agent_id"]
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "action":       { "type": "string", "enum": ["request_documents", "submit_recommendation"] },
+          "spec_hash":    { "type": "string", "description": "keccak256 of document spec (if action=request_documents)" },
+          "result_hash":  { "type": "string", "description": "keccak256 of screening result (if action=submit_recommendation)" },
+          "cleared":      { "type": "boolean", "description": "Whether AML screening passed (if action=submit_recommendation)" }
+        },
+        "required": ["action"]
+      },
+      "autonomy_bounds": {
+        "reputation": { "signal": "reputation_degradation", "min_score": 40, "min_score_decimals": 0, "min_feedback_count": 10, "tag": "aml_review", "action": "revoke" },
+        "anomaly":    { "signal": "anomaly_detection", "max_error_rate_pct": 10, "window_requests": 50, "action": "revoke" },
+        "performance":{ "signal": "performance_degradation", "min_success_rate_pct": 90, "window_requests": 100, "action": "revoke" },
+        "flow":       { "signal": "flow_anomaly", "max_hops": 30, "loop_detection": true, "max_requests_per_minute": 5, "response_timeout_seconds": 600, "action": "revoke" }
+      },
+      "action_permits": {
+        "classification": "aml_action",
+        "tool_action":    "aml:screen_client",
+        "default_tier":   1,
+        "approval_timeout_seconds": 600,
+        "violation_threshold": 2
+      }
+    },
+    {
+      "name": "continue_screening",
+      "description": "Resume AML screening after client documents have been submitted.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "flow_id":    { "type": "string" },
+          "request_id": { "type": "string" },
+          "data_hash":  { "type": "string", "description": "keccak256 hash of submitted documents" },
+          "round":      { "type": "integer", "description": "Data request round number" },
+          "trace_id":   { "type": "string" }
+        },
+        "required": ["flow_id", "request_id", "data_hash"]
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "action":      { "type": "string", "enum": ["request_documents", "submit_recommendation"] },
+          "spec_hash":   { "type": "string" },
+          "result_hash": { "type": "string" },
+          "cleared":     { "type": "boolean" }
+        },
+        "required": ["action"]
+      },
+      "autonomy_bounds": {
+        "flow": { "signal": "flow_anomaly", "max_hops": 30, "loop_detection": true, "max_requests_per_minute": 5, "response_timeout_seconds": 600, "action": "revoke" }
+      },
+      "action_permits": {
+        "classification": "aml_action",
+        "tool_action":    "aml:continue_screening",
+        "default_tier":   1,
+        "violation_threshold": 2
+      }
+    }
+  ],
+
+  "resources": [
+    {
+      "uri": "aml://{flow_id}/status",
+      "name": "AML Screening Status",
+      "description": "Current status of the AML screening for a flow.",
+      "mimeType": "application/json"
+    }
+  ],
+
+  "prompts": [
+    {
+      "name": "aml_screening",
+      "description": "AML screening prompt for institutional client onboarding.",
+      "arguments": [
+        { "name": "client_name", "description": "Legal name of the institutional client", "required": true },
+        { "name": "jurisdiction", "description": "Client jurisdiction (e.g. 'Cayman Islands')", "required": false }
+      ],
+      "template": "You are an AML compliance officer performing sanctions and PEP screening.\n\nClient: {{client_name}}{{#if jurisdiction}}\nJurisdiction: {{jurisdiction}}{{/if}}\n\nScreen this client against all applicable sanctions lists and PEP databases.\nAssess beneficial ownership structure and source of funds.\nProvide a recommendation: CLEARED or REQUIRES_REVIEW, with justification."
+    }
+  ]
+}

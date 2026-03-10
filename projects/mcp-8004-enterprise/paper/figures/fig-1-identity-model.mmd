@@ -1,0 +1,30 @@
+﻿flowchart LR
+    subgraph REG["register -- Single Atomic Transaction"]
+        direction TB
+        MINT["1. Mint ERC-721 NFT\nagentId = tokenId"]
+        WALLET["2. Bind agentWallet\nEIP-712 signed attestation\nverified on-chain"]
+        ORACLE["3. Bind oracleAddress\noracle contract for this agent"]
+        CARD["4. Store cardHash\nkeccak256 of MCP card JSON"]
+        MINT --> WALLET --> ORACLE --> CARD
+    end
+
+    CARD --> TRIPLE(["Identity Triple Ready\n(agentId, agentWallet, oracleAddress)"])
+
+    subgraph TRANSFER["_beforeTokenTransfer Hook"]
+        direction TB
+        XFER["NFT transferred\nto new owner"]
+        CLEAR["Clear all four reserved keys:\nagentWallet = 0\noracleAddress = 0\ncardHash = 0\nparticipantId = 0"]
+        BLANK["Blank token --\nmust re-register to act"]
+        XFER --> CLEAR --> BLANK
+    end
+
+    subgraph GETTERS["O(1) On-Chain Lookups"]
+        direction TB
+        GW["getAgentWallet(agentId)"]
+        GO["getOracleAddress(agentId)"]
+        GC["getCardHash(agentId)"]
+    end
+
+    TRIPLE --> GW
+    TRIPLE --> GO
+    TRIPLE --> GC

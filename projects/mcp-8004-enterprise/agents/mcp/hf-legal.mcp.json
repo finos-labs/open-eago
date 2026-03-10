@@ -1,0 +1,45 @@
+{
+  "$schema": "https://modelcontextprotocol.io/schema/v1/server.json",
+  "name": "hf-legal",
+  "version": "1.0.0",
+  "description": "MCP specification for the hedge fund legal agent. Reviews contract drafts and submits markup.",
+
+  "tools": [
+    {
+      "name": "review_draft",
+      "description": "Review a contract draft issued by the bank's legal agent. Returns markup hash (changes tracked off-chain).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "flow_id":       { "type": "string" },
+          "request_id":    { "type": "string" },
+          "draft_hash":    { "type": "string", "description": "keccak256 of the bank's contract draft" },
+          "round":         { "type": "integer", "description": "Negotiation round number" },
+          "trace_id":      { "type": "string" }
+        },
+        "required": ["flow_id", "request_id", "draft_hash", "round"]
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "markup_hash": { "type": "string", "description": "keccak256 of the HF markup document" },
+          "changes":     { "type": "integer", "description": "Number of substantive changes" },
+          "notes":       { "type": "string" }
+        },
+        "required": ["markup_hash"]
+      },
+      "autonomy_bounds": {
+        "flow": { "signal": "flow_anomaly", "max_hops": 60, "loop_detection": true, "max_requests_per_minute": 3, "response_timeout_seconds": 1800, "action": "revoke" }
+      },
+      "action_permits": {
+        "classification": "legal_negotiation_action",
+        "tool_action":    "hf:submit_markup",
+        "default_tier":   1,
+        "violation_threshold": 2
+      }
+    }
+  ],
+
+  "resources": [],
+  "prompts": []
+}

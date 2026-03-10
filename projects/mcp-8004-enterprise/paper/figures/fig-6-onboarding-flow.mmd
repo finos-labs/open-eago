@@ -1,0 +1,59 @@
+sequenceDiagram
+    participant Orch as Orchestrator
+    participant FlowAuth as FlowAuthRegistry
+    participant BankB as Bank B
+    participant AML as AMLOracle
+    participant HFDoc as HF Document Agent
+    participant Credit as CreditRiskOracle
+    participant HFNeg as HF Negotiator
+    participant Legal as LegalOracle
+    participant HFLeg as HF Legal Agent
+    participant Action as ActionPermitRegistry
+    participant Setup as ClientSetupOracle
+    participant OnbReg as OnboardingRegistry
+    participant Trace as ExecutionTraceLog
+    participant Rep as ReputationRegistry
+
+    rect rgb(240, 240, 240)
+        Note over Orch,BankB: Authorization (Phases 1–2)
+        Orch->>OnbReg: initiate(traceId, bankAgentId, clientAgentId)
+        Orch->>FlowAuth: createFlow(traceId, entries[])
+        BankB->>FlowAuth: authorizeAgentForFlow(flowId, agentId, caps[])
+        Note over FlowAuth: Bilateral consent complete<br/>All agents active
+    end
+
+    rect rgb(230, 230, 230)
+        Note over AML,HFNeg: Assessment (Phases 3–7)
+        HFDoc-->>AML: payloadHash (document hashes on-chain)
+        Orch->>AML: requestReview(traceId, agentId, payloadHash)
+        AML-->>OnbReg: AML phase bit set (both banks cleared)
+
+        Orch->>Credit: requestAssessment(traceId, agentId, termsHash)
+        loop Negotiation rounds
+            HFNeg->>Credit: submitCounterProposal(termsHash)
+            Credit->>Credit: acceptTerms / continue
+        end
+        Credit-->>OnbReg: Credit risk phase bit set
+
+        Orch->>Legal: submitDraft(traceId, draftHash)
+        loop Markup rounds
+            HFLeg->>Legal: submitMarkup(markupHash)
+        end
+        Legal->>Legal: approveBankSide()
+        HFLeg->>Legal: approveClientSide()
+        Action->>Action: Tier 2 approval (M-of-N multi-sig)
+        Legal->>Legal: execute()
+        Legal-->>OnbReg: Legal phase bit set
+    end
+
+    rect rgb(220, 220, 220)
+        Note over Setup,Trace: Setup and Finalization (Phases 8–10)
+        Setup->>Setup: setupLegalEntity → setupAccount → setupProducts
+        Setup-->>OnbReg: All setup phase bits set
+        OnbReg-->>Orch: FlowCompleted event
+        Orch->>Trace: finalizeTrace(traceId)
+        Note over Rep: Post-completion reputation feedback
+        Orch->>Rep: submitFeedback(agentId, score, tag)
+        BankB->>Rep: submitFeedback(agentId, score, tag)
+    end
+

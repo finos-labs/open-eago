@@ -1,0 +1,31 @@
+sequenceDiagram
+    participant Caller as Caller / Orchestrator
+    participant Oracle as Oracle Contract
+    participant Trace as ExecutionTraceLog
+    participant Bridge as Oracle Bridge
+    participant MCP as MCP Server
+
+    Caller->>Oracle: requestReview(traceId, agentId, payloadHash)
+    activate Oracle
+    Note over Oracle: Validate authorization<br/>(onlyRegisteredOracle modifier)
+    Oracle->>Trace: recordHop(traceId, agentId, actionName)
+    Oracle-->>Bridge: emit ReviewRequested event
+    deactivate Oracle
+
+    activate Bridge
+    Note over Bridge: ethers.js event subscription<br/>catches on-chain event
+    Bridge->>MCP: POST tools/call (JSON-RPC 2.0)
+    activate MCP
+    Note over MCP: Execute tool handler<br/>(LLM inference / business logic)
+    MCP-->>Bridge: Structured result
+    deactivate MCP
+
+    Note over Bridge: Sign TX with agent wallet<br/>(VaultSigner / HSM)
+    Bridge->>Oracle: fulfillReview(traceId, agentId, resultHash, outcomeCode)
+    deactivate Bridge
+
+    activate Oracle
+    Note over Oracle: Validate fulfillment<br/>(wallet + oracle binding check)
+    Oracle->>Trace: recordHop(traceId, agentId, "fulfill")
+    Oracle-->>Caller: emit ReviewCompleted event
+    deactivate Oracle

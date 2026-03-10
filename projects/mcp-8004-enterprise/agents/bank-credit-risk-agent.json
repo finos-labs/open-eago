@@ -1,0 +1,9 @@
+{
+  "name": "BankCreditRiskAgent",
+  "description": "Bank credit risk assessment agent. Evaluates credit limits and negotiates terms with institutional clients.",
+  "capabilities": ["credit_review"],
+  "institution": "ACME_BANK",
+  "dmzTier": "BANK_EXTERNAL",
+  "endpoint": "http://localhost:8011",
+  "mcpSpec": "./mcp/credit-risk.mcp.json"
+}

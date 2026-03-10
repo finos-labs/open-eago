@@ -1,0 +1,9 @@
+{
+  "name": "BankAccountSetupAgent",
+  "description": "Bank internal agent. Provisions trading accounts for the client after legal entity setup.",
+  "capabilities": ["setup_account"],
+  "institution": "ACME_BANK",
+  "dmzTier": "BANK_INTERNAL",
+  "endpoint": "http://localhost:8015",
+  "mcpSpec": "./mcp/client-setup.mcp.json"
+}

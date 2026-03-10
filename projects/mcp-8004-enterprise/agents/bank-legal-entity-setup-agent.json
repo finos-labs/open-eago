@@ -1,0 +1,9 @@
+{
+  "name": "BankLegalEntitySetupAgent",
+  "description": "Bank internal agent. Registers the client legal entity in bank systems after all reviews are complete.",
+  "capabilities": ["setup_legal_entity"],
+  "institution": "ACME_BANK",
+  "dmzTier": "BANK_INTERNAL",
+  "endpoint": "http://localhost:8014",
+  "mcpSpec": "./mcp/client-setup.mcp.json"
+}

@@ -1,0 +1,48 @@
+{
+  "$schema": "https://modelcontextprotocol.io/schema/v1/server.json",
+  "name": "onboarding-orchestrator",
+  "version": "1.0.0",
+  "description": "MCP specification for the bank onboarding orchestrator. Initiates the on-chain flow and triggers all parallel review sub-workflows.",
+
+  "tools": [
+    {
+      "name": "initiate_onboarding",
+      "description": "Initiate an institutional client onboarding flow. Registers the flow on-chain and opens AML, Credit Risk, and Legal review requests in parallel.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "flow_id":             { "type": "string", "description": "Unique flow identifier (bytes32 hex, e.g. keccak256 of client+timestamp)" },
+          "client_address":      { "type": "string", "description": "Ethereum address of the client institution initiating onboarding" },
+          "bank_aml_agent_id":   { "type": "string", "description": "Bank AML agent NFT id" },
+          "bank_credit_agent_id":{ "type": "string", "description": "Bank credit risk agent NFT id" },
+          "bank_legal_agent_id": { "type": "string", "description": "Bank legal agent NFT id" },
+          "hf_doc_agent_id":     { "type": "string", "description": "Hedge fund document agent NFT id" },
+          "hf_credit_agent_id":  { "type": "string", "description": "Hedge fund credit negotiator agent NFT id" },
+          "hf_legal_agent_id":   { "type": "string", "description": "Hedge fund legal agent NFT id" },
+          "trace_id":            { "type": "string" }
+        },
+        "required": ["flow_id", "client_address", "bank_aml_agent_id", "bank_credit_agent_id", "bank_legal_agent_id", "hf_doc_agent_id", "hf_credit_agent_id", "hf_legal_agent_id"]
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "flow_id":          { "type": "string" },
+          "aml_request_id":   { "type": "string" },
+          "credit_request_id":{ "type": "string" },
+          "legal_request_id": { "type": "string" },
+          "status":           { "type": "string" }
+        },
+        "required": ["flow_id", "status"]
+      },
+      "action_permits": {
+        "classification": "onboarding_action",
+        "tool_action":    "onboarding:initiate",
+        "default_tier":   1,
+        "violation_threshold": 1
+      }
+    }
+  ],
+
+  "resources": [],
+  "prompts": []
+}

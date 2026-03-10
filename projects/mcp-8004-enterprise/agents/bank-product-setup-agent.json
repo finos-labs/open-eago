@@ -1,0 +1,9 @@
+{
+  "name": "BankProductSetupAgent",
+  "description": "Bank internal agent. Configures approved financial products for the client after account setup.",
+  "capabilities": ["setup_products"],
+  "institution": "ACME_BANK",
+  "dmzTier": "BANK_INTERNAL",
+  "endpoint": "http://localhost:8016",
+  "mcpSpec": "./mcp/client-setup.mcp.json"
+}

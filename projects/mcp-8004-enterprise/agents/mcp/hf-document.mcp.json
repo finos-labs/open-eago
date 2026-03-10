@@ -1,0 +1,45 @@
+{
+  "$schema": "https://modelcontextprotocol.io/schema/v1/server.json",
+  "name": "hf-document",
+  "version": "1.0.0",
+  "description": "MCP specification for the hedge fund document agent. Assembles and submits KYC/AML and credit documents.",
+
+  "tools": [
+    {
+      "name": "assemble_documents",
+      "description": "Assemble client documents in response to a bank data request. Returns a hash of the assembled document bundle.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "flow_id":       { "type": "string" },
+          "request_id":    { "type": "string" },
+          "oracle_type":   { "type": "string", "enum": ["aml", "credit"], "description": "Which oracle issued the data request" },
+          "spec_hash":     { "type": "string", "description": "keccak256 of the document specification from the bank" },
+          "round":         { "type": "integer", "description": "Data request round number" },
+          "trace_id":      { "type": "string" }
+        },
+        "required": ["flow_id", "request_id", "oracle_type", "spec_hash"]
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "data_hash": { "type": "string", "description": "keccak256 of the assembled document bundle" },
+          "documents": { "type": "array", "items": { "type": "string" }, "description": "List of document types included" }
+        },
+        "required": ["data_hash"]
+      },
+      "autonomy_bounds": {
+        "flow": { "signal": "flow_anomaly", "max_hops": 30, "loop_detection": true, "max_requests_per_minute": 5, "response_timeout_seconds": 300, "action": "revoke" }
+      },
+      "action_permits": {
+        "classification": "document_action",
+        "tool_action":    "hf:submit_documents",
+        "default_tier":   1,
+        "violation_threshold": 3
+      }
+    }
+  ],
+
+  "resources": [],
+  "prompts": []
+}

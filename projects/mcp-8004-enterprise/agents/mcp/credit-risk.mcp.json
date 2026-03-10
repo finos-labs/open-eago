@@ -1,0 +1,102 @@
+{
+  "$schema": "https://modelcontextprotocol.io/schema/v1/server.json",
+  "name": "credit-risk",
+  "version": "1.0.0",
+  "description": "MCP specification for the bank credit risk assessment agent.",
+
+  "tools": [
+    {
+      "name": "assess_credit",
+      "description": "Initiate credit risk assessment for a new onboarding client. May request documents, propose terms, or submit a recommendation.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "flow_id":         { "type": "string" },
+          "request_id":      { "type": "string" },
+          "client_agent_id": { "type": "string" },
+          "trace_id":        { "type": "string" }
+        },
+        "required": ["flow_id", "request_id", "client_agent_id"]
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "action":       { "type": "string", "enum": ["request_documents", "propose_terms", "submit_recommendation"] },
+          "spec_hash":    { "type": "string" },
+          "terms_hash":   { "type": "string", "description": "keccak256 of proposed terms (if action=propose_terms)" },
+          "result_hash":  { "type": "string" },
+          "approved":     { "type": "boolean" }
+        },
+        "required": ["action"]
+      },
+      "autonomy_bounds": {
+        "reputation": { "signal": "reputation_degradation", "min_score": 40, "min_score_decimals": 0, "min_feedback_count": 10, "tag": "credit_review", "action": "revoke" },
+        "flow":       { "signal": "flow_anomaly", "max_hops": 40, "loop_detection": true, "max_requests_per_minute": 5, "response_timeout_seconds": 900, "action": "revoke" }
+      },
+      "action_permits": {
+        "classification": "credit_action",
+        "tool_action":    "credit:assess_client",
+        "default_tier":   1,
+        "violation_threshold": 2
+      }
+    },
+    {
+      "name": "continue_assessment",
+      "description": "Resume credit assessment after documents or a counter-proposal has been received.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "flow_id":       { "type": "string" },
+          "request_id":    { "type": "string" },
+          "trigger":       { "type": "string", "enum": ["data_fulfilled", "counter_proposed"], "description": "What resumed the assessment" },
+          "data_hash":     { "type": "string", "description": "Hash of submitted data or counter-proposal" },
+          "current_round": { "type": "integer" },
+          "trace_id":      { "type": "string" }
+        },
+        "required": ["flow_id", "request_id", "trigger", "data_hash"]
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "action":      { "type": "string", "enum": ["request_documents", "propose_terms", "accept_terms", "submit_recommendation"] },
+          "spec_hash":   { "type": "string" },
+          "terms_hash":  { "type": "string" },
+          "agreed_hash": { "type": "string", "description": "keccak256 of agreed terms (if action=accept_terms)" },
+          "result_hash": { "type": "string" },
+          "approved":    { "type": "boolean" }
+        },
+        "required": ["action"]
+      },
+      "autonomy_bounds": {
+        "flow": { "signal": "flow_anomaly", "max_hops": 40, "loop_detection": true, "max_requests_per_minute": 5, "response_timeout_seconds": 900, "action": "revoke" }
+      },
+      "action_permits": {
+        "classification": "credit_action",
+        "tool_action":    "credit:continue_assessment",
+        "default_tier":   1,
+        "violation_threshold": 2
+      }
+    }
+  ],
+
+  "resources": [
+    {
+      "uri": "credit://{flow_id}/terms",
+      "name": "Credit Terms",
+      "description": "Current proposed credit terms for a flow.",
+      "mimeType": "application/json"
+    }
+  ],
+
+  "prompts": [
+    {
+      "name": "credit_assessment",
+      "description": "Credit risk assessment prompt for institutional client onboarding.",
+      "arguments": [
+        { "name": "client_name", "description": "Legal name of the institutional client", "required": true },
+        { "name": "aum",         "description": "Assets under management (e.g. '$500M')",  "required": false }
+      ],
+      "template": "You are a credit risk officer assessing a new institutional client for trading.\n\nClient: {{client_name}}{{#if aum}}\nAUM: {{aum}}{{/if}}\n\nEvaluate counterparty risk and propose suitable credit limits and trading terms.\nConsider: financial statements, AUM, trading history, jurisdiction risk.\nOutput: proposed credit limit (USD), margin requirements, approved products."
+    }
+  ]
+}
