@@ -54,6 +54,11 @@ const CREDIT_CONTRACT = arg('--credit-contract',      'CREDIT_CONTRACT_ADDRESS')
 const LEGAL_CONTRACT  = arg('--legal-contract',       'LEGAL_CONTRACT_ADDRESS');
 const SETUP_CONTRACT  = arg('--setup-contract',       'SETUP_CONTRACT_ADDRESS');
 
+// ── Bounds monitor ────────────────────────────────────────────────────────────
+
+const BOUNDS_PORT    = arg('--bounds-port') ?? '9090';
+const BOUNDS_MOCK    = process.argv.includes('--bounds-mock');
+
 // ── Agent IDs ─────────────────────────────────────────────────────────────────
 
 const AML_AGENT_ID      = arg('--aml-agent-id',      'AML_AGENT_ID')      ?? '0';
@@ -90,6 +95,18 @@ function signerFlags() {
 // ── Bridge definitions ────────────────────────────────────────────────────────
 
 const bridges = [
+  // ── Bounds monitor (always started; --mock skips on-chain calls) ───────────
+  {
+    name: 'bounds-monitor',
+    script: 'bounds-monitor.js',
+    args: [
+      '--port', BOUNDS_PORT,
+      '--rpc',  RPC,
+      ...(PRIVKEY      ? ['--privkey',        PRIVKEY]    : []),
+      ...(AUTO_BOUNDS  ? ['--autonomy-bounds', AUTO_BOUNDS]: []),
+      ...(BOUNDS_MOCK || !AUTO_BOUNDS ? ['--mock'] : []),
+    ],
+  },
   // ── Bank side ──────────────────────────────────────────────────────────────
   AML_CONTRACT && {
     name: 'aml-bridge',

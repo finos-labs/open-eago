@@ -142,6 +142,7 @@ contracts/
 | `bridge-base.js` | Shared bridge bootstrap: provider/signer, governance preflight, `callMcpTool` |
 | `vault-signer.js` | `VaultSigner` extends `ethers.AbstractSigner`; local or HashiCorp Vault backend |
 | `action-gateway.js` | `ActionGateway` class — off-chain action-permit pre-flight |
+| `bounds-monitor.js` | Layer 6/7 autonomy bounds monitor: tracks sliding-window error/success rates and burst rates; writes `bounds-state.json`; optionally calls `disableTool`/`enableTool` on `AutonomyBoundsRegistry`; HTTP API on port 9090 (`/report`, `/state`, `/metrics`, `/reset`) |
 | `audit-exporter.js` | On-chain event indexer + REST API for audit trail export |
 | `launch-agents.js` | Spawns one server process per `agents/*.json` card |
 | `launch-bridges.js` | Spawns all 8 bridge processes with shared CLI flags |
