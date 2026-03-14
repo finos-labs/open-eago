@@ -4,7 +4,7 @@
 
 MCP treats prompts as first-class primitives (`prompts/list`, `prompts/get`) but defines no security properties — no versioning, no hashing, no signatures. ERC-8004 says nothing about prompts at all; `architecture.proposal.md` explicitly noted that prompts are "loaded as system prompt in MCP server; not stored on-chain."
 
-In this codebase the two agent templates (`code_review`, `approve_pr_prompt`) are static Handlebars strings stored in `agents/mcp/*.mcp.json`. A developer can change them silently — no audit trail, no on-chain record, no way for a verifier to know what instructions the agent was operating under when it produced a result.
+In this codebase the agent prompt templates (e.g. `aml_screening`, `credit_assessment`) are static Handlebars strings stored in `agents/mcp/*.mcp.json`. A developer can change them silently — no audit trail, no on-chain record, no way for a verifier to know what instructions the agent was operating under when it produced a result.
 
 ---
 
@@ -22,7 +22,7 @@ The gate is **hard**: `require(promptRegistry.isActive(...), "unrecognized promp
 
 ### Hash-only on-chain vs. full template on-chain
 
-Only `keccak256(template)` is stored, not the template text. Full templates can be kilobytes of natural language; storing them on-chain would be expensive and of no additional security benefit — a hash is sufficient to prove integrity. The full text lives in `agents/mcp/*.mcp.json` and is referenced by the optional `metadataUri` field (e.g., `"agents/mcp/code-reviewer.mcp.json"` or an IPFS CID).
+Only `keccak256(template)` is stored, not the template text. Full templates can be kilobytes of natural language; storing them on-chain would be expensive and of no additional security benefit — a hash is sufficient to prove integrity. The full text lives in `agents/mcp/*.mcp.json` and is referenced by the optional `metadataUri` field (e.g., `"agents/mcp/aml-review.mcp.json"` or an IPFS CID).
 
 ### Hash computed from raw template string
 
@@ -111,40 +111,40 @@ onlyRegisteredOracle(agentId)              ← IdentityRegistryUpgradeable
         → state change
 ```
 
-### `CodeReviewerOracle`
+### `AMLOracle`
 
 - Added `IPromptRegistry public promptRegistry;`
 - Added `setPromptRegistry(address) external onlyOwner` (emits `PromptRegistrySet`)
-- Added `bytes32 promptHash` to `FulfillReviewParams` struct and `ReviewResult` struct
+- Added `bytes32 promptHash` to `FulfillReviewParams` struct and `AMLResult` struct
 - In `fulfillReview`, after the reputation gate check:
 
 ```solidity
 if (address(promptRegistry) != address(0)) {
-    require(promptRegistry.isActive(CAP_REVIEW_CODE, params.promptHash), "unrecognized prompt");
+    require(promptRegistry.isActive(CAP_AML_REVIEW, params.promptHash), "unrecognized prompt");
 }
 req.status = RequestStatus.Fulfilled;
-results[params.requestId] = ReviewResult(
-    traceId, params.summaryJson, params.commentsJson, params.approved,
+results[params.requestId] = AMLResult(
+    traceId, params.resultHash, params.cleared,
     agentId, block.timestamp, params.promptHash   // hash stored for audit
 );
 ```
 
-### `CodeApproverOracle`
+### `CreditRiskOracle`
 
-Same pattern. `bytes32 promptHash` added to `FulfillDecisionParams`, `FulfillNeedsRevisionParams`, and `ApprovalResult`. The internal `_validateAndSetStatus` helper accepts `promptHash` and performs the gate check before writing state.
+Same pattern. `bytes32 promptHash` added to `FulfillReviewParams`, `FulfillTermsParams`, and `CreditResult`. The internal `_validateAndSetStatus` helper accepts `promptHash` and performs the gate check before writing state.
 
 ---
 
 ## Bridge integration
 
-Both bridges compute `PROMPT_HASH` once at startup:
+All bridges compute `PROMPT_HASH` once at startup:
 
 ```javascript
 import { readFileSync } from 'fs';
 import { resolve, dirname } from 'path';
 import { ethers } from 'ethers';
 
-const MCP_SPEC_PATH = resolve(__dirname, '..', 'agents', 'mcp', 'code-reviewer.mcp.json');
+const MCP_SPEC_PATH = resolve(__dirname, '..', 'agents', 'mcp', 'aml-review.mcp.json');
 const mcpSpec = JSON.parse(readFileSync(MCP_SPEC_PATH, 'utf8'));
 const PROMPT_TEMPLATE = mcpSpec.prompts[0].template;
 const PROMPT_HASH = ethers.keccak256(ethers.toUtf8Bytes(PROMPT_TEMPLATE));
@@ -154,7 +154,7 @@ Before submitting a fulfillment transaction (defense-in-depth pre-flight):
 
 ```javascript
 if (promptRegistry) {
-    const ok = await promptRegistry.isActive(CAP_REVIEW_CODE, PROMPT_HASH);
+    const ok = await promptRegistry.isActive(CAP_AML_REVIEW, PROMPT_HASH);
     if (!ok) {
         console.warn('Prompt hash not active — skipping fulfillment tx');
         return;
@@ -172,19 +172,21 @@ if (promptRegistry) {
 
 ```javascript
 // Read MCP spec files and compute hashes
-const reviewerSpec = JSON.parse(fs.readFileSync(path.join(mcpDir, 'code-reviewer.mcp.json'), 'utf8'));
-const approverSpec = JSON.parse(fs.readFileSync(path.join(mcpDir, 'code-approver.mcp.json'), 'utf8'));
-const reviewerHash = hre.ethers.keccak256(hre.ethers.toUtf8Bytes(reviewerSpec.prompts[0].template));
-const approverHash = hre.ethers.keccak256(hre.ethers.toUtf8Bytes(approverSpec.prompts[0].template));
+const amlSpec    = JSON.parse(fs.readFileSync(path.join(mcpDir, 'aml-review.mcp.json'), 'utf8'));
+const creditSpec = JSON.parse(fs.readFileSync(path.join(mcpDir, 'credit-risk.mcp.json'), 'utf8'));
+const amlHash    = hre.ethers.keccak256(hre.ethers.toUtf8Bytes(amlSpec.prompts[0].template));
+const creditHash = hre.ethers.keccak256(hre.ethers.toUtf8Bytes(creditSpec.prompts[0].template));
 
 // Deploy and wire
 const promptReg = await PromptReg.deploy();
-await promptReg.registerPrompt(CAP_REVIEW_CODE, reviewerHash, 'agents/mcp/code-reviewer.mcp.json');
-await promptReg.setActiveVersion(CAP_REVIEW_CODE, 0);
-await promptReg.registerPrompt(CAP_APPROVE_PR, approverHash, 'agents/mcp/code-approver.mcp.json');
-await promptReg.setActiveVersion(CAP_APPROVE_PR, 0);
-await reviewerOracle.setPromptRegistry(promptRegAddr);
-await approverOracle.setPromptRegistry(promptRegAddr);
+await promptReg.registerPrompt(CAP_AML_REVIEW,  amlHash,    'agents/mcp/aml-review.mcp.json');
+await promptReg.setActiveVersion(CAP_AML_REVIEW, 0);
+await promptReg.registerPrompt(CAP_CREDIT_RISK, creditHash, 'agents/mcp/credit-risk.mcp.json');
+await promptReg.setActiveVersion(CAP_CREDIT_RISK, 0);
+await amlOracle.setPromptRegistry(promptRegAddr);
+await creditOracle.setPromptRegistry(promptRegAddr);
+await legalOracle.setPromptRegistry(promptRegAddr);
+await clientSetupOracle.setPromptRegistry(promptRegAddr);
 ```
 
 No manual configuration is needed post-deploy. Bridges are launched with `--prompt-registry 0x<addr>` or `PROMPT_REGISTRY_ADDRESS=0x<addr>`.
@@ -193,22 +195,22 @@ No manual configuration is needed post-deploy. Bridges are launched with `--prom
 
 ## How to rotate a prompt
 
-1. Edit `agents/mcp/code-reviewer.mcp.json` — update `prompts[0].template`.
+1. Edit `agents/mcp/aml-review.mcp.json` — update `prompts[0].template`.
 2. Compute the new hash:
    ```javascript
    const newHash = ethers.keccak256(ethers.toUtf8Bytes(newTemplate));
    ```
 3. Register the new version on-chain:
    ```solidity
-   uint256 v1 = promptRegistry.registerPrompt(CAP_REVIEW_CODE, newHash, "agents/mcp/code-reviewer.mcp.json");
+   uint256 v1 = promptRegistry.registerPrompt(CAP_AML_REVIEW, newHash, "agents/mcp/aml-review.mcp.json");
    ```
 4. Activate it:
    ```solidity
-   promptRegistry.setActiveVersion(CAP_REVIEW_CODE, v1);
+   promptRegistry.setActiveVersion(CAP_AML_REVIEW, v1);
    ```
 5. Restart bridge processes — they recompute `PROMPT_HASH` from the updated spec file on startup.
 
-**Rollback:** Re-activate any previous version index (`setActiveVersion(CAP_REVIEW_CODE, 0)`) — takes effect immediately, no bridge restart needed for the old version.
+**Rollback:** Re-activate any previous version index (`setActiveVersion(CAP_AML_REVIEW, 0)`) — takes effect immediately, no bridge restart needed for the old version.
 
 ---
 
@@ -229,10 +231,12 @@ All four layers are opt-in. Any combination can be enabled independently by sett
 
 - `contracts/PromptRegistry.sol` — implemented
 - `contracts/IPromptRegistry.sol` — implemented
-- `contracts/CodeReviewerOracle.sol` — wired (`setPromptRegistry`, `isActive` check, `promptHash` in result)
-- `contracts/CodeApproverOracle.sol` — wired (all three fulfill paths gated)
-- `agents_implementation/code-reviewer-bridge.js` — computes hash, pre-flight check, passes hash in tx
-- `agents_implementation/code-approver-bridge.js` — same
+- `contracts/AMLOracle.sol` — wired (`setPromptRegistry`, `isActive` check, `promptHash` in result)
+- `contracts/CreditRiskOracle.sol` — wired (all fulfill paths gated via `_validateAndSetStatus`)
+- `contracts/LegalOracle.sol`, `contracts/ClientSetupOracle.sol` — wired (same pattern)
+- `agents_implementation/aml-bridge.js` — computes hash, pre-flight check, passes hash in tx
+- `agents_implementation/credit-risk-bridge.js` — same
+- `agents_implementation/legal-bridge.js`, `agents_implementation/client-setup-bridge.js` — same
 - `agents_implementation/launch-bridges.js` — `--prompt-registry` / `PROMPT_REGISTRY_ADDRESS` threaded through
 - `scripts/deploy-registries.js` — auto-deploys, registers, activates, and wires
 - `test/PromptRegistry.test.js` — 34 tests covering all functions + oracle integrations + full rotation cycle

@@ -13,10 +13,10 @@ This concept adds four new anomaly types, all detected without changing oracle c
 
 | Anomaly type   | Example                                                  |
 |----------------|----------------------------------------------------------|
-| Loop           | Reviewer agent called twice in the same trace            |
-| Runaway depth  | A flow accumulates 25 hops when 20 is the declared limit |
-| Burst          | 15 review requests arrive within a single minute         |
-| Stuck response | A request is never fulfilled within 5 minutes            |
+| Loop           | AML agent called twice for the same onboarding flow              |
+| Runaway depth  | A flow accumulates 25 hops when 20 is the declared limit         |
+| Burst          | 15 AML screening requests arrive within a single minute          |
+| Stuck response | A screening request is never fulfilled within 5 minutes          |
 
 ---
 

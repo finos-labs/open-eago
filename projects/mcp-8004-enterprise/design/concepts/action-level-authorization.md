@@ -10,7 +10,7 @@
 
 ## Problem Statement
 
-All nine existing concepts govern whether an agent *may participate* in a flow and whether its outputs meet quality and structural thresholds. None of them govern **what specific operations an agent may perform on external systems** once authorized. An agent with `review_code` capability and sufficient reputation can invoke any tool available to it — including tools that execute destructive shell commands, delete databases, or modify infrastructure — because the governance stack authorizes *participation*, not *actions*.
+All nine existing concepts govern whether an agent *may participate* in a flow and whether its outputs meet quality and structural thresholds. None of them govern **what specific operations an agent may perform on external systems** once authorized. An authorized AML agent with `aml_review` capability and sufficient reputation can invoke any tool available to it — including tools that write to a sanctions database, provision client accounts, or execute a legal contract — because the governance stack authorizes *participation*, not *actions*.
 
 Natural language instructions embedded in prompts ("you must never delete backups") are not a security boundary. They are advisory. An LLM can hallucinate, be prompt-injected, misinterpret context, or simply ignore instructions. The gap is structural: between the moment an agent decides to invoke a tool and the moment that invocation reaches an external system, there is no typed, classified, permit-checked enforcement layer.
 
@@ -26,10 +26,10 @@ Every tool invocation that reaches an external system is classified into one of 
 
 | Tier | Name | Examples | Enforcement |
 |------|------|----------|-------------|
-| 0 | Read-only | `SELECT`, `ls`, `GET /api/status`, list resources | Permitted by default if agent holds flow authorization for the capability |
-| 1 | Reversible write | `INSERT`, `CREATE TABLE`, `echo >> file`, `POST /api/config` | Permitted per explicit role-level action permit |
-| 2 | Irreversible / destructive | `DROP TABLE`, `DELETE FROM`, `rm -rf`, `revoke IAM role` | Requires multi-agent approval or human-in-the-loop confirmation before execution |
-| 3 | Forbidden | `DROP TABLE backups`, `DELETE FROM audit_log`, format disk, disable monitoring | Never executable by any agent regardless of role; hard block, no override |
+| 0 | Read-only | query KYC status, read client profile, `GET /aml/status`, list documents | Permitted by default if agent holds flow authorization for the capability |
+| 1 | Reversible write | submit AML screening recommendation, issue contract draft, propose credit terms | Permitted per explicit role-level action permit |
+| 2 | Irreversible / destructive | execute legal contract, accept credit facility, provision client account | Requires multi-agent approval or human-in-the-loop confirmation before execution |
+| 3 | Forbidden | delete audit log entries, purge execution trace, mass client data export | Never executable by any agent regardless of role; hard block, no override |
 
 Tier assignment is by **action pattern**, not by intent. The runtime gateway classifies based on the parsed command, not on the agent's stated reason for issuing it.
 
@@ -95,14 +95,14 @@ A pattern registry loaded at startup from a configuration file (`action-patterns
 ```json
 {
   "patterns": [
-    { "id": "SQL:SELECT",   "regex": "^\\s*SELECT\\b",          "tier": 0 },
-    { "id": "SQL:INSERT",   "regex": "^\\s*INSERT\\b",          "tier": 1 },
-    { "id": "SQL:UPDATE",   "regex": "^\\s*UPDATE\\b",          "tier": 1 },
-    { "id": "SQL:DROP",     "regex": "^\\s*DROP\\b",            "tier": 2 },
-    { "id": "SQL:DELETE",   "regex": "^\\s*DELETE\\b",          "tier": 2 },
-    { "id": "SQL:TRUNCATE", "regex": "^\\s*TRUNCATE\\b",        "tier": 2 },
-    { "id": "SHELL:RM_RF",  "regex": "rm\\s+-[^\\s]*r[^\\s]*f", "tier": 3 },
-    { "id": "SHELL:FORMAT", "regex": "\\bformat\\b.*\\bdisk\\b", "tier": 3 }
+    { "id": "AML:QUERY",       "regex": "aml:(query|check|lookup)",  "tier": 0 },
+    { "id": "AML:SCREEN",      "regex": "aml:screen_client",         "tier": 1 },
+    { "id": "CREDIT:PROPOSE",  "regex": "credit:propose_terms",      "tier": 1 },
+    { "id": "CREDIT:ACCEPT",   "regex": "credit:accept_terms",       "tier": 2 },
+    { "id": "LEGAL:DRAFT",     "regex": "legal:issue_.*draft",       "tier": 1 },
+    { "id": "LEGAL:EXECUTE",   "regex": "legal:execute_contract",    "tier": 2 },
+    { "id": "SETUP:PROVISION", "regex": "setup:(account|products)",  "tier": 2 },
+    { "id": "AUDIT:DELETE",    "regex": "audit:(delete|purge)",      "tier": 3 }
   ]
 }
 ```
@@ -139,15 +139,15 @@ Following the pattern established by Concept 7 (`autonomy_bounds`) and Concept 8
 
 ```json
 {
-  "name": "execute_sql",
-  "description": "Execute a SQL query against the project database",
-  "inputSchema": { "type": "object", "properties": { "query": { "type": "string" } } },
+  "name": "execute_contract",
+  "description": "Execute the bilaterally approved legal agreement",
+  "inputSchema": { "type": "object", "properties": { "request_id": { "type": "string" }, "final_hash": { "type": "string" } } },
   "action_permits": {
-    "classification": "sql",
-    "default_tier": 1,
-    "forbidden_patterns": ["SQL:DROP", "SQL:TRUNCATE"],
-    "tier_2_patterns": ["SQL:DELETE"],
-    "required_approvals_tier_2": 2
+    "classification": "legal",
+    "tool_action": "legal:execute_contract",
+    "default_tier": 2,
+    "approval_timeout_seconds": 600,
+    "violation_threshold": 2
   }
 }
 ```
