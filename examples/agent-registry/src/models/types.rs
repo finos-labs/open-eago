@@ -16,6 +16,8 @@ pub enum AgentStatus {
     Degraded,
     /// Agent is unhealthy
     Unhealthy,
+    /// Agent has not been seen within TTL; automatically set by the registry
+    Quarantine,
     /// Agent status is unknown
     #[default]
     Unknown,
@@ -132,6 +134,9 @@ pub struct AgentDetails {
     /// Required services or dependencies
     #[serde(default)]
     pub dependencies: Vec<String>,
+    /// When set, agent is in quarantine (no contact for ≥ quarantine_ttl). Removed after removal_ttl in quarantine.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub quarantined_at: Option<u64>,
 }
 
 impl AgentDetails {
@@ -155,6 +160,7 @@ impl AgentDetails {
             uptime_percentage: None,
             geographic_location: None,
             dependencies: vec![],
+            quarantined_at: None,
         }
     }
     
@@ -221,6 +227,7 @@ const DEFAULT_PORT: u16 = 8443;
 const DEFAULT_SWAGGER_PORT: u16 = 8080;
 const DEFAULT_SYNC_INTERVAL: u64 = 30;
 const DEFAULT_MAX_TTL: u64 = 60;
+const DEFAULT_REMOVAL_TTL: u64 = 300;
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Config {
@@ -242,10 +249,16 @@ pub struct ServerConfig {
     #[serde(default = "default_swagger_port")]
     pub swagger_port: u16,
     pub bootstrap: bool,
+    /// Seconds without contact before an agent is put in quarantine.
+    #[serde(alias = "quarantine_ttl")]
     pub max_ttl: u64,
+    /// Seconds an agent stays in quarantine before being removed from the registry.
+    #[serde(default = "default_removal_ttl")]
+    pub removal_ttl: u64,
 }
 
 fn default_swagger_port() -> u16 { DEFAULT_SWAGGER_PORT }
+fn default_removal_ttl() -> u64 { DEFAULT_REMOVAL_TTL }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct BootstrapConfig {
@@ -292,6 +305,7 @@ impl Default for Config {
                 swagger_port: DEFAULT_SWAGGER_PORT,
                 bootstrap: false,
                 max_ttl: DEFAULT_MAX_TTL,
+                removal_ttl: DEFAULT_REMOVAL_TTL,
             },
             bootstrap: BootstrapConfig {
                 urls: vec![],
@@ -310,6 +324,9 @@ impl Config {
         config.agent.validate()?;
         if config.server.max_ttl == 0 {
             return Err("server.max_ttl must be greater than 0".into());
+        }
+        if config.server.removal_ttl == 0 {
+            return Err("server.removal_ttl must be greater than 0".into());
         }
         Ok(config)
     }

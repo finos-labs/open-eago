@@ -43,7 +43,12 @@ async fn main() -> std::io::Result<()> {
     let app_state = create_app_state(config.clone(), addresses, urls, local_address.clone(), args.allow_insecure);
     
     spawn_sync_task_if_needed(&config, &app_state, &local_address);
-    spawn_eviction_task(app_state.registry.clone(), local_address.clone(), config.server.max_ttl);
+    spawn_eviction_task(
+        app_state.registry.clone(),
+        local_address.clone(),
+        config.server.max_ttl,
+        config.server.removal_ttl,
+    );
 
     // api_https_url is the mTLS proxy target; use loopback so the proxy hits the
     // local server directly without traversing the network.
@@ -126,15 +131,15 @@ fn spawn_sync_task_if_needed(config: &Config, app_state: &web::Data<AppState>, l
 }
 
 /// Spawn a background task that evicts stale registry entries on a fixed timer.
-/// Running eviction independently of request handlers ensures TTL is enforced
-/// even when `GET /list` is never called (e.g. bootstrap-only or write-heavy load).
-fn spawn_eviction_task(registry: Registry, local_address: String, max_ttl: u64) {
-    let interval = Duration::from_secs(max_ttl.max(1));
+/// Uses two-phase TTL: quarantine after max_ttl without contact, remove after removal_ttl in quarantine.
+fn spawn_eviction_task(registry: Registry, local_address: String, quarantine_ttl: u64, removal_ttl: u64) {
+    let interval_secs = (quarantine_ttl.min(removal_ttl) / 2).max(1);
+    let interval = Duration::from_secs(interval_secs);
     tokio::spawn(async move {
         loop {
-            tokio::time::sleep(interval).await;
             let current_ts = AppState::current_timestamp();
-            evict_stale_entries(&registry, &local_address, current_ts, max_ttl);
+            evict_stale_entries(&registry, &local_address, current_ts, quarantine_ttl, removal_ttl);
+            tokio::time::sleep(interval).await;
         }
     });
 }

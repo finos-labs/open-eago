@@ -2,7 +2,8 @@ server:
   port: 8443
   swagger_port: 8080
   bootstrap: true
-  max_ttl: 300
+  max_ttl: 120        # seconds without contact → put agent in quarantine
+  removal_ttl: 120     # seconds in quarantine → remove from registry
 
 bootstrap:
   urls: []
