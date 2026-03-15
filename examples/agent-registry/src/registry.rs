@@ -2,16 +2,12 @@ use crate::models::{AddressInfo, AgentDetails, AgentStatus, AppState, BootstrapU
 use actix_web::{HttpRequest, HttpResponse};
 use tracing::{info, warn};
 
-// ─── Input validation limits ──────────────────────────────────────────────────
-
 pub const MAX_BOOTSTRAP_URLS: usize = 32;
 pub const MAX_REGISTRY_ENTRIES: usize = 10_000;
 pub const MAX_TAGS_COUNT: usize = 50;
-pub const MAX_LIST_FIELD_LEN: usize = 100; // capability_codes, compliance, dependencies
-pub const MAX_STRING_VALUE_LEN: usize = 512; // per string in tags / version / etc.
+pub const MAX_LIST_FIELD_LEN: usize = 100;
+pub const MAX_STRING_VALUE_LEN: usize = 512;
 pub const ALLOWED_BOOTSTRAP_SCHEMES: &[&str] = &["http", "https"];
-
-// ─── Registry update result ───────────────────────────────────────────────────
 
 #[derive(PartialEq)]
 pub enum RegistryUpdate {
@@ -20,29 +16,20 @@ pub enum RegistryUpdate {
     CapExceeded,
 }
 
-// ─── Core registry operations ─────────────────────────────────────────────────
-
 pub fn update_registry(registry: &Registry, address: &str, mut agent_details: AgentDetails) -> RegistryUpdate {
     let mut reg = registry.lock().unwrap();
     let is_new = !reg.contains_key(address);
-
-    // Atomic cap check: both the check and insert happen under the same lock,
-    // eliminating the TOCTOU race that existed when they used separate acquisitions.
     if is_new && reg.len() >= MAX_REGISTRY_ENTRIES {
         return RegistryUpdate::CapExceeded;
     }
-
-    // Preserve fields that can only be updated via PUT /status endpoint
     if let Some(existing_details) = reg.get(address) {
         agent_details.reliability = existing_details.reliability;
         agent_details.health_status = existing_details.health_status.clone();
         agent_details.uptime_percentage = existing_details.uptime_percentage;
-        // Always preserve registration_time once it's set (only /status can update it)
         if existing_details.registration_time.is_some() {
             agent_details.registration_time = existing_details.registration_time;
         }
     }
-    // Re-registration clears quarantine
     agent_details.quarantined_at = None;
     agent_details.last_seen = AppState::current_timestamp();
     reg.insert(address.to_string(), agent_details);
@@ -79,8 +66,6 @@ pub fn validate_register_request(req: &RegisterRequest) -> Option<HttpResponse> 
         return Some(HttpResponse::BadRequest()
             .json(serde_json::json!({"error": "address exceeds maximum length"})));
     }
-    // Accept either a numeric IP:PORT socket address or a hostname:port.
-    // Split on the last ':' so IPv6 addresses like [::1]:9001 work too.
     if !is_valid_host_port(&req.address) {
         return Some(HttpResponse::BadRequest()
             .json(serde_json::json!({"error": "address must be a valid host:port (e.g. 192.168.1.1:9001 or myhost.example.com:9001)"})));
@@ -92,7 +77,6 @@ pub fn validate_register_request(req: &RegisterRequest) -> Option<HttpResponse> 
         }
     }
     if let Some(ref details) = req.agent_details {
-        // List field element count limits
         if details.capability_codes.len() > MAX_LIST_FIELD_LEN
             || details.compliance.len() > MAX_LIST_FIELD_LEN
             || details.dependencies.len() > MAX_LIST_FIELD_LEN
@@ -100,7 +84,6 @@ pub fn validate_register_request(req: &RegisterRequest) -> Option<HttpResponse> 
             return Some(HttpResponse::BadRequest()
                 .json(serde_json::json!({"error": format!("list field exceeds maximum length (max {})", MAX_LIST_FIELD_LEN)})));
         }
-        // Per-element length in list fields
         for s in details.capability_codes.iter()
             .chain(&details.compliance)
             .chain(&details.dependencies)
@@ -110,7 +93,6 @@ pub fn validate_register_request(req: &RegisterRequest) -> Option<HttpResponse> 
                     .json(serde_json::json!({"error": "list element exceeds maximum length"})));
             }
         }
-        // Tag count and per-key/value limits
         if details.tags.len() > MAX_TAGS_COUNT {
             return Some(HttpResponse::BadRequest()
                 .json(serde_json::json!({"error": format!("too many tags (max {})", MAX_TAGS_COUNT)})));
@@ -121,7 +103,6 @@ pub fn validate_register_request(req: &RegisterRequest) -> Option<HttpResponse> 
                     .json(serde_json::json!({"error": "tag key or value exceeds maximum length"})));
             }
         }
-        // Scalar string field lengths
         for opt in [
             &details.version, &details.instance_id, &details.jurisdiction,
             &details.data_center, &details.timestamp,
@@ -133,7 +114,6 @@ pub fn validate_register_request(req: &RegisterRequest) -> Option<HttpResponse> 
                     .json(serde_json::json!({"error": "string field exceeds maximum length"})));
             }
         }
-        // Custom endpoint map limits
         if details.endpoints.custom.len() > MAX_TAGS_COUNT {
             return Some(HttpResponse::BadRequest()
                 .json(serde_json::json!({"error": format!("too many custom endpoints (max {})", MAX_TAGS_COUNT)})));
@@ -144,7 +124,6 @@ pub fn validate_register_request(req: &RegisterRequest) -> Option<HttpResponse> 
                     .json(serde_json::json!({"error": "custom endpoint key or value exceeds maximum length"})));
             }
         }
-        // Geographic coordinate range validation
         if let Some(ref geo) = details.geographic_location {
             if !(-90.0..=90.0).contains(&geo.latitude) || !(-180.0..=180.0).contains(&geo.longitude) {
                 return Some(HttpResponse::BadRequest()
@@ -155,21 +134,16 @@ pub fn validate_register_request(req: &RegisterRequest) -> Option<HttpResponse> 
     None
 }
 
-/// Return true if `addr` is a valid `host:port` or `[IPv6]:port` string with a non-zero port.
-/// Accepts numeric IPs, bracketed IPv6, and DNS hostnames (does not resolve, only validates form).
 pub fn is_valid_host_port(addr: &str) -> bool {
-    // Fast path: parses directly as a SocketAddr (numeric IP:port)
     if addr.parse::<std::net::SocketAddr>().is_ok() {
         return true;
     }
-    // General path: split on the last ':' to separate host and port
     if let Some((host, port_str)) = addr.rsplit_once(':') {
         let host = host.trim_start_matches('[').trim_end_matches(']');
         if host.is_empty() {
             return false;
         }
         if let Ok(port) = port_str.parse::<u16>() {
-            // Port 0 is reserved and not usable for registry entries
             return port > 0;
         }
     }
@@ -182,7 +156,6 @@ pub fn cleanup_and_build_list(
     current_ts: Timestamp,
     is_bootstrap: bool,
 ) -> Vec<AddressInfo> {
-    // Pure read — stale entries are evicted by the background task, not here.
     let reg = registry.lock().unwrap();
     reg.iter()
         .filter(|(addr, _)| !is_bootstrap || *addr != local_address)
@@ -194,8 +167,6 @@ pub fn cleanup_and_build_list(
         .collect()
 }
 
-/// Two-phase TTL: (1) put agent in quarantine after `quarantine_ttl` seconds without contact,
-/// (2) remove from registry after `removal_ttl` seconds in quarantine. The local address is never evicted.
 pub fn evict_stale_entries(
     registry: &Registry,
     local_address: &str,
@@ -230,11 +201,6 @@ pub fn evict_stale_entries(
     }
 }
 
-/// Returns Ok if the HTTP caller's peer IP matches the IP portion of `address`.
-/// Accepts both numeric IPs and hostnames; hostnames are resolved asynchronously
-/// via `tokio::net::lookup_host` so that `localhost:9001` works alongside
-/// `127.0.0.1:9001` without blocking a Tokio worker thread.
-/// Allows loopback-to-loopback (127.x / ::1) so local testing works without special-casing.
 pub async fn verify_caller_owns_address(http_req: &HttpRequest, address: &str) -> std::result::Result<(), String> {
     use std::net::IpAddr;
 
@@ -243,25 +209,18 @@ pub async fn verify_caller_owns_address(http_req: &HttpRequest, address: &str) -
         .ok_or("Cannot determine peer address")?
         .ip();
 
-    // Strip port: take everything before the last ':'
     let addr_host = address
         .rsplit_once(':')
         .map(|(host, _)| host)
         .unwrap_or(address);
 
-    // Handle bracketed IPv6 addresses like [::1]
     let addr_host = addr_host
         .trim_start_matches('[')
         .trim_end_matches(']');
 
-    // Try numeric IP first; fall back to async DNS resolution for hostnames.
-    // Using tokio::net::lookup_host avoids blocking a Tokio worker thread during
-    // DNS resolution, which std::net::ToSocketAddrs would do.
     let registered_ips: Vec<IpAddr> = if let Ok(ip) = addr_host.parse::<IpAddr>() {
         vec![ip]
     } else {
-        // Resolve hostname → collect all returned IP addresses.
-        // lookup_host requires host:port form; use port 0 as a placeholder.
         tokio::net::lookup_host(format!("{}:0", addr_host))
             .await
             .map_err(|e| format!("Cannot resolve hostname '{}': {}", addr_host, e))?
@@ -272,8 +231,6 @@ pub async fn verify_caller_owns_address(http_req: &HttpRequest, address: &str) -
     if registered_ips.is_empty() {
         return Err(format!("'{}' resolved to no addresses", addr_host));
     }
-
-    // Both loopback → allow (same-machine agents and local testing)
     if peer_ip.is_loopback() && registered_ips.iter().all(|ip| ip.is_loopback()) {
         return Ok(());
     }
@@ -293,11 +250,7 @@ pub fn merge_addresses(registry: &Registry, addresses: Vec<AddressInfo>) {
         match reg.entry(address) {
             std::collections::hash_map::Entry::Occupied(mut e) => {
                 let existing = e.get_mut();
-                // Always refresh TTL — receiving a gossip entry means the peer is still live.
                 existing.last_seen = details.last_seen;
-                // Propagate capability / identity updates from the gossip peer.
-                // Intentionally leave reliability, health_status, and uptime_percentage
-                // untouched — those fields are owned exclusively by PUT /status.
                 if let Some(v) = details.version { existing.version = Some(v); }
                 if !details.capability_codes.is_empty() {
                     existing.capability_codes = details.capability_codes;
@@ -321,14 +274,10 @@ pub fn merge_addresses(registry: &Registry, addresses: Vec<AddressInfo>) {
     }
 }
 
-// ─── Unit Tests ───────────────────────────────────────────────────────────────
-
 #[cfg(test)]
 mod tests {
     use super::*;
     use std::collections::HashMap;
-
-    // ── is_valid_host_port ────────────────────────────────────────────────────
 
     #[test]
     fn valid_ipv4_port() {
@@ -374,8 +323,6 @@ mod tests {
         assert!(!is_valid_host_port("localhost:abc"));
     }
 
-    // ── evict_stale_entries ───────────────────────────────────────────────────
-
     #[test]
     fn evicts_old_entries_after_quarantine_and_removal_ttl() {
         let registry: Registry = std::sync::Arc::new(std::sync::Mutex::new(HashMap::new()));
@@ -416,8 +363,6 @@ mod tests {
         evict_stale_entries(&registry, "127.0.0.1:8443", now, 300, 300);
         assert!(!registry.lock().unwrap().is_empty(), "fresh entry must be retained");
     }
-
-    // ── merge_addresses ───────────────────────────────────────────────────────
 
     #[test]
     fn merge_inserts_new_address() {

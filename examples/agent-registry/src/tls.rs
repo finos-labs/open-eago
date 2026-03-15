@@ -2,14 +2,11 @@ use crate::models::SpireConfig;
 use openssl::ssl::{SslAcceptor, SslFiletype, SslMethod, SslVerifyMode};
 use std::path::Path;
 use std::sync::Arc;
-use tracing::{debug, info};
+use tracing::info;
 
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 
-/// Server cert verifier that validates the chain against the SPIRE CA bundle but
-/// skips hostname verification. Used by the Swagger proxy when connecting to
-/// https://127.0.0.1:8443: the backend presents a SPIRE SVID with SPIFFE URI SAN,
-/// not 127.0.0.1, so hostname check would fail otherwise.
+/// Verifies backend cert against SPIRE CA; skips hostname (backend is 127.0.0.1 with SPIFFE SAN).
 #[derive(Debug)]
 struct SpireProxyServerVerifier {
     roots: Arc<rustls::RootCertStore>,
@@ -59,18 +56,10 @@ impl rustls::client::danger::ServerCertVerifier for SpireProxyServerVerifier {
     }
 }
 
-/// Build a reqwest client that presents the SPIRE SVID as a client certificate.
-/// For the Swagger proxy we use a custom server verifier that validates the
-/// backend cert chain against the SPIRE CA but skips hostname verification
-/// (backend at 127.0.0.1 presents a SPIRE SVID with SPIFFE URI SAN). Other callers
-/// (e.g. sync) get full hostname verification via with_root_certificates.
-/// Called per sync-round so SPIRE cert rotation is picked up at the next interval.
 pub fn build_mtls_client(spire: &SpireConfig) -> Result<reqwest::Client> {
     build_mtls_client_inner(spire, true)
 }
 
-/// Build mTLS client for the Swagger proxy: same as build_mtls_client but uses
-/// a custom server verifier that skips hostname check so proxy→127.0.0.1 works.
 pub fn build_mtls_client_for_proxy(spire: &SpireConfig) -> Result<reqwest::Client> {
     build_mtls_client_inner(spire, false)
 }
@@ -86,7 +75,6 @@ fn build_mtls_client_inner(spire: &SpireConfig, verify_hostname: bool) -> Result
     let ca_pem = std::fs::read(&spire.bundle_path)
         .map_err(|e| format!("Cannot read CA bundle {}: {}", spire.bundle_path, e))?;
 
-    // Build trusted CA root store from SPIRE CA bundle
     let mut roots = RootCertStore::empty();
     for cert in rustls_pemfile::certs(&mut ca_pem.as_slice()) {
         roots.add(cert.map_err(|e| format!("Invalid CA cert in bundle: {}", e))?)
@@ -94,13 +82,11 @@ fn build_mtls_client_inner(spire: &SpireConfig, verify_hostname: bool) -> Result
     }
     let roots = Arc::new(roots);
 
-    // Parse client certificate chain (presented during mTLS handshake)
     let certs: Vec<CertificateDer<'static>> =
         rustls_pemfile::certs(&mut cert_pem.as_slice())
             .collect::<std::result::Result<_, _>>()
             .map_err(|e| format!("Invalid client cert: {}", e))?;
 
-    // SPIRE issues PKCS#8 keys (BEGIN PRIVATE KEY)
     let key = rustls_pemfile::private_key(&mut key_pem.as_slice())
         .map_err(|e| format!("Cannot parse private key: {}", e))?
         .ok_or("No private key found in SVID key file")?;
@@ -125,8 +111,6 @@ fn build_mtls_client_inner(spire: &SpireConfig, verify_hostname: bool) -> Result
     };
 
     let mut builder = reqwest::Client::builder().use_preconfigured_tls(tls_config);
-    // Proxy only: disable connection pooling so we don't reuse a connection the backend
-    // may have closed after the previous response (avoids /list failing after /health).
     if !verify_hostname {
         builder = builder
             .pool_max_idle_per_host(0)
@@ -156,8 +140,6 @@ pub fn load_spire_tls_config(spire: &SpireConfig) -> Result<openssl::ssl::SslAcc
     builder.set_ca_file(&spire.bundle_path)?;
     builder.set_verify(SslVerifyMode::PEER | SslVerifyMode::FAIL_IF_NO_PEER_CERT);
 
-    info!("✓ SPIRE certificates loaded");
-    debug!("  cert={} key={} CA={}", spire.cert_path, spire.key_path, spire.bundle_path);
-
+    info!("SPIRE certificates loaded");
     Ok(builder)
 }

@@ -52,8 +52,6 @@ pub async fn sync_from_bootstrap(
         let (addresses, urls) = sync_with_all_bootstraps(&known_urls, &local_address, &agent, &spire).await;
 
         merge_addresses(&registry, addresses);
-        // Route learned URLs through the capped helper so a malicious bootstrap
-        // peer cannot grow the set beyond MAX_BOOTSTRAP_URLS.
         learn_bootstrap_urls(&bootstrap_urls, &Some(urls.into_iter().collect()));
     }
 }
@@ -112,7 +110,6 @@ fn init_as_bootstrap(
         agent.clone().stamp_now(),
     );
 
-    // Advertise https:// unless running in explicit insecure/dev mode without SPIRE certs present
     let scheme = if allow_insecure && !std::path::Path::new(&spire.cert_path).exists() {
         "http"
     } else {

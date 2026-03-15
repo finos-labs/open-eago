@@ -5,9 +5,16 @@ use tracing::error;
 
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 
-/// Actix-web handler that proxies the request to the mTLS HTTPS API backend.
-/// Attached as `default_service` on the Swagger/dev HTTP server so every API
-/// path that SwaggerUI calls is transparently forwarded with SPIRE certs.
+const REQUEST_SKIP_HEADERS: &[&str] = &["host", "content-length", "transfer-encoding", "connection"];
+const RESPONSE_SKIP_HEADERS: &[&str] = &["transfer-encoding", "connection"];
+
+fn error_chain(e: &dyn std::error::Error) -> String {
+    std::iter::successors(Some(e), |e| e.source())
+        .map(|e| e.to_string())
+        .collect::<Vec<_>>()
+        .join("; ")
+}
+
 pub async fn proxy_handler(
     req: HttpRequest,
     body: web::Bytes,
@@ -17,14 +24,7 @@ pub async fn proxy_handler(
     match forward_request(&req, body, api_https_url.get_ref(), &app_state).await {
         Ok(resp) => resp,
         Err(e) => {
-            let mut msg = e.to_string();
-            let mut src = e.source();
-            while let Some(s) = src {
-                msg.push_str("; ");
-                msg.push_str(&s.to_string());
-                src = s.source();
-            }
-            error!("mTLS proxy error: {}", msg);
+            error!("mTLS proxy error: {}", error_chain(&*e));
             HttpResponse::BadGateway()
                 .json(serde_json::json!({"error": format!("mTLS proxy error: {}", e)}))
         }
@@ -41,10 +41,6 @@ async fn forward_request(
         .map(|pq| pq.as_str())
         .unwrap_or("/");
     let target_url = format!("{}{}", api_https_url.trim_end_matches('/'), path_and_query);
-
-    // Build a fresh mTLS client per request so we never reuse a connection to the backend.
-    // The backend (actix OpenSSL) often closes the connection after each response; reusing
-    // causes "error sending request" on the second call (e.g. /list after /health).
     let client = build_mtls_client_for_proxy(&state.spire)?;
 
     let method = reqwest::Method::from_bytes(req.method().as_str().as_bytes())
@@ -52,10 +48,9 @@ async fn forward_request(
 
     let mut fwd = client.request(method, &target_url);
 
-    // Forward headers; skip hop-by-hop headers managed by reqwest
     for (name, value) in req.headers() {
         let n = name.as_str();
-        if !matches!(n, "host" | "content-length" | "transfer-encoding" | "connection") {
+        if !REQUEST_SKIP_HEADERS.contains(&n) {
             if let Ok(v) = value.to_str() {
                 fwd = fwd.header(n, v);
             }
@@ -72,10 +67,9 @@ async fn forward_request(
         .unwrap_or(actix_web::http::StatusCode::BAD_GATEWAY);
     let mut resp = HttpResponse::build(status);
 
-    // Forward headers; skip hop-by-hop headers
     for (name, value) in backend_resp.headers() {
         let n = name.as_str();
-        if !matches!(n, "transfer-encoding" | "connection") {
+        if !RESPONSE_SKIP_HEADERS.contains(&n) {
             resp.insert_header((n, value.as_bytes()));
         }
     }
