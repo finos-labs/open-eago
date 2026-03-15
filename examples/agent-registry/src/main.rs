@@ -6,16 +6,18 @@ mod registry;
 mod server;
 mod tls;
 
+use std::collections::{HashMap, HashSet};
+use std::time::Duration;
+
+use actix_web::web;
+use clap::Parser;
+use tracing::info;
+use tracing_subscriber::{fmt, layer::SubscriberExt, util::SubscriberInitExt, EnvFilter};
+
 use bootstrap::{initialize_registry, sync_from_bootstrap};
 use models::{AgentDetails, AppState, Args, Config, Registry};
 use registry::evict_stale_entries;
 use server::{start_server, start_swagger_server};
-use actix_web::web;
-use clap::Parser;
-use std::collections::{HashMap, HashSet};
-use std::time::Duration;
-use tracing::info;
-use tracing_subscriber::{fmt, layer::SubscriberExt, util::SubscriberInitExt, EnvFilter};
 
 const DEFAULT_LOCAL_IP: &str = "127.0.0.1";
 
@@ -27,7 +29,6 @@ fn get_local_ip() -> String {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    // Install the ring CryptoProvider for rustls before any TLS is used.
     rustls::crypto::ring::default_provider()
         .install_default()
         .map_err(|_| std::io::Error::other("Failed to install rustls CryptoProvider"))?;
@@ -49,8 +50,6 @@ async fn main() -> std::io::Result<()> {
         config.server.removal_ttl,
     );
 
-    // api_https_url is the mTLS proxy target; use loopback so the proxy hits the
-    // local server directly without traversing the network.
     let api_https_url = format!("https://127.0.0.1:{}", config.server.port);
     let swagger_port = config.server.swagger_port;
 
@@ -59,11 +58,11 @@ async fn main() -> std::io::Result<()> {
         local_address
     );
 
-    // Run the HTTPS API server and the HTTP Swagger UI server concurrently
-    tokio::try_join!(
+    let ((), ()) = tokio::try_join!(
         start_server(config.server.port, app_state.clone()),
         start_swagger_server(swagger_port, api_https_url, app_state),
-    ).map(|_| ())
+    )?;
+    Ok(())
 }
 
 fn load_config(args: &Args) -> Config {
@@ -115,8 +114,6 @@ fn spawn_sync_task_if_needed(config: &Config, app_state: &web::Data<AppState>, l
     }
 }
 
-/// Spawn a background task that evicts stale registry entries on a fixed timer.
-/// Uses two-phase TTL: quarantine after max_ttl without contact, remove after removal_ttl in quarantine.
 fn spawn_eviction_task(registry: Registry, local_address: String, quarantine_ttl: u64, removal_ttl: u64) {
     let interval_secs = (quarantine_ttl.min(removal_ttl) / 2).max(1);
     let interval = Duration::from_secs(interval_secs);

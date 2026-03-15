@@ -21,15 +21,9 @@ use utoipa::OpenApi;
         (name = "Health", description = "Health check endpoints"),
         (name = "Registry", description = "Address registry management")
     ),
-    info(
-        title = "OpenEAGO Registry API",
-        version = "0.1.0",
-        description = "A distributed registry service for managing and discovering network addresses with bootstrap server support.",
-    )
+    info(title = "OpenEAGO Registry API", version = "0.1.0")
 )]
 pub struct ApiDoc;
-
-// ─── Health ───────────────────────────────────────────────────────────────────
 
 #[utoipa::path(
     get,
@@ -41,8 +35,6 @@ pub struct ApiDoc;
 pub async fn health() -> impl Responder {
     HttpResponse::Ok().json(HealthResponse { status: "ok" })
 }
-
-// ─── Register ─────────────────────────────────────────────────────────────────
 
 #[utoipa::path(
     post,
@@ -99,8 +91,6 @@ pub async fn register(data: web::Data<AppState>, req: web::Json<RegisterRequest>
     })
 }
 
-// ─── List ─────────────────────────────────────────────────────────────────────
-
 #[utoipa::path(
     get,
     path = "/list",
@@ -122,8 +112,6 @@ pub async fn list(data: web::Data<AppState>) -> impl Responder {
     })
 }
 
-// ─── Update Status ────────────────────────────────────────────────────────────
-
 #[utoipa::path(
     put,
     path = "/status",
@@ -143,25 +131,16 @@ pub async fn update_status(
     http_req: HttpRequest,
     req: web::Json<UpdateStatusRequest>,
 ) -> impl Responder {
-    // Only the agent whose peer IP matches req.address may update its own entry.
     if let Err(e) = verify_caller_owns_address(&http_req, &req.address).await {
         warn!("Ownership check failed for {}: {}", req.address, e);
         return HttpResponse::Forbidden()
             .json(serde_json::json!({"error": format!("Forbidden: {}", e)}));
     }
-    if let Some(reliability) = req.reliability {
-        if !(0.0..=1.0).contains(&reliability) {
-            return HttpResponse::BadRequest().json(serde_json::json!({
-                "error": "Reliability must be between 0.0 and 1.0"
-            }));
-        }
-    }
-    if let Some(uptime) = req.uptime_percentage {
-        if !(0.0..=100.0).contains(&uptime) {
-            return HttpResponse::BadRequest().json(serde_json::json!({
-                "error": "Uptime percentage must be between 0.0 and 100.0"
-            }));
-        }
+    let mut validation_dummy = AgentDetails::default();
+    validation_dummy.reliability = req.reliability;
+    validation_dummy.uptime_percentage = req.uptime_percentage;
+    if let Err(e) = validation_dummy.validate() {
+        return HttpResponse::BadRequest().json(serde_json::json!({"error": e}));
     }
 
     let mut registry = data.registry.lock().unwrap();
@@ -182,12 +161,6 @@ pub async fn update_status(
             agent_details.uptime_percentage = Some(uptime_percentage);
             updates.push(format!("uptime_percentage: {}%", uptime_percentage));
         }
-        // registration_time is intentionally not updatable via this endpoint:
-        // it is an immutable record of when the agent first registered.
-
-        // Renew TTL: an agent signalling liveness via PUT /status should not get
-        // evicted while it is actively reporting. Update last_seen regardless of
-        // whether any status fields changed.
         agent_details.last_seen = AppState::current_timestamp();
 
         let message = if updates.is_empty() {
@@ -198,15 +171,13 @@ pub async fn update_status(
 
         info!("Updated status for {}: {}", req.address, message);
 
-        // Read back the stored values so the response reflects the authoritative post-update state,
-        // not just the request fields (some fields may have been preserved from existing data).
         HttpResponse::Ok().json(UpdateStatusResponse {
             success: true,
             message,
             address: req.address.clone(),
             reliability: agent_details.reliability,
             health_status: Some(agent_details.health_status.clone()),
-            registration_time: agent_details.registration_time, // read-back only; not writable via this endpoint
+            registration_time: agent_details.registration_time,
             uptime_percentage: agent_details.uptime_percentage,
         })
     } else {

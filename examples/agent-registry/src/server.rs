@@ -14,7 +14,6 @@ pub async fn start_server(port: u16, app_state: web::Data<AppState>) -> std::io:
     let allow_insecure = app_state.allow_insecure;
     let spire = app_state.spire.clone();
 
-    // Build the app factory once; both TLS and insecure paths share the same factory.
     let factory = move || {
         let mut app = App::new()
             .app_data(app_state.clone())
@@ -60,11 +59,7 @@ pub async fn start_swagger_server(
     let bind_addr = format!("127.0.0.1:{}", swagger_port);
     info!("Swagger UI  : http://{}/swagger-ui/", bind_addr);
     info!("mTLS proxy  : http://{}/* → {}", bind_addr, api_https_url);
-    info!("   (SPIRE client cert cached at startup; sync task rebuilds per interval for rotation)");
 
-    // OpenAPI server URL is "/" (relative) so Swagger Try-it-out calls resolve
-    // to the same HTTP port as the UI — which is the mTLS proxy, not the backend
-    // directly. This works regardless of devcontainer port-forwarding hostname.
     let mut openapi = ApiDoc::openapi();
     openapi.servers = Some(vec![Server::new("/")]);
 
@@ -78,8 +73,6 @@ pub async fn start_swagger_server(
                 SwaggerUi::new("/swagger-ui/{_:.*}")
                     .urls(vec![("/api-docs/openapi.json".into(), openapi.clone())]),
             )
-            // Catch-all: any path not served by SwaggerUi is proxied to the
-            // mTLS HTTPS backend with the SPIRE client certificate attached
             .default_service(web::route().to(proxy_handler))
     })
     .bind(&bind_addr)?
