@@ -233,6 +233,32 @@ Swagger UI (no mTLS): <http://localhost:8080/swagger-ui/>
 
 To stop the registry, interrupt it (Ctrl+C) or run: `pkill -f OpenEAGO-registry`.
 
+### Testing from Swagger UI
+
+Use **bootstrap** mode so `POST /register` is enabled (e.g. `config.bootstrap.yaml`). Then open <http://localhost:8080/swagger-ui/>. The UI proxies all requests to the mTLS backend using the registry’s SVID; you do not need client certs in the browser.
+
+- **GET /health** — Try it out with no body. Should return `{"status":"ok"}`.
+- **GET /list** — Try it out. Returns all registered addresses and agent details.
+- **POST /register** — Try it out with a request body. Minimum: `{"address": "127.0.0.1:8091"}`. Optional: `known_bootstrap_urls`, `agent_details` (see schema). Example:
+  ```json
+  {
+    "address": "127.0.0.1:8091",
+    "known_bootstrap_urls": ["https://localhost:8443"],
+    "agent_details": {
+      "instance_id": "agent-001",
+      "capability_codes": ["SPIRE_ENABLED"],
+      "jurisdiction": "US",
+      "data_center": "dc1",
+      "compliance": ["SOC2"],
+      "reliability": 0.99,
+      "version": "0.1.0",
+      "health_status": "healthy",
+      "uptime_percentage": 99.9
+    }
+  }
+  ```
+- **PUT /status** — Updates reliability/health for an existing address. The backend checks that the **caller’s IP** matches the address; when using Swagger the connection comes from the proxy (127.0.0.1), so use an address that resolves to 127.0.0.1 (e.g. `127.0.0.1:8091` or `localhost:8091`) and ensure that address is already registered. Example body: `{"address": "127.0.0.1:8091", "health_status": "degraded", "reliability": 0.85}`.
+
 > `--insecure` skips hostname verification only. SPIFFE SVIDs use URI SANs (`spiffe://…`), not DNS SANs. CA-chain trust is still enforced by the bundle.
 
 ### CLI flags (override config)

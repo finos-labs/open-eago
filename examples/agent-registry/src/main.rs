@@ -10,12 +10,11 @@ use bootstrap::{initialize_registry, sync_from_bootstrap};
 use models::{AgentDetails, AppState, Args, Config, Registry};
 use registry::evict_stale_entries;
 use server::{start_server, start_swagger_server};
-use tls::build_mtls_client;
 use actix_web::web;
 use clap::Parser;
 use std::collections::{HashMap, HashSet};
 use std::time::Duration;
-use tracing::{info, warn};
+use tracing::info;
 use tracing_subscriber::{fmt, layer::SubscriberExt, util::SubscriberInitExt, EnvFilter};
 
 const DEFAULT_LOCAL_IP: &str = "127.0.0.1";
@@ -92,19 +91,6 @@ fn create_app_state(
 ) -> web::Data<AppState> {
     use std::sync::{Arc, Mutex};
 
-    // Build a cached proxy client at startup. Failure is non-fatal: if SPIRE certs
-    // are not yet present the proxy will fall back to per-request building.
-    let proxy_client = match build_mtls_client(&config.spire) {
-        Ok(c) => {
-            info!("Swagger proxy mTLS client cached at startup");
-            Some(c)
-        }
-        Err(e) => {
-            warn!("Cannot pre-build proxy mTLS client (SPIRE certs missing?): {}", e);
-            None
-        }
-    };
-    
     web::Data::new(AppState {
         registry: Arc::new(Mutex::new(addresses)),
         is_bootstrap: config.server.bootstrap,
@@ -113,7 +99,6 @@ fn create_app_state(
         agent: config.agent,
         spire: config.spire,
         allow_insecure,
-        proxy_client,
     })
 }
 

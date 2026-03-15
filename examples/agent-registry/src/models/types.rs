@@ -398,10 +398,6 @@ pub struct AppState {
     /// When true, falls back to plaintext HTTP if SPIRE certs are missing.
     /// Development/testing only — never set in production.
     pub allow_insecure: bool,
-    /// Cached mTLS client for the Swagger-UI proxy (`forward_request`).
-    /// Built once at startup; the sync task uses its own per-round client so
-    /// cert rotation is always picked up there without affecting this cache.
-    pub proxy_client: Option<reqwest::Client>,
 }
 
 impl AppState {
