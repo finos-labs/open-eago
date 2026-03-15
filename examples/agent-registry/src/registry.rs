@@ -1,4 +1,4 @@
-use crate::models::{AddressInfo, AgentDetails, AppState, BootstrapUrls, RegisterRequest, Registry, Timestamp};
+use crate::models::{AddressInfo, AgentDetails, AgentStatus, AppState, BootstrapUrls, RegisterRequest, Registry, Timestamp};
 use actix_web::{HttpRequest, HttpResponse};
 use tracing::{info, warn};
 
@@ -42,7 +42,8 @@ pub fn update_registry(registry: &Registry, address: &str, mut agent_details: Ag
             agent_details.registration_time = existing_details.registration_time;
         }
     }
-
+    // Re-registration clears quarantine
+    agent_details.quarantined_at = None;
     agent_details.last_seen = AppState::current_timestamp();
     reg.insert(address.to_string(), agent_details);
     if is_new { RegistryUpdate::New } else { RegistryUpdate::Updated }
@@ -193,20 +194,39 @@ pub fn cleanup_and_build_list(
         .collect()
 }
 
-/// Remove registry entries whose `last_seen` timestamp is older than `max_ttl` seconds.
-/// The local address is always retained regardless of TTL.
+/// Two-phase TTL: (1) put agent in quarantine after `quarantine_ttl` seconds without contact,
+/// (2) remove from registry after `removal_ttl` seconds in quarantine. The local address is never evicted.
 pub fn evict_stale_entries(
     registry: &Registry,
     local_address: &str,
     current_ts: Timestamp,
-    max_ttl: u64,
+    quarantine_ttl: u64,
+    removal_ttl: u64,
 ) {
     let mut reg = registry.lock().unwrap();
     let before = reg.len();
-    reg.retain(|addr, details| addr == local_address || current_ts.saturating_sub(details.last_seen) <= max_ttl);
+    let mut to_remove = Vec::new();
+    for (addr, details) in reg.iter_mut() {
+        if addr == local_address {
+            continue;
+        }
+        let age = current_ts.saturating_sub(details.last_seen);
+        if age >= quarantine_ttl {
+            let at = details.quarantined_at.get_or_insert(current_ts);
+            details.health_status = AgentStatus::Quarantine;
+            if current_ts.saturating_sub(*at) >= removal_ttl {
+                to_remove.push(addr.clone());
+            }
+        } else {
+            details.quarantined_at = None;
+        }
+    }
+    for addr in to_remove {
+        reg.remove(&addr);
+    }
     let evicted = before.saturating_sub(reg.len());
     if evicted > 0 {
-        info!("Evicted {} stale registry entries (TTL={}s)", evicted, max_ttl);
+        info!("Evicted {} stale registry entries (quarantine_ttl={}s, removal_ttl={}s)", evicted, quarantine_ttl, removal_ttl);
     }
 }
 
@@ -287,6 +307,7 @@ pub fn merge_addresses(registry: &Registry, addresses: Vec<AddressInfo>) {
                 if !details.compliance.is_empty() { existing.compliance = details.compliance; }
                 if !details.dependencies.is_empty() { existing.dependencies = details.dependencies; }
                 if details.instance_id.is_some() { existing.instance_id = details.instance_id; }
+                existing.quarantined_at = None;
                 if details.geographic_location.is_some() {
                     existing.geographic_location = details.geographic_location;
                 }
@@ -356,15 +377,17 @@ mod tests {
     // ── evict_stale_entries ───────────────────────────────────────────────────
 
     #[test]
-    fn evicts_old_entries() {
+    fn evicts_old_entries_after_quarantine_and_removal_ttl() {
         let registry: Registry = std::sync::Arc::new(std::sync::Mutex::new(HashMap::new()));
         {
             let mut reg = registry.lock().unwrap();
-            reg.insert("10.0.0.1:9001".to_string(), AgentDetails::new(0));
+            let mut d = AgentDetails::new(0);
+            d.quarantined_at = Some(1000 - 61); // already in quarantine 61s
+            reg.insert("10.0.0.1:9001".to_string(), d);
         }
-        // current_ts=1000, max_ttl=60  →  age=1000 > 60 → should be evicted
-        evict_stale_entries(&registry, "127.0.0.1:8443", 1000, 60);
-        assert!(registry.lock().unwrap().is_empty(), "stale entry must be evicted");
+        // age=1000 >= 60 (quarantine), time in quarantine 61 >= 60 (removal) → evicted
+        evict_stale_entries(&registry, "127.0.0.1:8443", 1000, 60, 60);
+        assert!(registry.lock().unwrap().is_empty(), "stale quarantined entry must be evicted");
     }
 
     #[test]
@@ -375,7 +398,7 @@ mod tests {
             let mut reg = registry.lock().unwrap();
             reg.insert(local_addr.to_string(), AgentDetails::new(0)); // last_seen=0, would normally evict
         }
-        evict_stale_entries(&registry, local_addr, 1000, 60);
+        evict_stale_entries(&registry, local_addr, 1000, 60, 60);
         assert!(
             registry.lock().unwrap().contains_key(local_addr),
             "local address must never be evicted by TTL"
@@ -390,7 +413,7 @@ mod tests {
             let mut reg = registry.lock().unwrap();
             reg.insert("10.0.0.2:9001".to_string(), AgentDetails::new(now));
         }
-        evict_stale_entries(&registry, "127.0.0.1:8443", now, 300);
+        evict_stale_entries(&registry, "127.0.0.1:8443", now, 300, 300);
         assert!(!registry.lock().unwrap().is_empty(), "fresh entry must be retained");
     }
 

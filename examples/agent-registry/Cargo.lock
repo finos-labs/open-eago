@@ -3,6 +3,29 @@
 version = 4
 
 [[package]]
+name = "OpenEAGO-registry"
+version = "0.1.0"
+dependencies = [
+ "actix-web",
+ "clap",
+ "local-ip-address",
+ "openssl",
+ "reqwest",
+ "rustls",
+ "rustls-pemfile",
+ "serde",
+ "serde_json",
+ "serde_yml",
+ "tokio",
+ "tracing",
+ "tracing-actix-web",
+ "tracing-subscriber",
+ "url",
+ "utoipa",
+ "utoipa-swagger-ui",
+]
+
+[[package]]
 name = "actix-codec"
 version = "0.5.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -458,9 +481,9 @@ dependencies = [
 
 [[package]]
 name = "clap_lex"
-version = "0.1.0"
+version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3a822ea5bc7590f9d40f1ba12c0dc3c2760f3482c6984db1573ad11031420831"
+checksum = "c8d4a3bb8b1e0c1050499d1815f5ab16d04f0959b233085fb31653fbfc9d98f9"
 
 [[package]]
 name = "cmake"
@@ -1485,29 +1508,6 @@ name = "once_cell_polyfill"
 version = "1.70.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "384b8ab6d37215f3c5301a95a4accb5d64aa607f1fcb26a11b5303878451b4fe"
-
-[[package]]
-name = "OpenEAGO-registry"
-version = "0.1.0"
-dependencies = [
- "actix-web",
- "clap",
- "local-ip-address",
- "openssl",
- "reqwest",
- "rustls",
- "rustls-pemfile",
- "serde",
- "serde_json",
- "serde_yml",
- "tokio",
- "tracing",
- "tracing-actix-web",
- "tracing-subscriber",
- "url",
- "utoipa",
- "utoipa-swagger-ui",
-]
 
 [[package]]
 name = "openssl"

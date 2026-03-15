@@ -68,6 +68,10 @@ pub async fn register(data: web::Data<AppState>, req: web::Json<RegisterRequest>
     let agent_details = req.agent_details.clone()
         .unwrap_or_else(AgentDetails::now);
 
+    if let Err(e) = agent_details.validate() {
+        return HttpResponse::BadRequest().json(serde_json::json!({"error": e}));
+    }
+
     let update = update_registry(&data.registry, &req.address, agent_details);
     if update == RegistryUpdate::CapExceeded {
         return HttpResponse::TooManyRequests()

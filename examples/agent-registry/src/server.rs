@@ -30,15 +30,15 @@ pub async fn start_server(port: u16, app_state: web::Data<AppState>) -> std::io:
 
     match load_spire_tls_config(&spire) {
         Ok(tls_acceptor) => {
-            info!("🔒 Starting HTTPS server with SPIRE mTLS on {}", bind_addr);
+            info!("Starting HTTPS server with SPIRE mTLS on {}", bind_addr);
             HttpServer::new(factory)
                 .bind_openssl(&bind_addr, tls_acceptor)?
                 .run()
                 .await
         }
         Err(e) if allow_insecure => {
-            warn!("⚠️  SPIRE certificates unavailable: {}", e);
-            warn!("⚠️  --allow-insecure is set: starting HTTP server (development/testing only)");
+            warn!("SPIRE certificates unavailable: {}", e);
+            warn!("--allow-insecure is set: starting HTTP server (development/testing only)");
             HttpServer::new(factory)
                 .bind(&bind_addr)?
                 .run()
@@ -58,8 +58,8 @@ pub async fn start_swagger_server(
     app_state: web::Data<AppState>,
 ) -> std::io::Result<()> {
     let bind_addr = format!("127.0.0.1:{}", swagger_port);
-    info!("📖 Swagger UI  : http://{}/swagger-ui/", bind_addr);
-    info!("🔀 mTLS proxy  : http://{}/* → {}", bind_addr, api_https_url);
+    info!("Swagger UI  : http://{}/swagger-ui/", bind_addr);
+    info!("mTLS proxy  : http://{}/* → {}", bind_addr, api_https_url);
     info!("   (SPIRE client cert cached at startup; sync task rebuilds per interval for rotation)");
 
     // OpenAPI server URL is "/" (relative) so Swagger Try-it-out calls resolve
@@ -67,7 +67,6 @@ pub async fn start_swagger_server(
     // directly. This works regardless of devcontainer port-forwarding hostname.
     let mut openapi = ApiDoc::openapi();
     openapi.servers = Some(vec![Server::new("/")]);
-    let openapi = openapi;
 
     let api_https_url = web::Data::new(api_https_url);
 
