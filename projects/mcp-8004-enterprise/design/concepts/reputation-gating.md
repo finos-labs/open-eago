@@ -41,7 +41,7 @@ All three gates are opt-in and independently optional:
 
 ### 3.1 Per-capability thresholds
 
-Each `bytes32 capability` (e.g. `keccak256("review_code")`) has its own independent threshold. An agent that excels at reviewing code but is unproven at approvals can be permitted for one capability and blocked for the other.
+Each `bytes32 capability` (e.g. `keccak256("aml_review")`) has its own independent threshold. An agent that excels at AML screening but is unproven in credit risk assessment can be permitted for one capability and blocked for the other.
 
 ### 3.2 Trusted evaluator list
 
@@ -49,7 +49,7 @@ Each `bytes32 capability` (e.g. `keccak256("review_code")`) has its own independ
 
 ### 3.3 Tag-filtered scoring
 
-Each threshold stores a `tag` string (default: the capability name, e.g. `"review_code"`). This tag is passed to `getSummary()` so only feedback tagged with that capability-relevant label counts toward the score. An agent's approval-related reputation cannot substitute for review-related reputation.
+Each threshold stores a `tag` string (default: the capability name, e.g. `"aml_review"`). This tag is passed to `getSummary()` so only feedback tagged with that capability-relevant label counts toward the score. An agent's credit risk reputation cannot substitute for AML review reputation.
 
 ### 3.4 Decimal-safe comparison
 
@@ -160,7 +160,7 @@ event EvaluatorRemoved(address indexed evaluator);
 
 ## 5. Oracle Contract Integration
 
-Both `CodeReviewerOracle` and `CodeApproverOracle` receive the same changes:
+`AMLOracle`, `CreditRiskOracle`, `LegalOracle`, and `ClientSetupOracle` all receive the same changes:
 
 ```solidity
 import "./IReputationGate.sol";
@@ -175,24 +175,24 @@ function setReputationGate(address reputationGate_) external onlyOwner {
 }
 ```
 
-**Insertion point in `CodeReviewerOracle.fulfillReview()`** — after the flow auth check, before the state change:
+**Insertion point in `AMLOracle.fulfillReview()`** — after the flow auth check, before the state change:
 
 ```solidity
 if (address(reputationGate) != address(0)) {
     require(
-        reputationGate.meetsThreshold(agentId, CAP_REVIEW_CODE),
+        reputationGate.meetsThreshold(agentId, CAP_AML_REVIEW),
         "reputation threshold not met"
     );
 }
 req.status = RequestStatus.Fulfilled;
 ```
 
-**Insertion point in `CodeApproverOracle._validateAndSetStatus()`** — this internal function is called by all three fulfillment paths (`fulfillApproval`, `fulfillNeedsRevision`, `fulfillRejection`), so a single insertion point covers all three:
+**Insertion point in `CreditRiskOracle._validateAndSetStatus()`** — this internal function is called by all fulfillment paths (`fulfillReview`, `proposeTerms`, etc.), so a single insertion point covers all:
 
 ```solidity
 if (address(reputationGate) != address(0)) {
     require(
-        reputationGate.meetsThreshold(agentId, CAP_APPROVE_PR),
+        reputationGate.meetsThreshold(agentId, CAP_CREDIT_RISK),
         "reputation threshold not met"
     );
 }
@@ -206,15 +206,15 @@ req.status = newStatus;
 When `--reputation-gate` is provided, bridges perform an off-chain pre-flight check before submitting any fulfillment transaction:
 
 ```javascript
-// code-reviewer-bridge.js
+// aml-bridge.js
 const REPUTATION_GATE_ABI = [
     'function meetsThreshold(uint256 agentId, bytes32 capability) view returns (bool)',
 ];
 
 if (reputationGate) {
-    const qualified = await reputationGate.meetsThreshold(AGENT_ID, CAP_REVIEW_CODE);
+    const qualified = await reputationGate.meetsThreshold(AGENT_ID, CAP_AML_REVIEW);
     if (!qualified) {
-        console.warn(`[reviewer-bridge] Agent ${AGENT_ID} does not meet reputation threshold — skipping`);
+        console.warn(`[aml-bridge] Agent ${AGENT_ID} does not meet reputation threshold — skipping`);
         return;
     }
 }
@@ -234,8 +234,10 @@ const RepGate = await hre.ethers.getContractFactory("ReputationGate");
 const repGate = await RepGate.deploy(reputationAddr);
 await repGate.waitForDeployment();
 
-await reviewerOracle.setReputationGate(repGateAddr);
-await approverOracle.setReputationGate(repGateAddr);
+await amlOracle.setReputationGate(repGateAddr);
+await creditOracle.setReputationGate(repGateAddr);
+await legalOracle.setReputationGate(repGateAddr);
+await clientSetupOracle.setReputationGate(repGateAddr);
 ```
 
 No threshold is active at deploy time — the gate is fully opt-in until the operator configures thresholds and evaluators.
@@ -245,18 +247,18 @@ No threshold is active at deploy time — the gate is fully opt-in until the ope
 ## 8. Example: Configuring a Threshold
 
 ```javascript
-const CAP_REVIEW_CODE = ethers.keccak256(ethers.toUtf8Bytes("review_code"));
+const CAP_AML_REVIEW = ethers.keccak256(ethers.toUtf8Bytes("aml_review"));
 
-// Require at least 3 reviews with an average score ≥ 70 (0 decimals)
+// Require at least 3 AML screenings with an average score ≥ 70 (0 decimals)
 await reputationGate.addEvaluator(trustedEvaluatorAddress);
-await reputationGate.setThreshold(CAP_REVIEW_CODE, 70, 0, 3, "review_code");
+await reputationGate.setThreshold(CAP_AML_REVIEW, 70, 0, 3, "aml_review");
 
 // Evaluator submits feedback after observing agent performance
 await reputationRegistry.giveFeedback(
     agentId,
     80,          // score
     0,           // decimals
-    "review_code",
+    "aml_review",
     "",
     agentEndpoint,
     "ipfs://...",
@@ -264,7 +266,7 @@ await reputationRegistry.giveFeedback(
 );
 
 // After 3 feedbacks averaging ≥ 70, meetsThreshold() returns true
-const ok = await reputationGate.meetsThreshold(agentId, CAP_REVIEW_CODE);
+const ok = await reputationGate.meetsThreshold(agentId, CAP_AML_REVIEW);
 // ok === true
 ```
 
@@ -290,7 +292,7 @@ const ok = await reputationGate.meetsThreshold(agentId, CAP_REVIEW_CODE);
 |---|---|---|
 | 1 — Identity | `IdentityRegistryUpgradeable` | Does this agent exist and is its wallet + oracle registered? |
 | 2 — Tracing | `ExecutionTraceLog` | What did this agent do and in what order? |
-| 3 — Flow authorization | `FlowAuthorizationRegistry` | Is this agent allowed to participate in **this specific flow**? |
+| 3 — Flow authorization | `FlowAuthorizationRegistry` | Is this agent allowed to participate in **this specific onboarding flow**? |
 | 4 — Reputation gating | `ReputationGate` | Has this agent **earned the right** to perform this capability? |
 
 The four layers are complementary and independently optional. A deployment can use any combination.
@@ -303,10 +305,11 @@ The four layers are complementary and independently optional. A deployment can u
 |---|---|
 | `IReputationRegistry.sol`, `IReputationGate.sol` | ✅ Done |
 | `ReputationGate.sol` with threshold storage, evaluator list, decimal-safe comparison | ✅ Done |
-| `CodeReviewerOracle` — `setReputationGate`, inline check | ✅ Done |
-| `CodeApproverOracle` — `setReputationGate`, inline check via `_validateAndSetStatus` | ✅ Done |
-| Bridge pre-flight check (`--reputation-gate` / `REPUTATION_GATE_ADDRESS`) | ✅ Done |
-| `deploy-registries.js` — deploy + wire | ✅ Done |
+| `AMLOracle` — `setReputationGate`, inline check | ✅ Done |
+| `CreditRiskOracle` — `setReputationGate`, inline check via `_validateAndSetStatus` | ✅ Done |
+| `LegalOracle`, `ClientSetupOracle` — `setReputationGate`, inline check | ✅ Done |
+| Bridge pre-flight check (`--reputation-gate` / `REPUTATION_GATE_ADDRESS`) in `aml-bridge.js`, `credit-risk-bridge.js`, `legal-bridge.js`, `client-setup-bridge.js` | ✅ Done |
+| `deploy-registries.js` — deploy + wire to all four oracles | ✅ Done |
 | `test/ReputationGate.test.js` — 38 tests including oracle integration and end-to-end | ✅ Done |
 | Per-capability threshold management UI / admin tool | Planned |
 | Automated threshold adjustment based on sliding window | Planned |

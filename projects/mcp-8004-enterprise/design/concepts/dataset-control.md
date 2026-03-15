@@ -2,7 +2,7 @@
 
 ## Problem
 
-Agents in a code-review or approval flow can silently consume any dataset — training corpora, retrieval indices, code embeddings, few-shot example libraries. MCP provides no mechanism to declare or restrict which data an agent uses during a tool invocation. ERC-8004 says nothing about datasets. Nothing in the five existing governance layers records or constrains the data that informed a fulfillment.
+AML and credit risk agents can silently consume any dataset — sanctions lists, risk model corpora, KYC document embeddings, few-shot screening libraries. MCP provides no mechanism to declare or restrict which data an agent uses during a tool invocation. ERC-8004 says nothing about datasets. Nothing in the five existing governance layers records or constrains the data that informed a fulfillment.
 
 This creates two distinct gaps:
 
@@ -54,7 +54,7 @@ The gate is a `require`, not an event. An advisory that merely logged the hash w
 
 ### `_anyRegistered` flat index
 
-`approveForFlow` checks `_anyRegistered[contentHash]` before admitting a hash to a flow policy. This prevents a flow initiator from approving a hash that was never catalogued — a phantom approval that could be exploited if the hash later happens to collide with something registered. The flat index spans all capabilities, so a hash registered under `review_code` cannot be phantom-approved under `approve_pr` without being explicitly registered there.
+`approveForFlow` checks `_anyRegistered[contentHash]` before admitting a hash to a flow policy. This prevents a flow initiator from approving a hash that was never catalogued — a phantom approval that could be exploited if the hash later happens to collide with something registered. The flat index spans all capabilities, so a hash registered under `aml_review` cannot be phantom-approved under `credit_risk` without being explicitly registered there.
 
 ### revokeGlobal restores opt-in when the last approval is removed
 
@@ -168,11 +168,11 @@ onlyRegisteredOracle(agentId)              ← IdentityRegistryUpgradeable
           → state change
 ```
 
-### `CodeReviewerOracle`
+### `AMLOracle`
 
 - Added `IDatasetRegistry public datasetRegistry;`
 - Added `setDatasetRegistry(address) external onlyOwner` (emits `DatasetRegistrySet`)
-- Added `bytes32[] datasetHashes` to `FulfillReviewParams` struct and `ReviewResult` struct
+- Added `bytes32[] datasetHashes` to `FulfillReviewParams` struct and `AMLResult` struct
 - Added `getResultDatasetHashes(bytes32 requestId) → bytes32[]` view function
 - In `fulfillReview`, after the prompt gate check:
 
@@ -180,21 +180,21 @@ onlyRegisteredOracle(agentId)              ← IdentityRegistryUpgradeable
 if (address(datasetRegistry) != address(0)) {
     for (uint256 i; i < params.datasetHashes.length; i++) {
         require(
-            datasetRegistry.isApproved(traceId, CAP_REVIEW_CODE, params.datasetHashes[i]),
+            datasetRegistry.isApproved(traceId, CAP_AML_REVIEW, params.datasetHashes[i]),
             "dataset not approved"
         );
     }
 }
 req.status = RequestStatus.Fulfilled;
-results[params.requestId] = ReviewResult(
-    traceId, params.summaryJson, params.commentsJson, params.approved,
+results[params.requestId] = AMLResult(
+    traceId, params.resultHash, params.cleared,
     agentId, block.timestamp, params.promptHash, params.datasetHashes  // hashes stored for audit
 );
 ```
 
-### `CodeApproverOracle`
+### `CreditRiskOracle`
 
-Same pattern. `bytes32[] datasetHashes` added to `FulfillDecisionParams`, `FulfillNeedsRevisionParams`, and `ApprovalResult`. The internal `_validateAndSetStatus` helper accepts `bytes32[] calldata datasetHashes` and performs the loop check before writing state. All three fulfill paths (`fulfillApproval`, `fulfillNeedsRevision`, `fulfillRejection`) store the hashes in the result.
+Same pattern. `bytes32[] datasetHashes` added to `FulfillReviewParams`, `FulfillTermsParams`, and `CreditResult`. The internal `_validateAndSetStatus` helper accepts `bytes32[] calldata datasetHashes` and performs the loop check before writing state. All fulfill paths store the hashes in the result.
 
 ---
 
@@ -228,7 +228,7 @@ await reviewerOracle.fulfillReview(agentId, {
 });
 ```
 
-> **Note:** Bridge integration (hash computation, pre-flight, params threading) is not yet implemented in `code-reviewer-bridge.js` or `code-approver-bridge.js`. The on-chain gate accepts an empty `datasetHashes[]` (no dataset claimed), so existing bridges continue to work unmodified until dataset enforcement is enabled via `setDatasetRegistry`.
+> **Note:** Bridge integration (hash computation, pre-flight, params threading) is not yet implemented in `aml-bridge.js` or `credit-risk-bridge.js`. The on-chain gate accepts an empty `datasetHashes[]` (no dataset claimed), so existing bridges continue to work unmodified until dataset enforcement is enabled via `setDatasetRegistry`.
 
 ---
 
@@ -299,9 +299,10 @@ All five layers are opt-in. The dataset layer is the most granular: it enforces 
 
 - `contracts/DatasetRegistry.sol` — implemented
 - `contracts/IDatasetRegistry.sol` — implemented
-- `contracts/CodeReviewerOracle.sol` — wired (`setDatasetRegistry`, `isApproved` loop, `datasetHashes` in result, `getResultDatasetHashes`)
-- `contracts/CodeApproverOracle.sol` — wired (all three fulfill paths gated via `_validateAndSetStatus`)
-- `scripts/deploy-registries.js` — deploys and wires both oracles (step 9)
+- `contracts/AMLOracle.sol` — wired (`setDatasetRegistry`, `isApproved` loop, `datasetHashes` in result, `getResultDatasetHashes`)
+- `contracts/CreditRiskOracle.sol` — wired (all fulfill paths gated via `_validateAndSetStatus`)
+- `contracts/LegalOracle.sol`, `contracts/ClientSetupOracle.sol` — wired (same pattern)
+- `scripts/deploy-registries.js` — deploys and wires all oracle contracts (step 9)
 - `test/DatasetRegistry.test.js` — 50 tests covering all functions + oracle integrations + all-gates revert order + end-to-end cycles
-- `agents_implementation/code-reviewer-bridge.js` — **not yet** (bridge passes empty `datasetHashes: []`)
-- `agents_implementation/code-approver-bridge.js` — **not yet**
+- `agents_implementation/aml-bridge.js` — **not yet** (bridge passes empty `datasetHashes: []`)
+- `agents_implementation/credit-risk-bridge.js` — **not yet**

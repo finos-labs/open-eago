@@ -16,7 +16,7 @@ Each tool entry gains an optional `autonomy_bounds` block:
 
 ```json
 {
-  "name": "review_pr",
+  "name": "screen_client",
   "description": "...",
   "inputSchema": { ... },
   "autonomy_bounds": {
@@ -25,7 +25,7 @@ Each tool entry gains an optional `autonomy_bounds` block:
       "min_score": 30,
       "min_score_decimals": 0,
       "min_feedback_count": 5,
-      "tag": "review_code",
+      "tag": "aml_review",
       "action": "revoke"
     },
     "anomaly": {
@@ -129,7 +129,7 @@ Both bridges check `isToolEnabled()` before calling the MCP server, parallel to 
 When a tool is disabled, `tools/list` reflects it:
 
 ```json
-{ "name": "review_pr", ..., "x_suspended": true, "x_suspension_reason": "anomaly: error rate 25% > threshold 20%" }
+{ "name": "screen_client", ..., "x_suspended": true, "x_suspension_reason": "anomaly: error rate 25% > threshold 20% (aml_review)" }
 ```
 
 `tools/call` on a suspended tool returns JSON-RPC error `-32001` with the suspension message.
@@ -144,8 +144,8 @@ Run after deploy or whenever MCP spec thresholds change:
 
 ```bash
 REPUTATION_GATE_ADDRESS=0x...
-REVIEWER_CONTRACT_ADDRESS=0x...
-APPROVER_CONTRACT_ADDRESS=0x...
+AML_CONTRACT_ADDRESS=0x...
+CREDIT_CONTRACT_ADDRESS=0x...
 npx hardhat run scripts/sync-autonomy-bounds.js --network localhost
 ```
 

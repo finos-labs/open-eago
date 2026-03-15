@@ -153,7 +153,37 @@ Two protocol-level additions are consumed by ERC-8004-aware clients; standard MC
 
 **`tools/call` response** - calling a suspended tool returns JSON-RPC error code `-32001` (in the application-defined range; MCP reserves -32000 to -32099).
 
-Suspension state is persisted in `bounds-state.json`, written by `bounds-monitor.js` and read by MCP servers on every request. Both additions are the client-visible surface of §5 Layer 6.
+Suspension state is persisted in `bounds-state.json`, written by `bounds-monitor.js` and read by MCP servers on every request. Both additions are the client-visible surface of §5 Layers 6 and 7.
+
+#### 3.3.1 The Bounds Monitor
+
+`bounds-monitor.js` is a sidecar process that runs alongside the oracle bridges. It is the sole writer of `bounds-state.json` and the sole caller of `disableTool` / `enableTool` on `AutonomyBoundsRegistry`. Its inputs are tool call outcome reports submitted by bridges via a local HTTP control API (`POST /report`); its outputs are a state file read by every MCP server and, when on-chain governance is configured, transactions to `AutonomyBoundsRegistry`.
+
+The report contract is minimal: `{ toolName, success, latencyMs }`. A bridge submits one report after each oracle fulfillment cycle completes, setting `success: false` on any exception (MCP error, contract revert, network failure) and supplying the wall-clock latency of the MCP server round-trip. The monitor does not need visibility into fulfillment transaction outcomes; it observes the quality of the tool execution, not the on-chain settlement.
+
+#### 3.3.2 Layer 6 — Tool-Level Metric Revocation
+
+Layer 6 is responsible for performance and anomaly signals defined in the `autonomy_bounds` block of each MCP tool declaration. Each tool carries two independent sliding windows:
+
+- **`anomaly` window** — tracks the error rate (fraction of `success: false` reports) over the last `window_requests` calls. When the rate exceeds `max_error_rate_pct`, the monitor suspends the tool.
+- **`performance` window** — tracks the success rate over the last `window_requests` calls. When it falls below `min_success_rate_pct`, the monitor suspends the tool.
+
+Both windows use the same per-call report stream but are sized and thresholded independently, so an operator can configure a tight anomaly window (e.g. 10 % error rate over 50 calls) alongside a looser performance window (e.g. 90 % success rate over 100 calls) without conflating burst failures with sustained degradation.
+
+On threshold breach the monitor: (1) writes `enabled: false` and a human-readable `disabledReason` to `bounds-state.json`; (2) optionally calls `disableTool(agentId, toolHash, reason)` on `AutonomyBoundsRegistry` so that the oracle contract also rejects fulfilment transactions (via `isToolEnabled` in the bridge's governance preflight). Suspension is self-healing: the monitor continues recording outcomes for suspended tools, and once the sliding window recovers within bounds it calls `enableTool` and updates the state file.
+
+#### 3.3.3 Layer 7 — Flow-Level Time-Relative Policies
+
+Layer 7 covers policies that are inherently time-relative and therefore cannot be enforced on-chain: burst rate limiting and response timeouts. Both are drawn from the `autonomy_bounds.flow` block:
+
+- **`max_requests_per_minute`** — the monitor maintains a per-tool timestamp buffer of all reports in the last 60 seconds. If a new report arrives when the buffer count already exceeds the limit, the monitor immediately suspends the tool with a burst-violation reason.
+- **`response_timeout_seconds`** — if the `latencyMs` value in a report exceeds the configured timeout, the call is treated as a violation regardless of whether `success` is true.
+
+Both violations trigger the same suspension path as Layer 6: `bounds-state.json` is updated and `disableTool` is called on-chain if configured. The on-chain complement of Layer 7 — `maxHopsPerTrace` and `loopDetectionEnabled` in `ExecutionTraceLog` — enforces structural flow policies (hop count, loop detection) that can be checked synchronously during the fulfilment transaction itself. The two halves are complementary: the on-chain registry enforces what can be known from the transaction context; the off-chain monitor enforces what can only be known from wall-clock time and accumulated call history.
+
+#### 3.3.4 Propagation to MCP Clients
+
+When a bridge calls `tools/list` on an MCP server before invoking a tool, the server reads `bounds-state.json` synchronously and annotates any suspended tool with `x_suspended: true` and `x_suspension_reason`. An ERC-8004-aware bridge treats a suspended tool as a pre-flight failure and skips the oracle fulfilment transaction entirely, avoiding a wasted gas spend. Standard MCP clients that do not inspect the `x_` fields will encounter the `-32001` error at `tools/call` time instead, with the reason string available in the error message. In both cases the oracle contract itself provides a final backstop: the bridge's governance preflight calls `isToolEnabled` before submitting any transaction, so a suspended tool cannot be fulfilled even if the client bypasses the protocol-level signal.
 
 ### 3.4 Agent Card Extensions (`agents/*.json`)
 
@@ -343,7 +373,7 @@ The table below summarizes all nine layers with their governing contracts and th
 
 | Layer | Contract / Component | What It Controls |
 |---|---|---|
-| 1 | `IdentityRegistryUpgradeable` | Who the agent is; wallet and oracle binding |
+| 1 | `IdentityRegistryUpgradeable` | Who the agent is; wallet and oracle binding (`onlyRegisteredOracle`) |
 | 2 | `FlowAuthorizationRegistry` | Which agents may act in this specific flow |
 | 3 | `ReputationGate` | Minimum reputation score to act |
 | 4 | `PromptRegistry` | Which prompt templates are approved |
@@ -375,25 +405,64 @@ The three-tier separation described in §4.6 is instantiated concretely as follo
 
 ![Figure 6: Ten-phase onboarding flow - authorization (phases 1–2), assessment and negotiation (phases 3–7), and setup with finalization (phases 8–10).](figures/fig-6-onboarding-flow.png)
 
+Each bridge in the reference implementation is an event-driven Node.js process (launched by `launch-bridges.js`) that subscribes to one or more oracle contract events, calls the corresponding MCP tool via HTTP/JSON-RPC 2.0, and submits an on-chain fulfillment transaction. Each MCP server is a stateless HTTP process (launched by `launch-agents.js`) that exposes tools over a fixed port. Before every fulfillment transaction, the bridge calls `governancePreflight()` from `bridge-base.js` to run all configured governance checks. After every MCP tool call completes, the bridge posts `POST http://localhost:9090/report { toolName, success, latencyMs }` to `bounds-monitor.js`, which updates its sliding windows and may write `bounds-state.json` to suspend the tool if a Layer 6 or 7 threshold is breached.
+
 **Phase 1: Flow Initiation and Authorization.** The bank-onboarding-orchestrator creates the flow by calling `OnboardingRegistry.initiate(traceId, bankAgentId, clientAgentId)` and simultaneously calls `FlowAuthorizationRegistry.createFlow(traceId, entries[])` to declare the complete agent authorization policy for this flow. The policy specifies which agents from Bank A, Bank B, and the hedge fund are authorized and which capabilities they may exercise. Bank B's agents are listed in the policy but are not yet authorized - authorization requires Bank B to counter-sign by calling `authorizeAgentForFlow` with its own participant credentials.
+
+*Call sequence:* `onboarding-orchestrator-bridge.js` receives a REST `POST /initiate` and calls the `initiate_onboarding` tool on `onboarding-orchestrator-server.js` (:8013), passing `{ flow_id, client_address, bank_aml_agent_id, bank_credit_agent_id, bank_legal_agent_id, hf_doc_agent_id, hf_credit_agent_id, hf_legal_agent_id }`. The bridge then submits three on-chain transactions in parallel: `AMLOracle.requestAMLReview(flowId, bankAmlAgentId, hfDocAgentId)`, `CreditRiskOracle.requestCreditReview(flowId, bankCreditAgentId, hfCreditAgentId)`, and `LegalOracle.requestLegalReview(flowId, bankLegalAgentId, hfLegalAgentId)`. Each of these emits its respective `*ReviewRequested` event, starting the three parallel review tracks simultaneously.
 
 **Phase 2: Bilateral Authorization.** Bank B's orchestrator, having observed the flow initiation event on-chain, reviews the proposed authorization policy and calls `FlowAuthorizationRegistry.authorizeAgentForFlow(flowId, agentId, capabilities[])` for each of its agents. The registry verifies on-chain that the caller's `participantId` matches the `participantId` recorded in each agent NFT. Once both banks have authorized their respective agents, all participants in the flow are active. Neither bank has been required to communicate directly with the other; the chain mediates the consent exchange. The protocol has a liveness dependency: if Bank B does not respond, the flow stalls at Phase 2. The initiating bank may call `OnboardingRegistry.terminate()` to cancel the flow, releasing any locked resources, and emitting a `FlowTerminated` event that both parties can observe.
 
+*Call sequence:* No bridge is involved on the Bank A side. Bank B's operator (or Bank B's own orchestrator bridge) calls `FlowAuthorizationRegistry.authorizeAgentForFlow(flowId, agentId, capability)` directly for each Bank B agent. The `participantId` check is enforced entirely on-chain.
+
 **Phase 3: Document Exchange.** The hf-document-agent responds to document request events by retrieving the requested documents from Hedge Fund C's internal systems and submitting their `bytes32 payloadHash` values on-chain. Raw document content never touches the chain. Bank A's and Bank B's bridges observe the hash submissions and retrieve the actual documents through a separately arranged encrypted channel (email, secure file transfer, or a bilateral data room). The chain provides integrity attestation - if Bank A receives a document whose hash does not match the on-chain record, the discrepancy is provable to any third party.
+
+*Call sequence:* `hf-document-bridge.js` listens for `DataRequested` events emitted by both `AMLOracle` and `CreditRiskOracle`. On each event it calls the `assemble_documents` tool on `hf-document-server.js` (:8020) with `{ flow_id, request_id, oracle_type: 'aml'|'credit', spec_hash, round }`, where `spec_hash` is the `dataSpecHash` field from the event. The server returns `{ data_hash }` — the keccak256 of the assembled document bundle; raw bytes are stored off-chain. The bridge then submits `AMLOracle.fulfillDataRequest(requestId, clientAgentId, dataHash)` or `CreditRiskOracle.fulfillDataRequest(...)` depending on which oracle emitted the event, and reports the outcome to `bounds-monitor.js`.
 
 **Phase 4: AML Screening.** `AMLOracle.requestReview(traceId, bankAgentId, clientAgentId, payloadHash)` is called independently by both banks. The two AML screening processes are independent: Bank A's bank-aml-agent and Bank B's correspondent AML agent each fulfill their respective requests with `AMLStatus` outcomes (Cleared, Rejected, InHumanReview, or Escalated). The AML oracle implements a state machine with a `DataRequested` intermediate state for cases where the agent requires additional information from the hedge fund; the hf-document-agent listens for `DataRequested` events and responds accordingly. Both AML requests must reach `Cleared` status before `OnboardingRegistry` will set the AML phase bit, which is a prerequisite for the credit risk phase.
 
+*Call sequence:* `aml-bridge.js` listens for `AMLReviewRequested` events. On each event it calls the `screen_client` tool on `aml-server.js` (:8010) with `{ flow_id, request_id, client_agent_id, trace_id }`. The server returns an `action` field that branches the bridge's response: if `action === 'request_documents'`, the response includes `{ spec_hash }` and the bridge submits `AMLOracle.requestClientData(requestId, bankAgentId, specHash)`, which emits `DataRequested` and hands off to `hf-document-bridge.js` (Phase 3); if `action === 'submit_recommendation'`, the response includes `{ result_hash, cleared }` and the bridge submits `AMLOracle.submitRecommendation(requestId, bankAgentId, resultHash)`. When the HF side responds and `AMLOracle` emits `DataFulfilled`, `aml-bridge.js` resumes by calling the `continue_screening` tool with `{ flow_id, request_id, data_hash, round }` and follows the same branch logic. After each MCP call, the bridge posts to `bounds-monitor.js`; the `screen_client` and `continue_screening` tools are each tracked against the `anomaly` and `performance` sliding windows defined in `aml-review.mcp.json`.
+
 **Phase 5: Credit Risk Assessment and Negotiation.** `CreditRiskOracle` implements a negotiation loop: the bank-credit-risk-agent submits initial terms, the hf-credit-negotiator-agent may call `submitCounterProposal`, and the bank-credit-risk-agent may call `acceptTerms` or continue negotiating. Each round of negotiation is recorded on-chain with a `payloadHash` representing the term sheet. The `ReputationGate` check at this layer verifies that the hf-credit-negotiator-agent meets the minimum reputation threshold for the `credit_negotiation` capability before allowing counter-proposals.
+
+*Call sequence (bank side):* `credit-risk-bridge.js` listens for `CreditReviewRequested` and `CounterProposed` events. On `CreditReviewRequested` it calls `assess_credit` on `credit-risk-server.js` (:8011) with `{ flow_id, request_id, client_agent_id }`. The response `action` field routes to: `request_documents` → `CreditRiskOracle.requestClientData(requestId, bankAgentId, specHash)`; `propose_terms` → `CreditRiskOracle.proposeTerms(requestId, bankAgentId, termsHash)`; `accept_terms` → `CreditRiskOracle.acceptTerms(requestId, bankAgentId, agreedHash)` followed by `submitRecommendation`. On `CounterProposed` the bridge reads the current `negotiationRound` from the oracle via `getRequest(requestId)` and calls `continue_assessment` with `{ flow_id, request_id, trigger: 'counter_proposed', data_hash: proposalHash, current_round }`.
+
+*Call sequence (HF side):* `hf-credit-negotiator-bridge.js` listens for `TermsProposed` events from `CreditRiskOracle`. It calls the `negotiate_terms` tool on `hf-credit-negotiator-server.js` (:8021) with `{ flow_id, request_id, terms_hash, round }`, receives `{ proposal_hash }`, and submits `CreditRiskOracle.submitCounterProposal(requestId, clientAgentId, proposalHash)`. Both bridges report outcomes to `bounds-monitor.js` against their respective tool windows.
 
 **Phase 6: Legal Review and Markup Negotiation.** `LegalOracle` implements a multi-round markup negotiation. The bank-legal-agent submits an initial draft hash; the hf-legal-agent submits a markup hash; rounds continue until both parties call their respective approval functions (`approveBankSide()` and `approveClientSide()`). The `LegalOracle.execute()` function is only available once both `bankApproved` and `clientApproved` flags are true - bilateral execution cannot be triggered unilaterally by either party.
 
+*Call sequence (bank side):* `legal-bridge.js` listens for `LegalReviewRequested` and `MarkupSubmitted` events. On `LegalReviewRequested` it calls `issue_initial_draft` on `legal-server.js` (:8012) with `{ flow_id, request_id, client_agent_id }`, receives `{ draft_hash }`, and submits `LegalOracle.issueDraft(requestId, bankAgentId, draftHash)`. On each `MarkupSubmitted` event it calls `review_markup_and_respond` with `{ flow_id, request_id, markup_hash, round }`. The response routes to: `issue_revised_draft` → `LegalOracle.issueDraft(requestId, bankAgentId, revisedDraftHash)` for another negotiation round; or `submit_recommendation` → `LegalOracle.submitRecommendation(requestId, bankAgentId, finalHash)` followed by `approveBankSide()`.
+
+*Call sequence (HF side):* `hf-legal-bridge.js` listens for `DraftIssued` events. It calls `review_draft` on `hf-legal-server.js` (:8022) with `{ flow_id, request_id, draft_hash, round }`, receives `{ markup_hash }`, and submits `LegalOracle.submitMarkup(requestId, clientAgentId, markupHash)`. Once the HF side is satisfied, it calls `approveClientSide()` directly.
+
 **Phase 7: Tier 2 Action Approval.** Before `LegalOracle.execute()` can proceed, the `ActionPermitRegistry` requires Tier 2 approval for the `legal:execute_contract` action type. The bridge's `action-gateway.js` detects that the action is Tier 2 and initiates a `MockMultiSig` approval request. Authorized human signers from both institutions submit their signatures; the M-of-N threshold must be reached before the gateway permits the fulfillment transaction to be submitted. The `ActionBlocked` event is emitted if the fulfillment is attempted before approval is complete, providing a visible on-chain record of the blocked attempt.
+
+*Call sequence:* No additional MCP tool call is made for the approval step itself. Inside `legal-bridge.js`, `action-gateway.js` classifies the pending action string `legal:execute_contract` against `action-patterns.json`, resolves it to Tier 2, and calls `ActionPermitRegistry.grantPermit(flowId, agentId, actionType, tier, requiredApprovals)`. It then polls `getPermit(flowId, agentId, actionType)` at a configurable interval until `approved === true` or the `approval_timeout_seconds` deadline is reached. Once approved, the bridge submits `LegalOracle.execute(requestId, bankAgentId, finalHash)`.
 
 **Phase 8: Sequential Client Setup.** Once `LegalOracle.execute()` succeeds and the legal phase bit is set in `OnboardingRegistry`, the `ClientSetupOracle` accepts setup requests in sequence: `setupLegalEntity`, then `setupAccount` (gated on the legal entity phase bit), then `setupProducts` (gated on the account phase bit). Each step is fulfilled by a dedicated bank setup agent - bank-legal-entity-setup-agent, bank-account-setup-agent, and bank-product-setup-agent respectively. The `client-setup-bridge.js` watches `PhaseCompleted` events from `OnboardingRegistry` and triggers each subsequent setup step automatically.
 
+*Call sequence:* `client-setup-bridge.js` listens for `PhaseCompleted` events from `OnboardingRegistry`. On each event it reads the current `phaseBitmask` and selects the next pending step: if `ALL_REVIEWS_DONE` bits are set and `ENTITY_SETUP_DONE` is not, it calls the `setup_legal_entity` tool on `client-setup-server.js` (:8014) with `{ flow_id }` and submits `ClientSetupOracle.setupLegalEntity(flowId, entityAgentId, entitySpecHash)`; once `ENTITY_SETUP_DONE` is set, it calls `setup_account` → `setupAccount(flowId, accountAgentId, accountSpecHash)`; once `ACCOUNT_SETUP_DONE` is set, it calls `setup_products` → `setupProducts(flowId, productAgentId, productSpecHash)`. All three tools share the same MCP server process on port 8014 but carry distinct `agentId` values (4, 5, and 6 respectively). Each tool call outcome is reported to `bounds-monitor.js`.
+
 **Phase 9: Trace Finalization.** Once all six phase bits are set, `OnboardingRegistry` emits a `FlowCompleted` event. The orchestrator calls `ExecutionTraceLog.finalizeTrace(traceId)`, which closes the trace to further hop recordings. The complete ordered hop log - spanning all ten agents, four oracle contracts, and multiple negotiation rounds - is now permanently available on-chain for regulatory review or dispute resolution.
 
+*Call sequence:* No MCP tool call is made. `onboarding-orchestrator-bridge.js` listens for `FlowCompleted` and submits `ExecutionTraceLog.finalizeTrace(traceId)` directly.
+
 **Phase 10: Reputation Update.** Post-completion, each institution's reputation infrastructure submits feedback on the agents from the counterparty institution. Feedback is recorded in `ReputationRegistryUpgradeable` with the submitting `participantId` tagged to each score. Future calls to `getSummaryFiltered` will include these scores in each agent's reputation summary, filtered by the requesting institution's trusted participant list.
+
+*Call sequence:* No bridge is involved. Each institution calls `ReputationRegistryUpgradeable.recordFeedback(agentId, score, capabilityTag, participantId)` directly from its own credentialed account.
+
+**Component summary.** Table 2 maps every bridge script to the events it consumes, the MCP server and port it targets, the tool names it calls, and the on-chain functions it submits. The full governance preflight sequence (`governancePreflight()` in `bridge-base.js`) runs before every on-chain transaction listed in the table.
+
+| Bridge | Trigger event(s) | MCP server (:port) | Tool(s) | On-chain function(s) |
+|---|---|---|---|---|
+| `onboarding-orchestrator-bridge.js` | REST POST /initiate | `onboarding-orchestrator-server.js` (:8013) | `initiate_onboarding` | `AMLOracle.requestAMLReview`, `CreditRiskOracle.requestCreditReview`, `LegalOracle.requestLegalReview` |
+| `aml-bridge.js` | `AMLReviewRequested`, `DataFulfilled` | `aml-server.js` (:8010) | `screen_client`, `continue_screening` | `AMLOracle.requestClientData`, `AMLOracle.submitRecommendation` |
+| `credit-risk-bridge.js` | `CreditReviewRequested`, `DataFulfilled`, `CounterProposed` | `credit-risk-server.js` (:8011) | `assess_credit`, `continue_assessment` | `CreditRiskOracle.requestClientData`, `.proposeTerms`, `.acceptTerms`, `.submitRecommendation` |
+| `legal-bridge.js` | `LegalReviewRequested`, `MarkupSubmitted` | `legal-server.js` (:8012) | `issue_initial_draft`, `review_markup_and_respond` | `LegalOracle.issueDraft`, `.submitRecommendation`, `.execute` |
+| `client-setup-bridge.js` | `PhaseCompleted` (OnboardingRegistry) | `client-setup-server.js` (:8014) | `setup_legal_entity`, `setup_account`, `setup_products` | `ClientSetupOracle.setupLegalEntity`, `.setupAccount`, `.setupProducts` |
+| `hf-document-bridge.js` | `DataRequested` (AML & Credit) | `hf-document-server.js` (:8020) | `assemble_documents` | `AMLOracle.fulfillDataRequest`, `CreditRiskOracle.fulfillDataRequest` |
+| `hf-credit-negotiator-bridge.js` | `TermsProposed` | `hf-credit-negotiator-server.js` (:8021) | `negotiate_terms` | `CreditRiskOracle.submitCounterProposal` |
+| `hf-legal-bridge.js` | `DraftIssued` | `hf-legal-server.js` (:8022) | `review_draft` | `LegalOracle.submitMarkup` |
 
 ### 6.4 All Nine Layers Applied
 

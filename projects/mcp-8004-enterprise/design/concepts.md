@@ -11,7 +11,7 @@ This repository is a lab for governed agentic workflow patterns built on the ERC
 
 AI agents are described by machine-readable cards, their capabilities are formalised in MCP specifications, and on-chain Solidity oracle contracts mediate every request and response. The oracle contract is the trust anchor: it records that a request was made, stores the result, and verifies (via the identity registry) that the agent fulfilling the request is the one registered to do so.
 
-**What it achieves:** A fully auditable, on-chain record of every agent action — code reviews, approvals, decisions — with the actual intelligence living off-chain in MCP servers. The ledger proves *what was requested, who answered, and what they said*, without exposing private model weights or business logic. The identity registry design — ERC-721 token, UUPS upgradeability, EIP-712 wallet binding, and reserved metadata keys — is documented in [8004.refactor.md](./8004.refactor.md).
+**What it achieves:** A fully auditable, on-chain record of every agent action — AML screenings, credit assessments, legal reviews, client setups — with the actual intelligence living off-chain in MCP servers. The ledger proves *what was requested, who answered, and what they said*, without exposing private model weights or business logic. The identity registry design — ERC-721 token, UUPS upgradeability, EIP-712 wallet binding, and reserved metadata keys — is documented in [8004.refactor.md](./8004.refactor.md).
 
 ---
 
@@ -31,7 +31,7 @@ A `bytes32 traceId` — a correlation token — is born once at the start of an 
 > **Status:** Implemented
 > **Design doc:** [flow-scoped-authorization.md](./concepts/flow-scoped-authorization.md)
 
-Before a flow begins, the orchestrator calls `FlowAuthorizationRegistry.createFlow(traceId, authorizations[])` to declare which agents — identified by their on-chain ERC-8004 agentId — are permitted to exercise which capabilities (`keccak256("review_code")`, `keccak256("approve_pr")`) within that specific flow. Policies are immutable after creation and remain on-chain as audit records. Oracle contracts check `isAuthorized(traceId, agentId, capability)` before accepting any fulfillment; bridges perform the same check off-chain as a gas-saving pre-flight.
+Before a flow begins, the orchestrator calls `FlowAuthorizationRegistry.createFlow(traceId, authorizations[])` to declare which agents — identified by their on-chain ERC-8004 agentId — are permitted to exercise which capabilities (`keccak256("aml_review")`, `keccak256("credit_risk")`) within that specific flow. Policies are immutable after creation and remain on-chain as audit records. Oracle contracts check `isAuthorized(traceId, agentId, capability)` before accepting any fulfillment; bridges perform the same check off-chain as a gas-saving pre-flight.
 
 **What it achieves:** Least-privilege enforcement at the flow level. A registered agent cannot act in a flow it was not explicitly authorized for. Different flows can authorize different agent combinations. The *who was allowed* record sits alongside the *what happened* trace on the ledger.
 
@@ -53,7 +53,7 @@ Before a flow begins, the orchestrator calls `FlowAuthorizationRegistry.createFl
 > **Status:** Implemented
 > **Design doc:** [prompt-governance.md](./concepts/prompt-governance.md)
 
-MCP treats prompts as first-class primitives but defines no security properties — no versioning, no hashing, no signatures. ERC-8004 says nothing about prompts at all. In this stack, the two agent templates (`code_review`, `approve_pr_prompt`) are static Handlebars strings stored in `agents/mcp/*.mcp.json`; a developer could silently change agent behaviour with no trace anywhere in the governance stack.
+MCP treats prompts as first-class primitives but defines no security properties — no versioning, no hashing, no signatures. ERC-8004 says nothing about prompts at all. In this stack, the agent prompt templates (e.g. `aml_screening`, `credit_assessment`) are static Handlebars strings stored in `agents/mcp/*.mcp.json`; an operator could silently change agent behaviour with no trace anywhere in the governance stack.
 
 `PromptRegistry` closes this gap. It stores `keccak256(templateText)` per `bytes32 capability` on-chain, supports multiple versions, and exposes `isActive(capability, hash) → bool`. Oracle contracts call it as the fifth authorization layer: if the bridge submits an unrecognized hash, the fulfillment reverts with `"unrecognized prompt"`. Bridges compute the hash from the MCP spec file at startup and submit it with every fulfillment. No active version → `isActive` returns `true` (opt-in). Rotating a prompt is a two-step owner transaction: `registerPrompt` + `setActiveVersion`.
 
@@ -168,7 +168,7 @@ the registry.
 > **Status:** Implemented
 > **Design doc:** [action-level-authorization.md](./concepts/action-level-authorization.md)
 
-All nine previous concepts govern whether an agent *may participate* in a flow and whether its outputs meet quality and structural thresholds. None of them govern **what specific operations an agent may perform on external systems** once authorized. An agent with `review_code` capability and sufficient reputation can invoke any tool available to it — including tools that execute destructive shell commands, delete databases, or modify infrastructure — because the governance stack authorizes *participation*, not *actions*.
+All nine previous concepts govern whether an agent *may participate* in a flow and whether its outputs meet quality and structural thresholds. None of them govern **what specific operations an agent may perform on external systems** once authorized. An authorized AML agent with `aml_review` capability and sufficient reputation can invoke any tool available to it — including tools that write to a sanctions database, provision client accounts, or execute legal contracts — because the governance stack authorizes *participation*, not *actions*.
 
 Natural language instructions embedded in prompts ("you must never delete backups") are not a security boundary. They are advisory. An LLM can hallucinate, be prompt-injected, misinterpret context, or simply ignore instructions. The gap is structural: between the moment an agent decides to invoke a tool and the moment that invocation reaches an external system, there is no typed, classified, permit-checked enforcement layer.
 

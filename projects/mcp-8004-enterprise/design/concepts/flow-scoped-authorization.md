@@ -9,7 +9,7 @@ In an enterprise agentic workflow, multiple agents collaborate across a traced e
 We introduce a **Flow Authorization Registry** that works alongside the existing `ExecutionTraceLog`. When a flow is initiated, the initiator declares:
 
 1. **Which agents** (by their on-chain identity/address) are authorized to participate.
-2. **Which capabilities** each agent is allowed to exercise within that flow (e.g., `review_code`, `approve_pr`).
+2. **Which capabilities** each agent is allowed to exercise within that flow (e.g., `aml_review`, `credit_risk`).
 
 Every subsequent on-chain action (oracle request, trace event emission) is gated by a check against this authorization list.
 
@@ -21,10 +21,10 @@ When a new `traceId` is created, the initiator registers a **flow policy** — a
 
 ### 2. Authorization Checks
 
-All existing contracts (`CodeReviewerOracle`, `CodeApproverOracle`, `ExecutionTraceLog`) are extended with a modifier that, before processing any request, verifies:
+All oracle contracts (`AMLOracle`, `CreditRiskOracle`, `LegalOracle`, `ClientSetupOracle`, `ExecutionTraceLog`) are extended with a modifier that, before processing any request, verifies:
 
 - The calling agent is listed in the flow policy for the given `traceId`.
-- The calling agent holds the required capability for the action being performed (e.g., only a `review_code`-authorized agent can submit a review request).
+- The calling agent holds the required capability for the action being performed (e.g., only an `aml_review`-authorized agent can submit an AML screening result).
 
 ### 3. Bridge-Level Enforcement
 
@@ -32,7 +32,7 @@ The off-chain bridges also enforce authorization before relaying responses back 
 
 ### 4. Capability Model
 
-Capabilities are derived directly from the MCP specifications already defined in agent cards. Each agent card declares capabilities like `review_code` or `approve_pr`. These capability strings are hashed and stored on-chain as `bytes32` identifiers for gas-efficient comparison.
+Capabilities are derived directly from the MCP specifications already defined in agent cards. Each agent card declares capabilities like `aml_review` or `credit_risk`. These capability strings are hashed and stored on-chain as `bytes32` identifiers for gas-efficient comparison.
 
 ## Flow Lifecycle
 
@@ -44,7 +44,7 @@ Capabilities are derived directly from the MCP specifications already defined in
 
 - **Least Privilege**: Agents only get the permissions they need for a specific workflow instance — not blanket access to all flows.
 - **Auditability**: The authorization policy is recorded on-chain alongside the execution trace, providing a complete picture of *who was allowed* and *what they actually did*.
-- **Flexibility**: Different flows can authorize different agent combinations. A high-risk code change might require two reviewers and two approvers, while a low-risk change needs only one of each.
+- **Flexibility**: Different flows can authorize different agent combinations. A high-value credit facility might require two AML agents and two credit approvers, while a low-risk standard onboarding needs only one of each.
 - **Compatibility**: This builds on top of the existing `ExecutionTraceLog` tracing system and the `IdentityRegistry` agent registration — it doesn't replace them, it layers authorization on top.
 
 ## Relationship to Existing Components

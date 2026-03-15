@@ -11,12 +11,12 @@
 
 An enterprise agentic workflow spans multiple agents, multiple on-chain transactions, and multiple off-chain MCP calls. Today there is no way to answer:
 
-- Which agents participated in processing a specific PR?
+- Which agents participated in processing a specific onboarding request?
 - In what order did the interactions happen?
 - Did the end-to-end chain complete, or did it stall at an intermediate step?
 - Where in the pipeline did a failure occur?
 
-Each oracle contract emits its own events, but there is no shared identifier linking a `ReviewRequested` event to the corresponding `ApprovalRequested` event, or either of them to the MCP tool calls that occurred off-chain in between.
+Each oracle contract emits its own events, but there is no shared identifier linking an `AMLReviewRequested` event to the corresponding `CreditReviewRequested` event, or either of them to the MCP tool calls that occurred off-chain in between.
 
 ---
 
@@ -30,122 +30,113 @@ This is the distributed tracing pattern (analogous to OpenTelemetry's trace ID) 
 traceId is born
       │
       ▼
-CodeReviewerOracle.requestReview(prId, traceId, focus)
-      │  event ReviewRequested(..., traceId)
+AMLOracle.requestAMLReview(flowId, bankAmlAgentId, hfDocAgentId, traceId)
+      │  event AMLReviewRequested(..., traceId)
       ▼
-code-reviewer-bridge.js  ←  receives event with traceId
-      │  POST /mcp  { review_pr, headers: X-Trace-Id }
+aml-bridge.js  ←  receives event with traceId
+      │  POST /mcp  { screen_client, headers: X-Trace-Id }
       ▼
-code-reviewer-server.js  ←  logs traceId
-      │  returns { summary, comments, approved }
+aml-server.js  ←  logs traceId
+      │  returns { action: 'submit_recommendation', result_hash, cleared: true }
       ▼
-code-reviewer-bridge.js  →  fulfillReview(agentId, requestId, prId, ...)
+aml-bridge.js  →  submitRecommendation(bankAmlAgentId, requestId, resultHash)
       │  contract reads traceId from storage
-      │  event ReviewFulfilled(..., traceId)
+      │  event AMLReviewFulfilled(..., traceId)
       │
-      │  if approved, hand off to approver with SAME traceId
+      │  AML cleared → OnboardingRegistry sets phase bit
+      │  same traceId propagates to credit review (runs in parallel)
       ▼
-CodeApproverOracle.requestApproval(prId, traceId, reviewerAgent, message)
-      │  event ApprovalRequested(..., traceId)
+CreditRiskOracle.requestCreditReview(flowId, bankCreditAgentId, hfCreditAgentId, traceId)
+      │  event CreditReviewRequested(..., traceId)
       ▼
-code-approver-bridge.js  →  POST /mcp  { approve_pr, headers: X-Trace-Id }
+credit-risk-bridge.js  →  POST /mcp  { assess_credit, headers: X-Trace-Id }
       ▼
-code-approver-server.js  ←  logs traceId
-      │  returns { decision, reason }
+credit-risk-server.js  ←  logs traceId
+      │  returns { action: 'propose_terms', terms_hash }
       ▼
-code-approver-bridge.js  →  fulfillApproval(agentId, requestId, prId, ...)
+credit-risk-bridge.js  →  proposeTerms(bankCreditAgentId, requestId, termsHash)
       │  contract reads traceId from storage
-      │  event PRApproved(..., traceId)
+      │  event TermsProposed(..., traceId)
       │
-      └──  chain complete
+      └──  continues through negotiation rounds with same traceId
 ```
 
 ---
 
 ## 3. On-Chain: Contract Changes
 
-### 3.1 `CodeReviewerOracle.sol`
+### 3.1 `AMLOracle.sol`
 
-Add `traceId` to request and events. The `traceId` is stored in the request struct and read from storage during fulfillment (to avoid EVM stack-too-deep):
+`traceId` is embedded in the `flowId` passed at request time and propagated through all events. The `traceId` is stored in the `AMLRequest` struct and read from storage during fulfillment (to avoid EVM stack-too-deep):
 
 ```solidity
-event ReviewRequested(
+event AMLReviewRequested(
     bytes32 indexed requestId,
-    address indexed requester,
-    string prId,
-    bytes32 indexed traceId,       // NEW
-    string focus,
+    bytes32 indexed flowId,        // carries traceId
+    uint256 bankAgentId,
+    uint256 clientAgentId,
     uint256 timestamp
 );
 
-event ReviewFulfilled(
+event AMLReviewFulfilled(
     bytes32 indexed requestId,
-    bytes32 indexed traceId,       // NEW
-    bool approved,
-    uint256 agentId,
+    bytes32 indexed flowId,        // same traceId
+    bytes32 resultHash,
+    bool    cleared,
+    uint256 bankAgentId,
     uint256 timestamp
 );
 
-function requestReview(
-    string calldata prId,
-    bytes32 traceId,               // NEW — caller provides or contract generates
-    string calldata focus
+function requestAMLReview(
+    bytes32 flowId,                // traceId — caller provides
+    uint256 bankAgentId,
+    uint256 clientAgentId
 ) external returns (bytes32 requestId);
 
-// traceId NOT passed to fulfillReview — contract reads it from storage via
-// _validateAndFulfill() to stay within the EVM's 16-slot stack limit.
-function fulfillReview(
-    uint256 agentId,
+// traceId NOT passed to submitRecommendation — contract reads it from request storage.
+function submitRecommendation(
     bytes32 requestId,
-    string calldata prId,
-    bytes calldata summaryJson,
-    bytes calldata commentsJson,
-    bool approved
-) external onlyRegisteredOracle(agentId);
+    uint256 bankAgentId,
+    bytes32 resultHash
+) external onlyBankAgent(bankAgentId);
 ```
 
-The `traceId` is stored in the `ReviewRequest` and `ReviewResult` structs.
+The `flowId` / `traceId` is stored in the `AMLRequest` struct and emitted on every event.
 
-### 3.2 `CodeApproverOracle.sol`
+### 3.2 `CreditRiskOracle.sol`
 
-Same pattern — the `traceId` carries through from the review phase. Like the reviewer oracle, fulfillment functions do NOT take `traceId` as a parameter; it is read from request storage:
+Same pattern — the `traceId` carries through from the AML phase. Fulfillment functions read it from request storage:
 
 ```solidity
-event ApprovalRequested(
+event CreditReviewRequested(
     bytes32 indexed requestId,
-    address indexed requester,
-    string prId,
-    bytes32 indexed traceId,       // SAME traceId from review phase
-    string reviewerAgent,
+    bytes32 indexed flowId,        // SAME traceId
+    uint256 bankAgentId,
+    uint256 clientAgentId,
     uint256 timestamp
 );
 
-event PRApproved(
+event TermsProposed(
     bytes32 indexed requestId,
-    bytes32 indexed traceId,       // SAME traceId
+    bytes32 indexed flowId,        // SAME traceId
+    bytes32 termsHash,
     uint256 agentId,
     uint256 timestamp
 );
 
-event RevisionRequested(
+event CreditReviewFulfilled(
     bytes32 indexed requestId,
-    bytes32 indexed traceId,
+    bytes32 indexed flowId,        // SAME traceId
+    bytes32 resultHash,
+    bool    approved,
     uint256 agentId,
     uint256 timestamp
 );
 
-event PRRejected(
-    bytes32 indexed requestId,
-    bytes32 indexed traceId,
-    uint256 agentId,
-    uint256 timestamp
-);
-
-function requestApproval(
-    string calldata prId,
-    bytes32 traceId,               // SAME traceId — binds review to approval
-    string calldata reviewerAgent,
-    string calldata message
+function requestCreditReview(
+    bytes32 flowId,                // SAME traceId — binds to AML phase
+    uint256 bankAgentId,
+    uint256 clientAgentId
 ) external returns (bytes32 requestId);
 ```
 
@@ -155,12 +146,12 @@ Because `traceId` is `indexed` on events, any consumer can reconstruct the full 
 
 ```javascript
 // Query all events across both oracles for one execution chain
-const reviewFilter = reviewerOracle.filters.ReviewRequested(null, null, null, traceId);
-const approvalFilter = approverOracle.filters.ApprovalRequested(null, null, null, traceId);
+const amlFilter    = amlOracle.filters.AMLReviewRequested(null, null, null, traceId);
+const creditFilter = creditOracle.filters.CreditReviewRequested(null, null, null, traceId);
 
 const allEvents = [
-    ...await reviewerOracle.queryFilter(reviewFilter),
-    ...await approverOracle.queryFilter(approvalFilter),
+    ...await amlOracle.queryFilter(amlFilter),
+    ...await creditOracle.queryFilter(creditFilter),
 ].sort((a, b) => a.blockNumber - b.blockNumber);
 ```
 
@@ -173,9 +164,10 @@ const allEvents = [
 The bridge reads the `traceId` from the emitted event and passes it to the MCP server as a header and tool argument:
 
 ```javascript
-// code-reviewer-bridge.js
-reviewerOracle.on("ReviewRequested", async (requestId, requester, prId, traceId, focus, timestamp) => {
-    const agentEndpoint = pickEndpoint("code-review");
+// aml-bridge.js
+amlOracle.on("AMLReviewRequested", async (requestId, flowId, bankAgentId, clientAgentId, timestamp) => {
+    const traceId = flowId;                           // flowId carries the traceId
+    const agentEndpoint = pickEndpoint("aml-review");
 
     const result = await fetch(`${agentEndpoint}/mcp`, {
         method: "POST",
@@ -188,35 +180,32 @@ reviewerOracle.on("ReviewRequested", async (requestId, requester, prId, traceId,
             id: 1,
             method: "tools/call",
             params: {
-                name: "review_pr",
-                arguments: { pr_id: prId, trace_id: traceId }
+                name: "screen_client",
+                arguments: { request_id: requestId, trace_id: traceId }
             }
         })
     });
 
-    const review = await result.json();
+    const screening = await result.json();
 
     // traceId NOT passed — contract reads it from request storage
-    await reviewerOracle.fulfillReview(
-        agentId, requestId, prId,
-        ethers.toUtf8Bytes(JSON.stringify(review.result.summary)),
-        ethers.toUtf8Bytes(JSON.stringify(review.result.comments)),
-        review.result.approved
+    await amlOracle.submitRecommendation(
+        bankAgentId, requestId,
+        ethers.keccak256(ethers.toUtf8Bytes(JSON.stringify(screening.result)))
     );
 });
 ```
 
 ### 4.2 Cross-agent handoff
 
-When the reviewer bridge triggers an approval request (the chain continues), it passes the **same** `traceId`:
+When AML clears, the onboarding orchestrator (or `OnboardingRegistry` callback) triggers the credit risk phase, passing the **same** `traceId`:
 
 ```javascript
-// After review fulfillment, if approved, hand off to approver
-await approverOracle.requestApproval(
-    prId,
-    traceId,                                          // SAME traceId — not a new one
-    reviewerAgentEndpoint,
-    "Auto-forwarded after review approval"
+// After AML fulfillment — if cleared, advance to credit review
+await creditOracle.requestCreditReview(
+    flowId,                                           // SAME traceId — not a new one
+    bankCreditAgentId,
+    hfCreditAgentId
 );
 ```
 
@@ -245,15 +234,15 @@ Derive from the initiating input so repeated calls with the same parameters yiel
 ```javascript
 const traceId = ethers.keccak256(
     ethers.AbiCoder.defaultAbiCoder().encode(
-        ["string", "uint256", "uint256"],
-        [prId, blockNumber, timestamp]
+        ["uint256", "uint256", "uint256"],
+        [bankParticipantId, hfParticipantId, timestamp]
     )
 );
 ```
 
-**Pros:** Same input → same trace. Replaying a failed chain reuses the original `traceId`. Easy to reconstruct the trace ID from known inputs.
+**Pros:** Same input → same trace. Replaying a failed onboarding chain reuses the original `traceId`. Easy to reconstruct the trace ID from known inputs.
 
-**Cons:** If the same PR is reviewed twice at different times, the caller must include a disambiguating factor (e.g. timestamp, nonce).
+**Cons:** If the same institution pair onboards twice at different times, the caller must include a disambiguating factor (e.g. timestamp, nonce).
 
 ### Option B: Random
 
@@ -267,7 +256,7 @@ const traceId = ethers.hexlify(ethers.randomBytes(32));
 
 ### Recommendation
 
-Use **Option A** for the common case (the chain initiator computes the trace ID), with a fallback to Option B when the caller doesn't supply one (the oracle contract generates a random trace ID using `keccak256(abi.encodePacked(msg.sender, prId, block.timestamp, nonce++))`).
+Use **Option A** for the common case (the chain initiator computes the trace ID), with a fallback to Option B when the caller doesn't supply one (the oracle contract generates a random trace ID using `keccak256(abi.encodePacked(msg.sender, bankParticipantId, block.timestamp, nonce++))`).
 
 ---
 
@@ -322,7 +311,7 @@ contract ExecutionTraceLog {
 }
 ```
 
-Each oracle contract calls `traceLog.recordHop(traceId, agentId, "reviewRequested")` in its request and fulfillment functions.
+Each oracle contract calls `traceLog.recordHop(traceId, agentId, "amlReviewRequested")` in its request and fulfillment functions.
 
 ### Usage
 
@@ -337,14 +326,14 @@ for (const hop of hops) {
 ### Integration with oracle contracts
 
 ```solidity
-// CodeReviewerOracle.sol — inside requestReview()
+// AMLOracle.sol — inside requestReview()
 if (address(traceLog) != address(0)) {
-    traceLog.recordHop(traceId, agentId, "reviewRequested");
+    traceLog.recordHop(traceId, agentId, "amlReviewRequested");
 }
 
 // Inside fulfillReview()
 if (address(traceLog) != address(0)) {
-    traceLog.recordHop(traceId, agentId, "reviewFulfilled");
+    traceLog.recordHop(traceId, agentId, "amlReviewFulfilled");
 }
 ```
 
@@ -358,7 +347,7 @@ The `traceLog` address can be set to `address(0)` to disable tracing with no gas
 |---|---|
 | Which agents participated? | Filter events by `traceId` across all oracle contracts |
 | What order did things happen? | `Hop.timestamp` or block number ordering |
-| Did the chain complete? | Check for a terminal event (`PRApproved`, `PRRejected`) with the `traceId` |
+| Did the chain complete? | Check for a terminal event (`OnboardingCompleted`, `OnboardingRejected`) with the `traceId` |
 | Off-chain debugging | `X-Trace-Id` header in MCP server logs — same ID as on-chain |
 | On-chain audit trail | `ExecutionTraceLog.getTrace(traceId)` returns every hop |
 | Compliance / reporting | Single indexed `bytes32` ties together all transactions and events for one workflow run |
@@ -372,18 +361,20 @@ All data emitted and received by oracles is visible on-chain:
 
 | Data | Where it lives |
 |---|---|
-| Review request parameters (`prId`, `focus`, `traceId`) | `ReviewRequested` event + `ReviewRequest` struct in storage |
-| Review result (`summary`, `comments`, `approved`) | `ReviewFulfilled` event + `ReviewResult` struct in storage |
-| Approval request parameters | `ApprovalRequested` event |
-| Approval decision (`approved` / `needs_revision` / `rejected`) | `PRApproved` / `RevisionRequested` / `PRRejected` events |
+| AML request parameters (`flowId`, `bankAgentId`, `clientAgentId`, `traceId`) | `AMLReviewRequested` event + `AMLRequest` struct in storage |
+| AML result (`resultHash`, `cleared`) | `AMLReviewFulfilled` event + result struct in storage |
+| Credit request parameters | `CreditReviewRequested` event |
+| Credit terms / decision | `TermsProposed` / `CreditReviewFulfilled` events |
+| Legal draft / approval | `LegalDraftIssued` / `LegalContractExecuted` events |
+| Client setup steps | `LegalEntitySetup` / `AccountSetup` / `ProductsSetup` events |
 | Which agent fulfilled which request | `agentId` field in every result struct and event |
 | Full execution trace | `ExecutionTraceLog.getTrace(traceId)` |
 
-The `bytes` payloads (summary, comments, reasons) are stored as raw JSON. Any block explorer or ethers.js call can read and decode them:
+The `bytes` payloads (result hashes, reasons) are stored as raw bytes or JSON. Any block explorer or ethers.js call can read and decode them:
 
 ```javascript
-const result = await reviewerOracle.getResultInfo(requestId);
-const comments = JSON.parse(ethers.toUtf8String(result.comments));
+const result = await amlOracle.getResultInfo(requestId);
+const cleared = result.cleared;
 ```
 
 On a private/enterprise chain (Besu, etc.), the full transaction input data is also available, so even the function call parameters are reconstructible from the ledger.
@@ -396,20 +387,24 @@ On a private/enterprise chain (Besu, etc.), the full transaction input data is a
 
 | File | Change |
 |---|---|
-| `CodeReviewerOracle.sol` | Add `traceId` to `requestReview()` and events. `fulfillReview()` reads `traceId` from request storage (not a parameter) to avoid stack-too-deep. Store in structs. Integrate `_recordHop()`. |
-| `CodeApproverOracle.sol` | Add `traceId` to `requestApproval()` and all events. `fulfill*()` functions read `traceId` from storage via `_validateAndSetStatus()`. Integrate `_recordHop()`. |
+| `AMLOracle.sol` | `traceId` embedded in `flowId` passed at request time; propagated through all events. `submitRecommendation()` reads `traceId` from `AMLRequest` storage. Integrate `_recordHop()`. |
+| `CreditRiskOracle.sol` | Same pattern — `traceId` flows from AML phase via same `flowId`. All `fulfill*()` functions read `traceId` from storage. Integrate `_recordHop()`. |
+| `LegalOracle.sol` | Same pattern across draft / markup / execution lifecycle events. |
+| `ClientSetupOracle.sol` | Same pattern across three sequential setup phases. |
 | `ExecutionTraceLog.sol` | **New contract** — deployed alongside oracles, address passed to constructors |
 | `IdentityRegistryUpgradeable.sol` | No changes |
-| `ReputationRegistry.sol` | No changes |
+| `ReputationRegistryUpgradeable.sol` | No changes |
 
 ### Off-chain
 
 | File | Change |
 |---|---|
-| `code-reviewer-bridge.js` | Read `traceId` from event, pass as `X-Trace-Id` header and tool argument. `fulfillReview()` no longer takes `traceId` — contract reads it from storage. |
-| `code-approver-bridge.js` | Same pattern. `fulfill*()` calls no longer take `traceId`. |
-| `code-reviewer-server.js` | Log `traceId` from header/argument on every tool call |
-| `code-approver-server.js` | Same pattern |
+| `aml-bridge.js` | Read `traceId` from event (`flowId`), pass as `X-Trace-Id` header and tool argument. `submitRecommendation()` no longer takes `traceId` — contract reads it from storage. |
+| `credit-risk-bridge.js` | Same pattern. `proposeTerms()` / `fulfillReview()` read `traceId` from storage. |
+| `legal-bridge.js` | Same pattern across draft / markup / execution events. |
+| `client-setup-bridge.js` | Same pattern across three setup phase events. |
+| `aml-server.js` | Log `traceId` from header/argument on every tool call |
+| `credit-risk-server.js` | Same pattern |
 | `deploy-registries.js` | Deploy `ExecutionTraceLog` and pass its address to oracle constructors |
 
 ### Agent cards / MCP specs
@@ -422,7 +417,7 @@ No changes required. The `traceId` is an infrastructure concern — it flows thr
 
 | Priority | Item | Status |
 |---|---|---|
-| High | Add `bytes32 traceId` to `CodeReviewerOracle` and `CodeApproverOracle` request/fulfill functions and events | ✅ Done |
+| High | Add `bytes32 traceId` (as `flowId`) to `AMLOracle`, `CreditRiskOracle`, `LegalOracle`, `ClientSetupOracle` request/fulfill functions and events | ✅ Done |
 | High | Update bridges to propagate `traceId` from event → MCP call → fulfillment tx | ✅ Done |
 | Medium | Implement `ExecutionTraceLog.sol` and integrate with oracle contracts | ✅ Done |
 | Medium | Add `traceId` to MCP server structured logs | ✅ Done |
