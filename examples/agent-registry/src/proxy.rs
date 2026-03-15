@@ -1,5 +1,5 @@
 use crate::models::AppState;
-use crate::tls::build_mtls_client;
+use crate::tls::build_mtls_client_for_proxy;
 use actix_web::{web, HttpRequest, HttpResponse};
 use tracing::error;
 
@@ -17,7 +17,14 @@ pub async fn proxy_handler(
     match forward_request(&req, body, api_https_url.get_ref(), &app_state).await {
         Ok(resp) => resp,
         Err(e) => {
-            error!("mTLS proxy error: {}", e);
+            let mut msg = e.to_string();
+            let mut src = e.source();
+            while let Some(s) = src {
+                msg.push_str("; ");
+                msg.push_str(&s.to_string());
+                src = s.source();
+            }
+            error!("mTLS proxy error: {}", msg);
             HttpResponse::BadGateway()
                 .json(serde_json::json!({"error": format!("mTLS proxy error: {}", e)}))
         }
@@ -35,15 +42,10 @@ async fn forward_request(
         .unwrap_or("/");
     let target_url = format!("{}{}", api_https_url.trim_end_matches('/'), path_and_query);
 
-    // Prefer the pre-built cached client; fall back to building a fresh one if
-    // the cache was not populated at startup (e.g. SPIRE certs arrived later).
-    let owned;
-    let client: &reqwest::Client = if let Some(ref c) = state.proxy_client {
-        c
-    } else {
-        owned = build_mtls_client(&state.spire)?;
-        &owned
-    };
+    // Build a fresh mTLS client per request so we never reuse a connection to the backend.
+    // The backend (actix OpenSSL) often closes the connection after each response; reusing
+    // causes "error sending request" on the second call (e.g. /list after /health).
+    let client = build_mtls_client_for_proxy(&state.spire)?;
 
     let method = reqwest::Method::from_bytes(req.method().as_str().as_bytes())
         .map_err(|e| format!("Unsupported HTTP method '{}': {}", req.method(), e))?;
