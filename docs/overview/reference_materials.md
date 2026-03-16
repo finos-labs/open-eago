@@ -8,4 +8,4 @@
 
 - [Spiffe](https://spiffe.io) - Universal identity control plane for distributed systems
 - [Agntcy](https://agntcy.org) - Building infrastructure for the Internet of Agents
-- [OSAF](https://oasf.io) - Open Agent Safety Framework for secure agent deployment
+- [OASF](https://oasf.io) - Open Agent Schema Framework for secure agent deployment

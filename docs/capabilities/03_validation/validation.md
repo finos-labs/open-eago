@@ -8,11 +8,11 @@ The Validation Agent receives **execution plans** from the Planning Agent, perfo
 
 ## OpenEAGO Specification Integration
 
-The Validation Agent implements **Phase 3 (Validation/Evaluation)** of the six-phase OpenEAGO architecture:
+The Validation Agent implements **Phase 3 (Validation & Compliance)** of the six-phase OpenEAGO architecture:
 
 1. Contract Management → Enriched contracts processed
 2. Planning & Negotiation → **Execution plans received**
-3. **Validation (Evaluation)** ← **Validation Agent (This Component)**
+3. **Validation & Compliance** ← **Validation Agent (This Component)**
 4. Execution ← Approved plans sent to Orchestration Agent
 5. Context Management ← Validation context propagation
 6. Communication ← Audit trail and approval notifications

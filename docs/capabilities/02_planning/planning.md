@@ -16,7 +16,7 @@ The Planning Agent implements **Phase 2 (Planning & Negotiation)** of the six-ph
 
 1. Contract Management → **Enriched contracts received**
 2. **Planning & Negotiation** ← **Planning Agent (This Component)**
-3. Validation (Evaluation) ← Execution plans sent to Validation Agent
+3. Validation & Compliance ← Execution plans sent to Validation Agent
 4. Execution ← Approved plans sent to Orchestration
 5. Context Management ← Plan context propagation
 6. Communication ← Agent discovery and routing
