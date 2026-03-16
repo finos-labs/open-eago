@@ -510,7 +510,7 @@ The new owner must re-bind their own wallet and oracle. This prevents a transfer
 
 | Priority | Item |
 |---|---|
-| High | Python bounds monitor — port `bounds-monitor.js` logic (sliding-window error/success rates, burst detection, timeout detection) to Python to restore full Layer 6/7 dynamic revocation. Node.js runtime archived at git tag `node-js-runtime-archive`. |
+| Medium | Activate prompt hash v1 in `scripts/deploy.js` — `PromptRegistry.setActiveVersion()` not yet called post-deploy |
 | Medium | Add a `deployed-addresses.json` output from deploy scripts so bridges read contract addresses without CLI flags |
 | Medium | Extract `MCPOracle.sol` base contract — `onlyRegisteredOracle` modifier, `requestId` generation, shared 10-layer auth stack — to avoid duplication between `CodeReviewerOracle` and `CodeApproverOracle` |
 | Medium | Replace raw `bytes` payload storage in oracle contracts with `payloadHash` only (prerequisite for cross-bank deployment; see [b2b.agentic.flow.md](./b2b.agentic.flow.md)) |
@@ -532,5 +532,5 @@ The off-chain layer is implemented in Python (`agents_implementation_py/`) using
 
 The Python layer consumes the same on-chain contracts, agent cards (`agents/*.json`), and MCP specs (`agents/mcp/*.mcp.json`). MCP specs carry a `langchain_messages` field (alongside the original `template` field) used by Python servers to build `ChatPromptTemplate` instances. Prompt hash v1 is registered in `scripts/deploy.js` but not yet activated.
 
-> **Bounds monitor gap:** `bounds-monitor.js` (archived with the Node.js runtime) has no Python replacement yet. Python bridges and servers degrade gracefully — if `bounds-state.json` is absent, all tools are assumed enabled. A Python bounds monitor is the primary remaining work item for full Layer 6/7 parity.
+The bounds monitor (`bounds_monitor.py`) runs alongside bridges and servers. It reads `autonomy_bounds` blocks from MCP specs, maintains sliding windows, and writes `bounds-state.json`. Optionally calls `disableTool`/`enableTool` on `AutonomyBoundsRegistry` on-chain. HTTP API on `:9090` (`/report`, `/state`, `/metrics`, `/reset`). Use `--mock` to skip on-chain calls during local development.
 

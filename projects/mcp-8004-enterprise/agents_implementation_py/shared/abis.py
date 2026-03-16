@@ -40,7 +40,28 @@ AUTONOMY_BOUNDS_ABI = [
             {"name": "toolHash",  "type": "bytes32"},
         ],
         "outputs": [{"name": "", "type": "bool"}],
-    }
+    },
+    {
+        "name": "disableTool",
+        "type": "function",
+        "stateMutability": "nonpayable",
+        "inputs": [
+            {"name": "agentId",   "type": "uint256"},
+            {"name": "toolHash",  "type": "bytes32"},
+            {"name": "reason",    "type": "string"},
+        ],
+        "outputs": [],
+    },
+    {
+        "name": "enableTool",
+        "type": "function",
+        "stateMutability": "nonpayable",
+        "inputs": [
+            {"name": "agentId",   "type": "uint256"},
+            {"name": "toolHash",  "type": "bytes32"},
+        ],
+        "outputs": [],
+    },
 ]
 
 ACTION_PERMIT_ABI = [

@@ -211,6 +211,4 @@ Each layer is opt-in. Setting the relevant address to `address(0)` (or omitting 
 
 **Governance relationship:** All ten governance layers (Concepts 1–10) apply. On-chain contracts, MCP spec files (`langchain_messages` field), and `PromptRegistry` hash gates are shared with the on-chain layer. Python bridges pass the same nine-layer governance preflight before every fulfillment transaction.
 
-**Bounds monitor gap:** The Node.js `bounds-monitor.js` (archived) has no Python replacement yet. Python servers degrade gracefully — all tools assumed enabled if `bounds-state.json` is absent. Porting the bounds monitor to Python is the primary remaining work item for full Layer 6/7 parity.
-
-**Status:** Implemented (all 29 modules; deps resolved for Python 3.11+).
+**Status:** Implemented (all 30 modules including `bounds_monitor.py`; deps resolved for Python 3.11+).

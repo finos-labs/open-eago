@@ -59,7 +59,15 @@ Optional bridge flags (also readable from env):
 
 Set `OPENAI_API_KEY` for LLM inference. `VaultSigner` (`shared/vault_signer.py`) supports a local private key or HashiCorp Vault (HSM): set `VAULT_ADDR` + `VAULT_TOKEN` + `VAULT_KEY_NAME`.
 
-> **Bounds monitor:** `bounds-monitor.js` (archived with the Node.js runtime — see git tag `node-js-runtime-archive`) has no Python replacement yet. Python servers degrade gracefully: if `bounds-state.json` is absent, all tools are assumed enabled. Set `BOUNDS_STATE_PATH` to an empty JSON file to suppress the log warning.
+# Bounds monitor (Layers 6 + 7) — run alongside servers and bridges
+python agents_implementation_py/bounds_monitor.py \
+  --rpc http://127.0.0.1:8545 \
+  --privkey 0x<key> \
+  --autonomy-bounds 0x... \
+  --specs-dir agents/mcp
+
+# --mock skips on-chain calls (useful for local dev without a running node)
+python agents_implementation_py/bounds_monitor.py --mock
 
 ## Architecture
 
@@ -135,6 +143,7 @@ contracts/
 | `shared/server_base.py` | FastMCP server factory + `@suspended_when_revoked` decorator |
 | `shared/bridge_base.py` | Bridge bootstrap: web3.py provider/signer, governance preflight, `call_mcp_tool` |
 | `shared/vault_signer.py` | `LocalSigner` / `VaultSigner` — local key or HashiCorp Vault backend |
+| `bounds_monitor.py` | Autonomy bounds monitor: sliding-window metrics → `bounds-state.json` + optional on-chain `disableTool`/`enableTool`; HTTP API on :9090 |
 | `shared/bounds_monitor_client.py` | Reads `bounds-state.json`, POSTs to `:9090/report` (graceful degradation if absent) |
 | `graph/onboarding_graph.py` | LangGraph `StateGraph` for the onboarding orchestrator bridge |
 | `launch_servers.py` | Spawns one server process per `agents/*.json` card |
