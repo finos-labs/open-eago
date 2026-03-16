@@ -510,7 +510,7 @@ The new owner must re-bind their own wallet and oracle. This prevents a transfer
 
 | Priority | Item |
 |---|---|
-| High | Replace stub `review_pr` / `approve_pr` tool handlers with real LLM API calls (Anthropic / OpenAI) |
+| High | Python bounds monitor — port `bounds-monitor.js` logic (sliding-window error/success rates, burst detection, timeout detection) to Python to restore full Layer 6/7 dynamic revocation. Node.js runtime archived at git tag `node-js-runtime-archive`. |
 | Medium | Add a `deployed-addresses.json` output from deploy scripts so bridges read contract addresses without CLI flags |
 | Medium | Extract `MCPOracle.sol` base contract — `onlyRegisteredOracle` modifier, `requestId` generation, shared 10-layer auth stack — to avoid duplication between `CodeReviewerOracle` and `CodeApproverOracle` |
 | Medium | Replace raw `bytes` payload storage in oracle contracts with `payloadHash` only (prerequisite for cross-bank deployment; see [b2b.agentic.flow.md](./b2b.agentic.flow.md)) |
@@ -523,4 +523,14 @@ The new owner must re-bind their own wallet and oracle. This prevents a transfer
 For analysis of extending this architecture to a permissioned inter-institutional blockchain, see [b2b.agentic.flow.md](./b2b.agentic.flow.md).
 
 For the reference implementation of this architecture — an institutional client onboarding flow (bank ↔ hedge fund) with 10 agents across both institutions, parallel AML / Credit / Legal sub-workflows, iterative negotiation, human-in-the-loop approvals, and sequential setup phases — see [onboarding.flow.md](./onboarding.flow.md).
+
+---
+
+## 13. Off-Chain Runtime
+
+The off-chain layer is implemented in Python (`agents_implementation_py/`) using web3.py AsyncWeb3, LangChain LCEL chains (`ChatPromptTemplate | ChatOpenAI.with_structured_output`), and a LangGraph `StateGraph` for the onboarding orchestrator. The Node.js reference implementation has been archived (git tag: `node-js-runtime-archive`).
+
+The Python layer consumes the same on-chain contracts, agent cards (`agents/*.json`), and MCP specs (`agents/mcp/*.mcp.json`). MCP specs carry a `langchain_messages` field (alongside the original `template` field) used by Python servers to build `ChatPromptTemplate` instances. Prompt hash v1 is registered in `scripts/deploy.js` but not yet activated.
+
+> **Bounds monitor gap:** `bounds-monitor.js` (archived with the Node.js runtime) has no Python replacement yet. Python bridges and servers degrade gracefully — if `bounds-state.json` is absent, all tools are assumed enabled. A Python bounds monitor is the primary remaining work item for full Layer 6/7 parity.
 

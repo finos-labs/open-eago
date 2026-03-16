@@ -397,24 +397,28 @@ No off-chain coordination is required for setup sequencing — the chain enforce
 
 ## Off-Chain Component Map
 
+All components are in `agents_implementation_py/` (Python, web3.py + LangChain).
+
 | File | Institution | DMZ tier | Role |
 |---|---|---|---|
-| `aml-server.js` | Bank | Internal | AML screening MCP server |
-| `credit-risk-server.js` | Bank | Internal | Credit assessment MCP server |
-| `legal-server.js` | Bank | Internal | Legal negotiation MCP server |
-| `onboarding-orchestrator-server.js` | Bank | Internal | Flow initiation MCP server |
-| `client-setup-server.js` | Bank | Internal | All 3 setup phases MCP server |
-| `aml-bridge.js` | Bank | DMZ external | Bidirectional; listens for HF document fulfillments |
-| `credit-risk-bridge.js` | Bank | DMZ external | Bidirectional; listens for HF counter-proposals |
-| `legal-bridge.js` | Bank | DMZ external | Bidirectional; listens for HF markups |
-| `onboarding-orchestrator-bridge.js` | Bank | DMZ internal | Submit-only |
-| `client-setup-bridge.js` | Bank | DMZ internal | Submit-only |
-| `hf-document-server.js` | Hedge fund | Internal | Document assembly MCP server |
-| `hf-credit-negotiator-server.js` | Hedge fund | Internal | Credit negotiation MCP server |
-| `hf-legal-server.js` | Hedge fund | Internal | Legal markup MCP server |
-| `hf-document-bridge.js` | Hedge fund | DMZ external | Listens for bank `DataRequested` events |
-| `hf-credit-negotiator-bridge.js` | Hedge fund | DMZ external | Listens for bank `TermsProposed` events |
-| `hf-legal-bridge.js` | Hedge fund | DMZ external | Listens for bank `DraftIssued` events |
+| `servers/aml_server.py` | Bank | Internal | AML screening MCP server |
+| `servers/credit_risk_server.py` | Bank | Internal | Credit assessment MCP server |
+| `servers/legal_server.py` | Bank | Internal | Legal negotiation MCP server |
+| `servers/onboarding_orchestrator_server.py` | Bank | Internal | Flow initiation MCP server |
+| `servers/client_setup_server.py` | Bank | Internal | All 3 setup phases MCP server |
+| `bridges/aml_bridge.py` | Bank | DMZ external | Bidirectional; listens for HF document fulfillments |
+| `bridges/credit_risk_bridge.py` | Bank | DMZ external | Bidirectional; listens for HF counter-proposals |
+| `bridges/legal_bridge.py` | Bank | DMZ external | Bidirectional; listens for HF markups |
+| `bridges/onboarding_orchestrator_bridge.py` | Bank | DMZ internal | Submit-only; runs LangGraph `StateGraph` |
+| `bridges/client_setup_bridge.py` | Bank | DMZ internal | Submit-only |
+| `servers/hf_document_server.py` | Hedge fund | Internal | Document assembly MCP server |
+| `servers/hf_credit_negotiator_server.py` | Hedge fund | Internal | Credit negotiation MCP server |
+| `servers/hf_legal_server.py` | Hedge fund | Internal | Legal markup MCP server |
+| `bridges/hf_document_bridge.py` | Hedge fund | DMZ external | Listens for bank `DataRequested` events |
+| `bridges/hf_credit_negotiator_bridge.py` | Hedge fund | DMZ external | Listens for bank `TermsProposed` events |
+| `bridges/hf_legal_bridge.py` | Hedge fund | DMZ external | Listens for bank `DraftIssued` events |
+
+The orchestrator bridge runs a LangGraph `StateGraph` (see `graph/`) modelling the entire onboarding flow as explicit typed states and conditional edges.
 
 ---
 

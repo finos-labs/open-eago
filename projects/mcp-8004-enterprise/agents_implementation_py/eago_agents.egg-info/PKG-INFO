@@ -1,0 +1,16 @@
+Metadata-Version: 2.4
+Name: eago-agents
+Version: 0.1.0
+Requires-Python: >=3.11
+Requires-Dist: langchain>=0.3
+Requires-Dist: langchain-core>=0.3
+Requires-Dist: langchain-openai>=0.2
+Requires-Dist: langgraph>=0.2
+Requires-Dist: mcp[cli]>=1.0
+Requires-Dist: web3>=7.0
+Requires-Dist: httpx>=0.27
+Requires-Dist: pydantic>=2.0
+Requires-Dist: eth-account>=0.13
+Requires-Dist: typing_extensions>=4.0
+Requires-Dist: starlette>=0.40
+Requires-Dist: uvicorn>=0.30

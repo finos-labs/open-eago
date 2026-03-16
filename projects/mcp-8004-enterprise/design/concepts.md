@@ -196,3 +196,21 @@ The MCP spec gains an optional `action_permits` block per tool (following the sa
 | Risk Management | Action-level authorization | `ActionPermitRegistry` (on-chain) + runtime action gateway (off-chain) | Is this agent permitted to perform **this specific action** on this external system in this flow? |
 
 Each layer is opt-in. Setting the relevant address to `address(0)` (or omitting it from the deploy) disables that layer with no gas overhead beyond a single `ISZERO` check.
+
+---
+
+## Concept 11: Python Off-Chain Runtime (LangChain / LangGraph)
+
+**What it is:** The off-chain stack in `agents_implementation_py/` — the sole runtime since the Node.js reference implementation was archived (git tag: `node-js-runtime-archive`). Implements real LLM inference via LangChain LCEL chains and models the multi-phase onboarding flow as a LangGraph `StateGraph`.
+
+**Key components:**
+- 8 FastMCP servers using `ChatPromptTemplate | ChatOpenAI.with_structured_output(PydanticModel)` chains
+- 8 web3.py bridges using `AsyncWeb3` event polling (2-second loop)
+- `onboarding_orchestrator_bridge.py`: LangGraph `StateGraph` with fan-out (parallel AML/Credit/Legal) → phase-gate → sequential client setup; `interrupt()` + `Command(resume=True)` for event-driven waiting
+- `shared/prompt_hash.py`: `json.dumps(messages, separators=(',',':'))` — byte-identical keccak256 hash with `PromptRegistry` v1
+
+**Governance relationship:** All ten governance layers (Concepts 1–10) apply. On-chain contracts, MCP spec files (`langchain_messages` field), and `PromptRegistry` hash gates are shared with the on-chain layer. Python bridges pass the same nine-layer governance preflight before every fulfillment transaction.
+
+**Bounds monitor gap:** The Node.js `bounds-monitor.js` (archived) has no Python replacement yet. Python servers degrade gracefully — all tools assumed enabled if `bounds-state.json` is absent. Porting the bounds monitor to Python is the primary remaining work item for full Layer 6/7 parity.
+
+**Status:** Implemented (all 29 modules; deps resolved for Python 3.11+).

@@ -267,3 +267,11 @@ State is persisted in `agents_implementation/bounds-state.json`, written by `bou
   }
 }
 ```
+
+---
+
+## MCP spec field usage
+
+The `langchain_messages` field added to 6 MCP spec prompts is silently ignored by compliant MCP clients (it is not part of the standard prompt schema). Python servers read it via `shared/prompt_hash.load_langchain_messages()` to build `ChatPromptTemplate` instances. The `"template"` field is retained for backwards compatibility with any MCP client that reads it directly.
+
+The `autonomy_bounds` and `action_permits` extension blocks are consumed by the Python `@suspended_when_revoked` decorator (reads `bounds-state.json`, with graceful degradation if absent) and by `governance_preflight()` in `bridge_base.py`.
