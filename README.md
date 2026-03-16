@@ -45,12 +45,12 @@ OpenEAGO orchestrates multi-agent workflows through a comprehensive architecture
 
 **Specification:**
 
-- **Contract** - The contract validates inputs, establishes terms, and manages agent capabilities.
-- **Planning** - The system discovers optimal agents, determines the execution pattern, and creates a comprehensive execution plan.
-- **Negotiation** - Plan validation with required Authorization, SLA/SLO, Cross-border Data Clearance, KYC Check, AML Check, Policy Compliance, Credit Risk etc.
-- **Execution** - The orchestrator runs tasks according to the plan, managing dependencies and context propagation.
-- **Context** - Agents' progress and states are captured and maintained across session, conversation, and agent layers.
-- **Communication** - Agents communicate using standardized formats, ensuring interoperability and context sharing.
+- **Contract Management** - Validates inputs, establishes terms, and manages agent capabilities.
+- **Planning & Negotiation** - Discovers optimal agents, determines the execution pattern, and performs negotiation (authorization, SLA/SLO feasibility, cross-border data clearance, KYC, AML, policy constraints, credit risk).
+- **Validation & Compliance** - Validates the execution plan against policy, risk, and regulatory requirements, including Human-in-the-Loop approval where required.
+- **Execution & Resilience** - Runs tasks according to the plan with resilience controls, managing dependencies, fallbacks, and compensating actions.
+- **Context & State Management** - Captures and maintains hierarchical state across session, conversation, agent, and task layers.
+- **Communication & Delivery** - Delivers messages using standardized formats with routing integrity, security, and audit anchoring.
 
 ## Prerequisites
 
@@ -140,7 +140,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed contribution guidelines.
 
 ## License & Legal
 
-- **Copyright** 2025 FINOS
+- **Copyright** 2026 FINOS
 - **License** [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0)
 - **SPDX-License-Identifier** [Apache-2.0](https://spdx.org/licenses/Apache-2.0)
 

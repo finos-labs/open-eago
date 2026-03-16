@@ -14,11 +14,11 @@ Agent identity encapsulates a unique, verifiable profile for each agent, analogo
 
 OpenEAGO adopts a decentralized approach to identity management, avoiding single points of failure. This approach is essential for scalable banking deployments spanning multiple organizations. The framework embeds identity as a trust layer, facilitating secure discovery, communication, and transparency. The Identity component supports onboarding, creation, and verification of identities for agents, Model Context Protocol (MCP) servers, and Multi-Agent Systems (MASs), leveraging decentralized technologies for trustworthy interactions.
 
-## Three-Level Authentication Architecture
+## Three-Tier Authentication Scope Model
 
-The OpenEAGO framework implements a comprehensive three-level authentication system to ensure security and prevent malicious access at different layers, aligning with the enterprise-grade security requirements outlined in the overall architecture.
+The OpenEAGO framework implements a comprehensive three-tier authentication **scope** model to ensure security and prevent malicious access at different layers of the request path, aligning with the enterprise-grade security requirements outlined in the overall architecture. This scope model is orthogonal to the four-level authentication **strength** matrix (Level&nbsp;1–4) defined in `SPECIFICATION.md` §6.2, which describes credential and assurance strength rather than where checks are applied.
 
-### Level 1: Agent-to-Registry Authentication
+### Tier 1: Agent-to-Registry Authentication
 
 **Purpose**: Eliminate malicious agents from entering the system
 
@@ -26,7 +26,7 @@ The OpenEAGO framework implements a comprehensive three-level authentication sys
 - **Threat prevention**: Prevents rogue, compromised, or unauthorized AI agents from registering and offering services
 - **Authentication method**: Mutual TLS (mTLS) with CA-issued certificates and capability validation using SPIRE/SPIFFE identity framework
 
-### Level 2: User/App-to-Framework Authentication
+### Tier 2: User/App-to-Framework Authentication
 
 **Purpose**: Prevent malicious applications from accessing the framework
 
@@ -34,7 +34,7 @@ The OpenEAGO framework implements a comprehensive three-level authentication sys
 - **Threat prevention**: Prevents malicious applications, unauthorized users, or compromised clients from making requests
 - **Authentication method**: OAuth2/OIDC with JWT tokens, role-based access control (RBAC), and client certificate validation
 
-### Level 3: Task-to-Contract/Planner Authorization
+### Tier 3: Task-to-Contract/Planner Authorization
 
 **Purpose**: Decide if user/app has permission to run specific tasks
 
@@ -571,23 +571,23 @@ Proactive monitoring via the Observability SDK detects anomalies, aligning with 
      }
 ```
 
-## Security Benefits of Three-Level Authentication
+## Security Benefits of the Three-Tier Scope Model
 
-### Level 1 Benefits (Agent-to-Registry)
+### Tier 1 Benefits (Agent-to-Registry)
 
 - **Prevents rogue agents**: Malicious or compromised AI agents cannot register
 - **Capability validation**: Only agents with verified capabilities can offer services
 - **Continuous monitoring**: Behavioral analysis detects compromised agents post-registration
 - **Certificate-based trust**: Strong cryptographic identity using SPIFFE IDs for all agents
 
-### Level 2 Benefits (User/App-to-Framework)
+### Tier 2 Benefits (User/App-to-Framework)
 
 - **Application verification**: Only trusted client applications can access the framework
 - **User authentication**: Multi-factor authentication prevents unauthorized access
 - **Request integrity**: Digital signatures prevent request tampering
 - **Rate limiting**: Prevents abuse and DoS attacks from malicious applications
 
-### Level 3 Benefits (Task-to-Contract/Planner)
+### Tier 3 Benefits (Task-to-Contract/Planner)
 
 - **Fine-grained control**: Precise permission control for specific tasks and resources
 - **Principle of least privilege**: Users can only execute tasks they are specifically authorized for

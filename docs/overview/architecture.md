@@ -88,9 +88,9 @@ Contract → Capability Discovery → Agent Selection → Execution Planning →
 - **Planning Strategy**: Sequential, Parallel, or Mixed execution patterns
 - **Assignment Logic**: Primary agent + fallback options with load balancing
 
-### Phase 3: Validation (Evaluation)
+### Phase 3: Validation & Compliance
 
-**Purpose**: Human-in-the-loop or automated review checkpoint
+**Purpose**: Human-in-the-loop or automated review checkpoint for validation and compliance
 
 **Components**:
 
@@ -464,7 +464,7 @@ The OpenEAGO logical architecture provides a comprehensive six-phase framework f
 
 1. **Contract**: Secure validation and processing gateway
 2. **Planning**: Intelligent agent discovery and workflow optimization
-3. **Validation**: Risk assessment and approval checkpoint
+3. **Validation & Compliance**: Risk, policy, and regulatory validation checkpoint
 4. **Execution**: Orchestrated multi-agent workflow coordination
 5. **Context**: Hierarchical state and lineage management
 6. **Communication**: Secure, compliant message exchange

@@ -17,7 +17,7 @@ The keywords **MUST**, **MUST NOT**, **REQUIRED**, **SHOULD**, **SHOULD NOT**, a
 ### 2.2 Core Terms
 
 - **OpenEAGO**: The open standard specification and governance umbrella.
-- ****: Specification shorthand used in technical fields and payload labels.
+- **EAGO**: Specification shorthand used in technical fields and payload labels.
 - **OASF**: Open Agent Schema Framework.
 - **ACU**: Assumed Cost Unit, a normalized non-currency planning unit for comparative cost/risk estimation.
 - **Context Hierarchy**: Ordered context levels: `session` → `conversation` → `agent` → `task`.

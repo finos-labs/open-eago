@@ -12,7 +12,7 @@ The Contract Agent implements **Phase 1 (Contract Management)** of the six-phase
 
 1. **Contract Management** ← **Contract Agent (This Component)**
 2. Planning & Negotiation ← Enriched contracts sent to Planner Agent
-3. Validation (Evaluation) ← Plan review and approval
+3. Validation & Compliance ← Plan review, risk assessment, and compliance validation
 4. Execution ← Orchestrated multi-agent workflow
 5. Context Management ← Hierarchical state preservation
 6. Communication ← Secure message exchange and audit

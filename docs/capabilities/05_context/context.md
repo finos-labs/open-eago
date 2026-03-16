@@ -12,7 +12,7 @@ The Context Agent implements **Phase 5 (Context Management)** of the six-phase O
 
 1. Contract Management → Session and Conversation context initialization
 2. Planning & Negotiation → Plan context creation and management  
-3. Validation (Evaluation) → Validation context tracking
+3. Validation & Compliance → Validation context tracking
 4. Execution → **Execution results and state updates received**
 5. **Context Management** ← **Context Agent (This Component)**
 6. Communication ← Context-aware response generation and state propagation
