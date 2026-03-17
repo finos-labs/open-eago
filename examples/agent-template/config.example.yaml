@@ -1,0 +1,68 @@
+# OpenEAGO RPC Agent — Example Configuration
+# Copy to config.yaml and adjust for your environment.
+# Reference: SPECIFICATION.md, spec/v0.1.0/spec.json
+
+server:
+  host: "127.0.0.1"
+  port: 9000                    # MCP JSON-RPC over HTTP/SSE or stdio
+  transport: "stdio"             # "stdio" | "sse" | "streamable-http"
+
+# OpenEAGO metadata — aligns with spec/v0.1.0/spec.json and agent registry
+metadata:
+  name: "open-eago-mcp-agent"
+  version: "0.1.0"
+  description: "RPC agent template compliant with OpenEAGO phases and EAGO envelope"
+  spec_version: "0.1.0"
+  eago_phases:
+    - contract_management
+    - planning_negotiation
+    - validation_compliance
+    - execution_resilience
+    - context_state_management
+    - communication_delivery
+  capabilities: []              # e.g. ["input_validation", "compliance_validation"]
+  tags:
+    - "open-eago"
+    - "mcp"
+    - "rpc"
+
+# Agent registration (for OpenEAGO Agent Registry integration)
+agent:
+  instance_id: null
+  capability_codes: []
+  version: "0.1.0"
+  jurisdiction: null
+  data_center: null
+  compliance: []
+  reliability: 0.99
+  health_status: "healthy"
+  uptime_percentage: null
+  endpoints:
+    http: null
+    https: null
+    grpc: null
+    websocket: null
+    custom: {}
+  resource_limits: {}
+  tags: {}
+
+# MCP server — standard MCP 1.0 + OpenEAGO extensions
+mcp:
+  protocol_version: "2024-11-05"
+  schema: "https://modelcontextprotocol.io/schema/v1/server.json"
+  # OpenEAGO extensions (see README: comparison with MCP, what was extended)
+  eago_envelope: true            # Wrap requests/responses in EAGO base envelope
+  phase_header: "X-EAGO-Phase"   # Optional phase context header
+  risk_context_header: "X-EAGO-Risk-Context"  # Propagate risk_context when present
+
+# SPIRE mTLS (required for production). Override paths via SPIRE_CERT_PATH, SPIRE_KEY_PATH, SPIRE_BUNDLE_PATH.
+spire:
+  enabled: true
+  cert_path: /tmp/svid.0.pem
+  key_path: /tmp/svid.0.key
+  bundle_path: /tmp/bundle.0.pem
+
+# Optional: bootstrap URLs for self-registration with agent-registry
+bootstrap:
+  urls: []
+  sync_interval: 30

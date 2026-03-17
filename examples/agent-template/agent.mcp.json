@@ -1,0 +1,48 @@
+{
+  "$schema": "https://modelcontextprotocol.io/schema/v1/server.json",
+  "name": "open-eago-mcp-agent",
+  "version": "0.1.0",
+  "open_eago": {
+    "spec_version": "0.1.0",
+    "eago_phases": [
+      "contract_management",
+      "planning_negotiation",
+      "validation_compliance",
+      "execution_resilience",
+      "context_state_management",
+      "communication_delivery"
+    ],
+    "base_envelope": {
+      "message_id": "required",
+      "phase": "required",
+      "timestamp": "required",
+      "payload": "required",
+      "metadata": "optional"
+    }
+  },
+  "tools": [
+    {
+      "name": "eago_health",
+      "description": "OpenEAGO liveness and phase capability check. Returns agent metadata and supported phases.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "phase": {
+            "type": "string",
+            "enum": [
+              "contract_management",
+              "planning_negotiation",
+              "validation_compliance",
+              "execution_resilience",
+              "context_state_management",
+              "communication_delivery"
+            ],
+            "description": "Optional phase to report support for."
+          }
+        }
+      }
+    }
+  ],
+  "resources": [],
+  "prompts": []
+}

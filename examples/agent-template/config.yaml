@@ -1,0 +1,76 @@
+# Demo config: RPC agent with SPIRE mTLS and registry registration.
+# Run SPIRE and fetch SVID to /tmp (or set SPIRE_CERT_PATH, SPIRE_KEY_PATH, SPIRE_BUNDLE_PATH).
+# Registry: run with mTLS (no --allow-insecure); use https in bootstrap.urls.
+
+server:
+  host: "127.0.0.1"
+  port: 9000
+  transport: "streamable-http"
+
+metadata:
+  name: "open-eago-mcp-agent"
+  version: "0.1.0"
+  description: "Demo RPC agent (Python, SPIRE mTLS)"
+  spec_version: "0.1.0"
+  eago_phases:
+    - contract_management
+    - planning_negotiation
+    - validation_compliance
+    - execution_resilience
+    - context_state_management
+    - communication_delivery
+  # NOTE: capability identifiers are free-form in this example. Prefer stable, namespaced tokens.
+  capabilities: ["tool:eago_health", "tool:agent_info", "http:execute"]
+  tags: ["open-eago", "mcp", "rpc", "demo", "mtls", "spire"]
+
+agent:
+  instance_id: "demo-agent-001"
+  capability_codes: ["tool:eago_health", "tool:agent_info", "http:execute"]
+  version: "0.1.0"
+  jurisdiction: "EU-WEST"
+  data_center: "GCP-EUC1"
+  # Semi-controlled vocabulary (strings) for registry metadata.
+  # Prefixes let you standardize meaning without needing a global enum.
+  #   - Reg:*       regulatory / legal regime
+  #   - Data:*      data classification handled by this agent
+  #   - Control:*   implemented controls
+  #   - Residency:* residency constraints
+  #   - Retention:* retention policy
+  compliance:
+    - "Reg:GDPR"
+    - "Data:PII"
+    - "Control:EncryptionInTransit:mTLS"
+    - "Residency:EU"
+  reliability: 0.99
+  health_status: "healthy"
+  uptime_percentage: null
+  endpoints:
+    # The registry address is authoritative; these are advisory hints for clients.
+    http: null
+    https: null
+    grpc: null
+    websocket: null
+    custom: {}
+  resource_limits:
+    max_requests_per_second: 50
+    max_connections: 100
+  tags:
+    env: "demo"
+    owner: "open-eago"
+    data_sensitivity: "pii"
+
+mcp:
+  protocol_version: "2024-11-05"
+  eago_envelope: false
+
+# SPIRE mTLS: required for production. Paths overridable via env (SPIRE_CERT_PATH, etc.).
+spire:
+  enabled: true
+  cert_path: /tmp/svid.0.pem
+  key_path: /tmp/svid.0.key
+  bundle_path: /tmp/bundle.0.pem
+
+# Registry: use https when registry runs with mTLS.
+bootstrap:
+  urls: ["https://127.0.0.1:8443"]
+  sync_interval: 30
