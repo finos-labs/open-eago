@@ -86,7 +86,7 @@ Permits are keyed by `keccak256(abi.encodePacked(flowId, agentId, actionType))` 
 
 ### 10.3 Off-Chain: Runtime Action Gateway
 
-The runtime gateway sits between the agent's tool invocation and the external system. It is implemented as a middleware layer in the existing bridge TypeScript code.
+The runtime gateway sits between the agent's tool invocation and the external system. It is implemented as middleware in `agents_implementation_py/shared/bridge_base.py` (`governance_preflight`).
 
 #### Action Classification Engine
 
@@ -152,7 +152,7 @@ Following the pattern established by Concept 7 (`autonomy_bounds`) and Concept 8
 }
 ```
 
-`sync-autonomy-bounds.js` is extended to read `action_permits` blocks and call `registerPattern` and `grantPermit` on `ActionPermitRegistry` during deployment.
+`scripts/deploy.js` is extended to read `action_permits` blocks and call `registerPattern` and `grantPermit` on `ActionPermitRegistry` during deployment.
 
 ### 10.5 Signal Integration
 
@@ -161,8 +161,8 @@ Action-level authorization emits signals that integrate with the existing Concep
 | Signal Type | Trigger | Effect |
 |-------------|---------|--------|
 | **Violation** | Agent attempts a Tier 3 action or a Tier 1/2 action without a permit | Reputation score reduction via `ReputationRegistryUpgradeable`. If score drops below threshold, `ReputationGate` blocks further capability use. |
-| **Escalation** | Tier 2 action pending multi-agent or human approval | `bounds-monitor.js` emits an escalation event. The flow is paused for the specific tool invocation (not the entire flow). Other tools remain operational. |
-| **Anomaly** | Agent issues an unusual volume of action requests, or repeatedly attempts forbidden actions | Feeds into the existing burst detection in `bounds-monitor.js`. Repeated violations trigger `disableTool()` via `AutonomyBoundsRegistry`. |
+| **Escalation** | Tier 2 action pending multi-agent or human approval | `bounds_monitor.py` emits an escalation event. The flow is paused for the specific tool invocation (not the entire flow). Other tools remain operational. |
+| **Anomaly** | Agent issues an unusual volume of action requests, or repeatedly attempts forbidden actions | Feeds into the existing burst detection in `bounds_monitor.py`. Repeated violations trigger `disableTool()` via `AutonomyBoundsRegistry`. |
 
 Violation signals are recorded on-chain via the `ActionBlocked` event, which includes the `flowId`, `agentId`, `actionType`, and `tier`. This is auditable alongside all other governance events.
 
@@ -213,7 +213,7 @@ A configurable timeout (from the MCP spec `action_permits.approval_timeout_secon
 | **C4 (Reputation Gating)** | Violation signals reduce reputation scores; reputation thresholds can block agents who repeatedly violate action permits |
 | **C5 (Prompt Governance)** | Orthogonal — prompts govern what the agent is told to do; action permits govern what it is allowed to do |
 | **C6 (Dataset Control)** | Orthogonal — dataset governance controls inputs; action permits control outputs |
-| **C7 (Dynamic Autonomy)** | Violation and anomaly signals feed into the same `bounds-monitor.js` and `AutonomyBoundsRegistry`; repeated action violations trigger `disableTool()` |
+| **C7 (Dynamic Autonomy)** | Violation and anomaly signals feed into the same `bounds_monitor.py` and `AutonomyBoundsRegistry`; repeated action violations trigger `disableTool()` |
 | **C8 (Flow Anomaly Detection)** | Repeated blocked actions within a flow contribute to burst detection thresholds |
 | **C9 (Card Integrity)** | Orthogonal — card hash validates identity; action permits validate behavior |
 

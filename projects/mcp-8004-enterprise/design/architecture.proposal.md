@@ -500,7 +500,7 @@ The new owner must re-bind their own wallet and oracle. This prevents a transfer
 
 | Item | Notes |
 |---|---|
-| `deploy-registries.js` deploying oracles with identity registry address | Done; `register-mocks.js` also wires cards and oracle addresses in one script |
+| `scripts/deploy.js` deploying oracles, wiring cards and oracle addresses | Done |
 | Bridges pass `agentId` on every `fulfill*()` call | Done; agentId is stored in every result struct |
 | 10-layer governance stack | Flow authorization, reputation gating, prompt governance, dataset control, autonomy bounding, flow anomaly detection, card integrity, action-level authorization — all implemented; see [concepts.md](./concepts.md) |
 | MCP spec extensions (`autonomy_bounds`, `action_permits`) | Documented in [mcp.extension.md](./mcp.extension.md) |

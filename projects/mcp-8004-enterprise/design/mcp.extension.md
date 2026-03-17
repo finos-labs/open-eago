@@ -15,9 +15,9 @@ Three extension blocks have been added, introduced across Concepts 7, 8, and 10 
 
 | Block | Concept | Introduced | Consumed by |
 |---|---|---|---|
-| `autonomy_bounds` (reputation, anomaly, performance) | 7 | 2026-02-28 | `bounds-monitor.js`, `sync-autonomy-bounds.js` |
-| `autonomy_bounds.flow` | 8 | 2026-03-02 | `bounds-monitor.js`, `sync-autonomy-bounds.js` |
-| `action_permits` | 10 | 2026-03-06 | `action-gateway.js`, `bounds-monitor.js` |
+| `autonomy_bounds` (reputation, anomaly, performance) | 7 | 2026-02-28 | `bounds_monitor.py`, `scripts/deploy.js` |
+| `autonomy_bounds.flow` | 8 | 2026-03-02 | `bounds_monitor.py`, `scripts/deploy.js` |
+| `action_permits` | 10 | 2026-03-06 | `shared/bridge_base.py` (`governance_preflight`), `bounds_monitor.py` |
 
 ---
 
@@ -63,7 +63,7 @@ Three extension blocks have been added, introduced across Concepts 7, 8, and 10 
 | `tag` | string | Capability tag used to filter `ReputationRegistry` entries |
 | `action` | `"revoke"` | Action taken when the threshold is violated |
 
-Consumed by `sync-autonomy-bounds.js` to call `ReputationGate.setThreshold(capability, minScore, scoreDecimals, minCount, tag)` on deployment.
+Consumed by `scripts/deploy.js` to call `ReputationGate.setThreshold(capability, minScore, scoreDecimals, minCount, tag)` on deployment.
 
 #### `anomaly` — off-chain sliding window
 
@@ -74,7 +74,7 @@ Consumed by `sync-autonomy-bounds.js` to call `ReputationGate.setThreshold(capab
 | `window_requests` | integer | Rolling window size in number of requests |
 | `action` | `"revoke"` | Action taken: calls `AutonomyBoundsRegistry.disableTool()` |
 
-Tracked by `bounds-monitor.js` per agent. When the window ratio exceeds `max_error_rate_pct`, the monitor calls `disableTool()`.
+Tracked by `bounds_monitor.py` per agent. When the window ratio exceeds `max_error_rate_pct`, the monitor calls `disableTool()`.
 
 #### `performance` — off-chain sliding window
 
@@ -85,7 +85,7 @@ Tracked by `bounds-monitor.js` per agent. When the window ratio exceeds `max_err
 | `window_requests` | integer | Rolling window size in number of requests |
 | `action` | `"revoke"` | Action taken when threshold is violated |
 
-Same monitoring mechanism as `anomaly`, using the complement metric (success rate instead of error rate).
+Same monitoring mechanism as `anomaly` (tracked by `bounds_monitor.py`), using the complement metric (success rate instead of error rate).
 
 ---
 
@@ -116,9 +116,9 @@ Same monitoring mechanism as `anomaly`, using the complement metric (success rat
 | `response_timeout_seconds` | integer | Timeout: seconds allowed between an oracle request event and its fulfillment |
 | `action` | `"revoke"` | Action taken: calls `disableTool()` on violation |
 
-**On-chain configuration** (`sync-autonomy-bounds.js`): reads `max_hops` and `loop_detection` and calls them on `ExecutionTraceLog` if `TRACE_LOG_ADDRESS` is set.
+**On-chain configuration** (`scripts/deploy.js`): reads `max_hops` and `loop_detection` and calls them on `ExecutionTraceLog`.
 
-**Off-chain monitoring** (`bounds-monitor.js`): tracks burst windows per agent using `max_requests_per_minute`; tracks pending requests with a timeout map using `response_timeout_seconds`; calls `disableTool()` on violation.
+**Off-chain monitoring** (`bounds_monitor.py`): tracks burst windows per agent using `max_requests_per_minute`; tracks pending requests with a timeout map using `response_timeout_seconds`; calls `disableTool()` on violation.
 
 ---
 
@@ -142,7 +142,7 @@ Same monitoring mechanism as `anomaly`, using the complement metric (success rat
 | `tool_action` | string | Pattern ID matching an entry in `action-patterns.json` (e.g. `"PR:APPROVE"`, `"SQL:DROP"`) |
 | `default_tier` | 0–3 | Default authorization tier for this tool's action (see tier table below) |
 | `approval_timeout_seconds` | integer | Tier 2 multi-sig: how long to poll for approvals before timing out |
-| `violation_threshold` | integer | Number of `ActionBlocked` events before `bounds-monitor.js` calls `disableTool()` |
+| `violation_threshold` | integer | Number of `ActionBlocked` events before `bounds_monitor.py` calls `disableTool()` |
 
 ### Action tiers
 
@@ -163,7 +163,7 @@ Same monitoring mechanism as `anomaly`, using the complement metric (success rat
 
 `actionType` is `keccak256(bytes(tool_action))` — e.g. `keccak256("PR:APPROVE")`.
 
-### Off-chain component — `action-gateway.js`
+### Off-chain component — `bridge_base.py` (`governance_preflight`)
 
 `ActionGateway` reads `tool_action` from `action_permits` and `action-patterns.json` at startup:
 
@@ -173,7 +173,7 @@ Same monitoring mechanism as `anomaly`, using the complement metric (success rat
 
 ### Violation escalation
 
-`bounds-monitor.js` watches `ActionBlocked(traceId, agentId, actionType)` events emitted by oracle contracts when `validateAction` returns false. Each event increments a per-agent-per-tool counter; when the counter reaches `violation_threshold`, the monitor calls `AutonomyBoundsRegistry.disableTool()`.
+`bounds_monitor.py` watches `ActionBlocked(traceId, agentId, actionType)` events emitted by oracle contracts when `validateAction` returns false. Each event increments a per-agent-per-tool counter; when the counter reaches `violation_threshold`, the monitor calls `AutonomyBoundsRegistry.disableTool()`.
 
 ---
 
@@ -214,7 +214,7 @@ Calling a suspended tool returns a JSON-RPC error:
 
 Error code `-32001` is in the application-defined error range (MCP standard reserves `-32000` to `-32099` for implementation-defined errors).
 
-State is persisted in `agents_implementation/bounds-state.json`, written by `bounds-monitor.js` and read by MCP servers on each `tools/list` and `tools/call` request.
+State is persisted in `agents_implementation_py/bounds-state.json`, written by `bounds_monitor.py` and read by MCP servers on each `tools/list` and `tools/call` request.
 
 ---
 

@@ -127,10 +127,10 @@ Per-tool extension blocks sit alongside the standard `inputSchema` and `outputSc
 
 | Sub-signal | Fields | On-chain effect | Off-chain effect | §5 Layer |
 |---|---|---|---|---|
-| `reputation` | `min_score`, `min_score_decimals`, `min_feedback_count`, `tag` | `ReputationGate.setThreshold()` via `sync-autonomy-bounds.js` | Gate checked at every oracle invocation | 3 |
-| `anomaly` | `max_error_rate_pct`, `window_requests` | - | `bounds-monitor.js` calls `disableTool()` when window ratio exceeded | 6 |
+| `reputation` | `min_score`, `min_score_decimals`, `min_feedback_count`, `tag` | `ReputationGate.setThreshold()` via `scripts/deploy.js` | Gate checked at every oracle invocation | 3 |
+| `anomaly` | `max_error_rate_pct`, `window_requests` | - | `bounds_monitor.py` calls `disableTool()` when window ratio exceeded | 6 |
 | `performance` | `min_success_rate_pct`, `window_requests` | - | Same monitor, complement metric | 6 |
-| `flow` | `max_hops`, `loop_detection`, `max_requests_per_minute`, `response_timeout_seconds` | `ExecutionTraceLog.setMaxHops()` + `setLoopDetection()` via `sync-autonomy-bounds.js` | Monitor enforces burst and timeout limits | 7 |
+| `flow` | `max_hops`, `loop_detection`, `max_requests_per_minute`, `response_timeout_seconds` | `ExecutionTraceLog.setMaxHops()` + `setLoopDetection()` via `scripts/deploy.js` | Monitor enforces burst and timeout limits | 7 |
 
 **`action_permits`** - per-tool action classification driving `ActionPermitRegistry` (§5 Layer 9):
 
@@ -139,8 +139,8 @@ Per-tool extension blocks sit alongside the standard `inputSchema` and `outputSc
 | `classification` | Human-readable category (`"pr_action"`, `"sql_action"`) |
 | `tool_action` | Pattern ID matched in `action-patterns.json` (e.g. `"PR:APPROVE"`, `"SQL:DROP"`) |
 | `default_tier` | 0 = read-only, 1 = reversible, 2 = destructive/multi-sig, 3 = forbidden |
-| `approval_timeout_seconds` | Tier 2: how long `action-gateway.js` polls for multi-sig approval |
-| `violation_threshold` | `ActionBlocked` event count before `bounds-monitor.js` calls `disableTool()` |
+| `approval_timeout_seconds` | Tier 2: how long `governance_preflight()` polls for multi-sig approval |
+| `violation_threshold` | `ActionBlocked` event count before `bounds_monitor.py` calls `disableTool()` |
 
 ### 3.3 MCP Protocol Extensions (Server-Side Behavior)
 
@@ -153,11 +153,11 @@ Two protocol-level additions are consumed by ERC-8004-aware clients; standard MC
 
 **`tools/call` response** - calling a suspended tool returns JSON-RPC error code `-32001` (in the application-defined range; MCP reserves -32000 to -32099).
 
-Suspension state is persisted in `bounds-state.json`, written by `bounds-monitor.js` and read by MCP servers on every request. Both additions are the client-visible surface of §5 Layers 6 and 7.
+Suspension state is persisted in `bounds-state.json`, written by `bounds_monitor.py` and read by MCP servers on every request. Both additions are the client-visible surface of §5 Layers 6 and 7.
 
 #### 3.3.1 The Bounds Monitor
 
-`bounds-monitor.js` is a shared sidecar process that runs alongside both the Node.js and Python oracle bridges. It is the sole writer of `bounds-state.json` and the sole caller of `disableTool` / `enableTool` on `AutonomyBoundsRegistry`. Its inputs are tool call outcome reports submitted by bridges via a local HTTP control API (`POST /report`); its outputs are a state file read by every MCP server and, when on-chain governance is configured, transactions to `AutonomyBoundsRegistry`. Both runtimes consume this shared service: Python bridges report via `shared/bounds_monitor_client.py`, which POSTs to the same `:9090/report` endpoint, and Python MCP servers read `bounds-state.json` through the `@suspended_when_revoked` decorator in `server_base.py`.
+`bounds_monitor.py` is a sidecar process that runs alongside the oracle bridges. It is the sole writer of `bounds-state.json` and the sole caller of `disableTool` / `enableTool` on `AutonomyBoundsRegistry`. Its inputs are tool call outcome reports submitted by bridges via a local HTTP control API (`POST /report`); its outputs are a state file read by every MCP server and, when on-chain governance is configured, transactions to `AutonomyBoundsRegistry`. Bridges report via `shared/bounds_monitor_client.py`, which POSTs to the `:9090/report` endpoint; MCP servers read `bounds-state.json` through the `@suspended_when_revoked` decorator in `server_base.py`.
 
 The report contract is minimal: `{ toolName, success, latencyMs }`. A bridge submits one report after each oracle fulfillment cycle completes, setting `success: false` on any exception (MCP error, contract revert, network failure) and supplying the wall-clock latency of the MCP server round-trip. The monitor does not need visibility into fulfillment transaction outcomes; it observes the quality of the tool execution, not the on-chain settlement.
 
@@ -219,11 +219,9 @@ Agent Card  (agents/*.json)
   └── mcpSpec ──► agents/mcp/*.mcp.json
                     ├── Solidity Oracle  (contracts/oracles/)
                     │     on-chain request / fulfillment lifecycle
-                    ├── MCP Server  (agents_implementation/*-server.js
-                    │               agents_implementation_py/servers/*_server.py)
+                    ├── MCP Server  (agents_implementation_py/servers/*_server.py)
                     │     off-chain tool handler
-                    └── Oracle Bridge  (agents_implementation/*-bridge.js
-                                        agents_implementation_py/bridges/*_bridge.py)
+                    └── Oracle Bridge  (agents_implementation_py/bridges/*_bridge.py)
                           event watcher + fulfillment tx submitter
 ```
 
@@ -275,7 +273,7 @@ mapping(bytes32 => Hop[]) private _trace;
 
 Oracle contracts call `ExecutionTraceLog.recordHop(traceId, agentId, actionName)` at each fulfillment step. Because the log is append-only and stored on-chain, it provides a tamper-evident, cross-institutional, immutable record of every agent action in the workflow. Any party with access to the chain - including regulators, auditors, and counterparty institutions - can call `getTrace(traceId)` and retrieve the complete ordered sequence of who did what and when, without relying on any institution's self-reported logs.
 
-The trace log also serves as the foundation for flow anomaly detection (Layer 7): the contract owner can configure `maxHopsPerTrace` and `loopDetectionEnabled`, causing the contract to revert hop recordings that exceed policy limits. Off-chain, the `bounds-monitor.js` process watches the trace log for burst rate violations and response timeouts that cannot be detected on-chain.
+The trace log also serves as the foundation for flow anomaly detection (Layer 7): the contract owner can configure `maxHopsPerTrace` and `loopDetectionEnabled`, causing the contract to revert hop recordings that exceed policy limits. Off-chain, the `bounds_monitor.py` process watches the trace log for burst rate violations and response timeouts that cannot be detected on-chain.
 
 ### 4.5 What Goes On-Chain vs. Behind Firewalls
 
@@ -368,7 +366,7 @@ control in the stack. It classifies every action in the system into one of four 
 
 The hot path is `validateAction(flowId, agentId, actionType) view returns (bool)`, which resolves in three or fewer storage reads (SLOADs): one for the flow's permit entry, one for the tier classification, and one for any multi-sig approval record. When `validateAction` returns `false`, the oracle emits an `ActionBlocked(traceId, agentId, actionType)` event before reverting. This event is recorded in the execution context even though the action failed, providing a complete audit trail of attempted but blocked actions.
 
-The off-chain counterpart is an action gateway integrated into each bridge's governance preflight. In the Node.js runtime this is `action-gateway.js`, which provides an `ActionGateway` class; in the Python runtime the equivalent check is performed directly by `governance_preflight()` in `bridge_base.py` via `ActionPermitRegistry.validateAction()`. Before the bridge calls `tools/call` on the MCP server, the gateway calls `validateAction` on-chain. If the action is blocked, the bridge does not invoke the tool and records the block locally. For Tier 2 actions, the gateway initiates an approval request workflow and polls for the required multi-signature approval before proceeding.
+The off-chain counterpart is an action gateway integrated into each bridge's governance preflight. The check is performed by `governance_preflight()` in `bridge_base.py` via `ActionPermitRegistry.validateAction()`. Before the bridge calls `tools/call` on the MCP server, the gateway calls `validateAction` on-chain. If the action is blocked, the bridge does not invoke the tool and records the block locally. For Tier 2 actions, the gateway initiates an approval request workflow and polls for the required multi-signature approval before proceeding.
 
 ### Summary
 The table below summarizes all nine layers with their governing contracts and the scope of control each provides. All nine layers are active simultaneously in the reference implementation described in §6; each oracle invocation traverses the full stack in order.
@@ -380,10 +378,10 @@ The table below summarizes all nine layers with their governing contracts and th
 | 3 | `ReputationGate` | Minimum reputation score to act |
 | 4 | `PromptRegistry` | Which prompt templates are approved |
 | 5 | `DatasetRegistry` | Which datasets are approved (global + flow-scoped) |
-| 6 | `AutonomyBoundsRegistry` + `bounds-monitor.js` | Tool-level revocation on performance degradation |
-| 7 | `ExecutionTraceLog` + `bounds-monitor.js` | Flow-level anomaly policy (hops, loops, burst, timeout) |
+| 6 | `AutonomyBoundsRegistry` + `bounds_monitor.py` | Tool-level revocation on performance degradation |
+| 7 | `ExecutionTraceLog` + `bounds_monitor.py` | Flow-level anomaly policy (hops, loops, burst, timeout) |
 | 8 | `IdentityRegistry.cardHash` | MCP card content integrity at startup and per-fulfillment |
-| 9 | `ActionPermitRegistry` + action gateway (`action-gateway.js` / `bridge_base.py`) | Action-type tiering and multi-sig approval for Tier 2 |
+| 9 | `ActionPermitRegistry` + `governance_preflight()` in `bridge_base.py` | Action-type tiering and multi-sig approval for Tier 2 |
 
 No single layer is sufficient on its own. Identity without flow scoping permits any registered agent to participate in any workflow. Flow scoping without action tiering permits authorized agents to perform any action within the flow. Action tiering without card integrity permits the action classification to be circumvented by swapping the agent's card to one with a different capability declaration. The architecture is robust because the layers are not alternatives - they are defenses-in-depth applied sequentially to every invocation.
 
@@ -439,9 +437,9 @@ Each bridge is an event-driven Python process (launched by `launch_bridges.py`) 
 
 *Call sequence (HF side):* `hf-legal-bridge` listens for `DraftIssued` events. It calls `review_draft` on `hf-legal-server` (:8022) with `{ flow_id, request_id, draft_hash, round }`, receives `{ markup_hash }`, and submits `LegalOracle.submitMarkup(requestId, clientAgentId, markupHash)`. Once the HF side is satisfied, it calls `approveClientSide()` directly.
 
-**Phase 7: Tier 2 Action Approval.** Before `LegalOracle.execute()` can proceed, the `ActionPermitRegistry` requires Tier 2 approval for the `legal:execute_contract` action type. The bridge's action gateway (Node.js: `action-gateway.js`; Python: direct `ActionPermitRegistry.validateAction()` in `governance_preflight()`) detects that the action is Tier 2 and initiates a `MockMultiSig` approval request. Authorized human signers from both institutions submit their signatures; the M-of-N threshold must be reached before the gateway permits the fulfillment transaction to be submitted. The `ActionBlocked` event is emitted if the fulfillment is attempted before approval is complete, providing a visible on-chain record of the blocked attempt.
+**Phase 7: Tier 2 Action Approval.** Before `LegalOracle.execute()` can proceed, the `ActionPermitRegistry` requires Tier 2 approval for the `legal:execute_contract` action type. The bridge's `governance_preflight()` in `bridge_base.py` detects that the action is Tier 2 via `ActionPermitRegistry.validateAction()` and initiates a `MockMultiSig` approval request. Authorized human signers from both institutions submit their signatures; the M-of-N threshold must be reached before the gateway permits the fulfillment transaction to be submitted. The `ActionBlocked` event is emitted if the fulfillment is attempted before approval is complete, providing a visible on-chain record of the blocked attempt.
 
-*Call sequence:* No additional MCP tool call is made for the approval step itself. Inside `legal-bridge`, the action classification step resolves `legal:execute_contract` to Tier 2 (via `action-gateway.js` in the Node.js runtime, or direct `ActionPermitRegistry.validateAction()` in `governance_preflight()` in the Python runtime) and calls `ActionPermitRegistry.grantPermit(flowId, agentId, actionType, tier, requiredApprovals)`. The bridge then polls `getPermit(flowId, agentId, actionType)` at a configurable interval until `approved === true` or the `approval_timeout_seconds` deadline is reached. Once approved, the bridge submits `LegalOracle.execute(requestId, bankAgentId, finalHash)`.
+*Call sequence:* No additional MCP tool call is made for the approval step itself. Inside `legal-bridge`, the action classification step resolves `legal:execute_contract` to Tier 2 (via `ActionPermitRegistry.validateAction()` in `governance_preflight()`) and calls `ActionPermitRegistry.grantPermit(flowId, agentId, actionType, tier, requiredApprovals)`. The bridge then polls `getPermit(flowId, agentId, actionType)` at a configurable interval until `approved === true` or the `approval_timeout_seconds` deadline is reached. Once approved, the bridge submits `LegalOracle.execute(requestId, bankAgentId, finalHash)`.
 
 **Phase 8: Sequential Client Setup.** Once `LegalOracle.execute()` succeeds and the legal phase bit is set in `OnboardingRegistry`, the `ClientSetupOracle` accepts setup requests in sequence: `setupLegalEntity`, then `setupAccount` (gated on the legal entity phase bit), then `setupProducts` (gated on the account phase bit). Each step is fulfilled by a dedicated bank setup agent - bank-legal-entity-setup-agent, bank-account-setup-agent, and bank-product-setup-agent respectively. The `client-setup-bridge` watches `PhaseCompleted` events from `OnboardingRegistry` and triggers each subsequent setup step automatically.
 
@@ -455,7 +453,7 @@ Each bridge is an event-driven Python process (launched by `launch_bridges.py`) 
 
 *Call sequence:* No bridge is involved. Each institution calls `ReputationRegistryUpgradeable.recordFeedback(agentId, score, capabilityTag, participantId)` directly from its own credentialed account.
 
-**Component summary.** Table 2 maps every bridge to the events it consumes, the MCP server and port it targets, the tool names it calls, and the on-chain functions it submits. The full governance preflight sequence (`governancePreflight()` in `bridge-base.js` / `bridge_base.py`) runs before every on-chain transaction listed in the table. Bridge and server names below are runtime-neutral; the Node.js runtime appends `.js`, the Python runtime uses underscores and `.py`.
+**Component summary.** Table 2 maps every bridge to the events it consumes, the MCP server and port it targets, the tool names it calls, and the on-chain functions it submits. The full governance preflight sequence (`governance_preflight()` in `bridge_base.py`) runs before every on-chain transaction listed in the table.
 
 | Bridge | Trigger event(s) | MCP server (:port) | Tool(s) | On-chain function(s) |
 |---|---|---|---|---|

@@ -121,7 +121,7 @@ FlowAuthorizationRegistry → whether it can participate in this flow
 ReputationGate            → whether its reputation clears the threshold
 AutonomyBoundsRegistry    → whether the specific tool is enabled
 ExecutionTraceLog         → whether flow policy (hops, loops) is satisfied
-bounds-monitor.js         → whether real-time anomaly signals are clear
+bounds_monitor.py         → whether real-time anomaly signals are clear
                                         ↓
                               [MCP server — current terminus]
                                         ↓

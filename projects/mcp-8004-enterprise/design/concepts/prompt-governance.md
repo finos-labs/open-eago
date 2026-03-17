@@ -168,28 +168,24 @@ if (promptRegistry) {
 
 ## Deployment
 
-`deploy-registries.js` handles all wiring automatically:
+`scripts/deploy.js` handles PromptRegistry deployment and prompt hash registration automatically (as part of the full-stack deploy):
 
 ```javascript
-// Read MCP spec files and compute hashes
-const amlSpec    = JSON.parse(fs.readFileSync(path.join(mcpDir, 'aml-review.mcp.json'), 'utf8'));
-const creditSpec = JSON.parse(fs.readFileSync(path.join(mcpDir, 'credit-risk.mcp.json'), 'utf8'));
-const amlHash    = hre.ethers.keccak256(hre.ethers.toUtf8Bytes(amlSpec.prompts[0].template));
-const creditHash = hre.ethers.keccak256(hre.ethers.toUtf8Bytes(creditSpec.prompts[0].template));
+// scripts/deploy.js (step 14 + prompt registration block)
+// Hashes langchain_messages (not raw template) to match Python bridge hashing
+const amlSpec    = JSON.parse(fs.readFileSync(path.join(mcpDir, 'aml-review.mcp.json'),   'utf8'));
+const creditSpec = JSON.parse(fs.readFileSync(path.join(mcpDir, 'credit-risk.mcp.json'),  'utf8'));
+const amlHash    = hre.ethers.keccak256(hre.ethers.toUtf8Bytes(JSON.stringify(amlSpec.prompts[0].langchain_messages)));
+const creditHash = hre.ethers.keccak256(hre.ethers.toUtf8Bytes(JSON.stringify(creditSpec.prompts[0].langchain_messages)));
 
-// Deploy and wire
 const promptReg = await PromptReg.deploy();
-await promptReg.registerPrompt(CAP_AML_REVIEW,  amlHash,    'agents/mcp/aml-review.mcp.json');
-await promptReg.setActiveVersion(CAP_AML_REVIEW, 0);
-await promptReg.registerPrompt(CAP_CREDIT_RISK, creditHash, 'agents/mcp/credit-risk.mcp.json');
-await promptReg.setActiveVersion(CAP_CREDIT_RISK, 0);
-await amlOracle.setPromptRegistry(promptRegAddr);
-await creditOracle.setPromptRegistry(promptRegAddr);
-await legalOracle.setPromptRegistry(promptRegAddr);
-await clientSetupOracle.setPromptRegistry(promptRegAddr);
+await promptReg.registerPrompt(CAP_AML_REVIEW,    amlHash,    'agents/mcp/aml-review.mcp.json#v1-langchain');
+await promptReg.registerPrompt(CAP_CREDIT_REVIEW, creditHash, 'agents/mcp/credit-risk.mcp.json#v1-langchain');
+// Hashes are registered but NOT activated — call setActiveVersion(CAP_*, 0) to enforce the gate
+// Call setPromptRegistry(promptRegAddr) on each oracle separately post-deploy
 ```
 
-No manual configuration is needed post-deploy. Bridges are launched with `--prompt-registry 0x<addr>` or `PROMPT_REGISTRY_ADDRESS=0x<addr>`.
+Bridges are launched with `--prompt-registry 0x<addr>` or `PROMPT_REGISTRY_ADDRESS=0x<addr>`.
 
 ---
 
@@ -234,9 +230,9 @@ All four layers are opt-in. Any combination can be enabled independently by sett
 - `contracts/AMLOracle.sol` — wired (`setPromptRegistry`, `isActive` check, `promptHash` in result)
 - `contracts/CreditRiskOracle.sol` — wired (all fulfill paths gated via `_validateAndSetStatus`)
 - `contracts/LegalOracle.sol`, `contracts/ClientSetupOracle.sol` — wired (same pattern)
-- `agents_implementation/aml-bridge.js` — computes hash, pre-flight check, passes hash in tx
-- `agents_implementation/credit-risk-bridge.js` — same
-- `agents_implementation/legal-bridge.js`, `agents_implementation/client-setup-bridge.js` — same
-- `agents_implementation/launch-bridges.js` — `--prompt-registry` / `PROMPT_REGISTRY_ADDRESS` threaded through
-- `scripts/deploy-registries.js` — auto-deploys, registers, activates, and wires
+- `agents_implementation_py/bridges/aml_bridge.py` — computes hash, pre-flight check, passes hash in tx
+- `agents_implementation_py/bridges/credit_risk_bridge.py` — same
+- `agents_implementation_py/bridges/legal_bridge.py`, `agents_implementation_py/bridges/client_setup_bridge.py` — same
+- `agents_implementation_py/launch_bridges.py` — `--prompt-registry` / `PROMPT_REGISTRY_ADDRESS` threaded through
+- `scripts/deploy.js` — deploys PromptRegistry (step 14), registers LangChain prompt hash v1 for AML/Credit/Legal (not yet activated); full wiring via `setPromptRegistry` on oracles done post-deploy
 - `test/PromptRegistry.test.js` — 34 tests covering all functions + oracle integrations + full rotation cycle
