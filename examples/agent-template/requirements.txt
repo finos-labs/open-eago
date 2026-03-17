@@ -1,0 +1,2 @@
+# OpenEAGO RPC Demo Agent (Python)
+PyYAML>=6.0

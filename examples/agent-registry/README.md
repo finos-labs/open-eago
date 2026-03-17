@@ -215,6 +215,13 @@ Bootstrap eviction uses two TTLs: an agent that has not contacted the registry f
 
 ### Start registry and verify
 
+#### (optional) Install Rust
+
+```bash
+curl https://sh.rustup.rs -sSf | sh
+# sudo apt install -y build-essential pkg-config
+```
+
 Start the registry:
 
 ```bash
