@@ -15,17 +15,6 @@ The binding: every agent card points to an MCP spec, every MCP spec drives a Sol
 
 The primary use case is a **cross-institutional B2B onboarding flow** between a bank and a hedge fund client, orchestrated entirely by on-chain oracle contracts and off-chain MCP servers.
 
-## Two separate npm packages
-
-There are **two independent npm workspaces** — each needs its own install:
-
-```bash
-npm install                                    # root: Hardhat + Solidity toolchain (CommonJS)
-cd agents_implementation && npm install        # off-chain servers + bridges (ESM)
-```
-
-`agents_implementation/` is `"type": "module"` (ESM). The root is CommonJS.
-
 ## Commands
 
 ### Contracts (root)
@@ -38,14 +27,17 @@ npx hardhat node          # start local Hardhat node (keep in a separate termina
 
 > Hardhat config: Solidity 0.8.22, optimizer runs: 1, `viaIR: true` (required for deep stack in oracle fulfillment functions). Networks: `hardhat` (in-process) and `localhost` (127.0.0.1:8545).
 
-### Off-chain servers (agents_implementation/)
+### Off-chain servers (agents_implementation_py/)
 
 ```bash
-# Foreground — Ctrl-C stops all
-node agents_implementation/launch-agents.js
+# Install
+cd agents_implementation_py && pip install -e .
+
+# MCP servers (ports 8010–8022)
+python agents_implementation_py/launch_servers.py
 
 # Oracle bridges
-node agents_implementation/launch-bridges.js \
+python agents_implementation_py/launch_bridges.py \
   --rpc                  http://127.0.0.1:8545 \
   --privkey              0x<OraclePrivateKey> \
   --onboarding-registry  0x... \
@@ -65,16 +57,26 @@ Optional bridge flags (also readable from env):
 | `--autonomy-bounds` | `AUTONOMY_BOUNDS_ADDRESS` | Tool enable/disable governance |
 | `--action-permit` | `ACTION_PERMIT_ADDRESS` | Action-level pre-flight |
 
-`VaultSigner` (`vault-signer.js`) supports local private key or HashiCorp Vault (HSM): set `VAULT_ADDR` + `VAULT_TOKEN` + `VAULT_KEY_NAME`.
+Set `OPENAI_API_KEY` for LLM inference. `VaultSigner` (`shared/vault_signer.py`) supports a local private key or HashiCorp Vault (HSM): set `VAULT_ADDR` + `VAULT_TOKEN` + `VAULT_KEY_NAME`.
+
+# Bounds monitor (Layers 6 + 7) — run alongside servers and bridges
+python agents_implementation_py/bounds_monitor.py \
+  --rpc http://127.0.0.1:8545 \
+  --privkey 0x<key> \
+  --autonomy-bounds 0x... \
+  --specs-dir agents/mcp
+
+# --mock skips on-chain calls (useful for local dev without a running node)
+python agents_implementation_py/bounds_monitor.py --mock
 
 ## Architecture
 
 ```
 Agent Card (agents/*.json)
   └── mcpSpec → agents/mcp/*.mcp.json
-        ├── Solidity Oracle (contracts/oracles/)   on-chain request/response lifecycle
-        ├── MCP Server (agents_implementation/*-server.js)   off-chain tool implementation
-        └── Oracle Bridge (*-bridge.js)            event watcher + fulfillment tx submitter
+        ├── Solidity Oracle (contracts/oracles/)              on-chain request/response lifecycle
+        ├── MCP Server (agents_implementation_py/servers/)    off-chain tool implementation
+        └── Oracle Bridge (agents_implementation_py/bridges/) event watcher + fulfillment tx submitter
 ```
 
 Three-tier topology:
@@ -138,14 +140,14 @@ contracts/
 
 | File | Role |
 |---|---|
-| `mcp-server-base.js` | Shared HTTP/JSON-RPC 2.0 factory for all MCP servers |
-| `bridge-base.js` | Shared bridge bootstrap: provider/signer, governance preflight, `callMcpTool` |
-| `vault-signer.js` | `VaultSigner` extends `ethers.AbstractSigner`; local or HashiCorp Vault backend |
-| `action-gateway.js` | `ActionGateway` class — off-chain action-permit pre-flight |
-| `bounds-monitor.js` | Layer 6/7 autonomy bounds monitor: tracks sliding-window error/success rates and burst rates; writes `bounds-state.json`; optionally calls `disableTool`/`enableTool` on `AutonomyBoundsRegistry`; HTTP API on port 9090 (`/report`, `/state`, `/metrics`, `/reset`) |
-| `audit-exporter.js` | On-chain event indexer + REST API for audit trail export |
-| `launch-agents.js` | Spawns one server process per `agents/*.json` card |
-| `launch-bridges.js` | Spawns all 8 bridge processes with shared CLI flags |
+| `shared/server_base.py` | FastMCP server factory + `@suspended_when_revoked` decorator |
+| `shared/bridge_base.py` | Bridge bootstrap: web3.py provider/signer, governance preflight, `call_mcp_tool` |
+| `shared/vault_signer.py` | `LocalSigner` / `VaultSigner` — local key or HashiCorp Vault backend |
+| `bounds_monitor.py` | Autonomy bounds monitor: sliding-window metrics → `bounds-state.json` + optional on-chain `disableTool`/`enableTool`; HTTP API on :9090 |
+| `shared/bounds_monitor_client.py` | Reads `bounds-state.json`, POSTs to `:9090/report` (graceful degradation if absent) |
+| `graph/onboarding_graph.py` | LangGraph `StateGraph` for the onboarding orchestrator bridge |
+| `launch_servers.py` | Spawns one server process per `agents/*.json` card |
+| `launch_bridges.py` | Spawns all 8 bridge processes with shared CLI flags |
 
 ### Agent cards and capability → server mapping
 
@@ -153,14 +155,14 @@ contracts/
 
 | Capability | Server | Agent(s) |
 |---|---|---|
-| `aml-review` | `aml-server.js` | `bank-aml-agent` (8010) |
-| `credit-risk` | `credit-risk-server.js` | `bank-credit-risk-agent` (8011) |
-| `legal-review` | `legal-server.js` | `bank-legal-agent` (8012) |
-| `onboarding` | `onboarding-orchestrator-server.js` | `bank-onboarding-orchestrator` (8013) |
-| `client-setup` | `client-setup-server.js` | `bank-legal-entity-setup-agent` (8014), `bank-account-setup-agent` (8015), `bank-product-setup-agent` (8016) |
-| `hf-document` | `hf-document-server.js` | `hf-document-agent` (8020) |
-| `hf-credit-negotiator` | `hf-credit-negotiator-server.js` | `hf-credit-negotiator-agent` (8021) |
-| `hf-legal` | `hf-legal-server.js` | `hf-legal-agent` (8022) |
+| `aml-review` | `aml_server.py` | `bank-aml-agent` (8010) |
+| `credit-risk` | `credit_risk_server.py` | `bank-credit-risk-agent` (8011) |
+| `legal-review` | `legal_server.py` | `bank-legal-agent` (8012) |
+| `onboarding` | `onboarding_orchestrator_server.py` | `bank-onboarding-orchestrator` (8013) |
+| `client-setup` | `client_setup_server.py` | `bank-legal-entity-setup-agent` (8014), `bank-account-setup-agent` (8015), `bank-product-setup-agent` (8016) |
+| `hf-document` | `hf_document_server.py` | `hf-document-agent` (8020) |
+| `hf-credit-negotiator` | `hf_credit_negotiator_server.py` | `hf-credit-negotiator-agent` (8021) |
+| `hf-legal` | `hf_legal_server.py` | `hf-legal-agent` (8022) |
 
 ### Distributed tracing
 

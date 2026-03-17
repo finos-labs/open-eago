@@ -41,5 +41,18 @@
   ],
 
   "resources": [],
-  "prompts": []
+  "prompts": [
+    {
+      "name": "term_evaluation",
+      "description": "Hedge fund credit term evaluation prompt for negotiation.",
+      "arguments": [
+        { "name": "terms_hash", "description": "keccak256 of bank-proposed terms", "required": true },
+        { "name": "round",      "description": "Negotiation round number",           "required": true }
+      ],
+      "template": "You are a hedge fund portfolio manager evaluating bank credit terms.\n\nTerms hash: {{terms_hash}}\nNegotiation round: {{round}}\n\nEvaluate the proposed credit terms against fund objectives.\nDecide whether to accept or submit a counter-proposal with modified parameters.",
+      "langchain_messages": [
+        {"role": "system", "content": "You are a hedge fund portfolio manager evaluating bank credit terms.\n\nTerms hash: {terms_hash}\nNegotiation round: {round}\n\nEvaluate the proposed credit terms against fund objectives.\nDecide whether to accept or submit a counter-proposal with modified parameters."}
+      ]
+    }
+  ]
 }

@@ -228,13 +228,13 @@ await reviewerOracle.fulfillReview(agentId, {
 });
 ```
 
-> **Note:** Bridge integration (hash computation, pre-flight, params threading) is not yet implemented in `aml-bridge.js` or `credit-risk-bridge.js`. The on-chain gate accepts an empty `datasetHashes[]` (no dataset claimed), so existing bridges continue to work unmodified until dataset enforcement is enabled via `setDatasetRegistry`.
+> **Note:** Bridge integration (hash computation, pre-flight, params threading) is not yet implemented in `bridges/aml_bridge.py` or `bridges/credit_risk_bridge.py`. The on-chain gate accepts an empty `datasetHashes[]` (no dataset claimed), so existing bridges continue to work unmodified until dataset enforcement is enabled via `setDatasetRegistry`.
 
 ---
 
 ## Deployment
 
-`deploy-registries.js` handles deployment and wiring as step 9:
+`scripts/deploy.js` handles deployment and wiring:
 
 ```javascript
 const DatasetReg = await hre.ethers.getContractFactory("DatasetRegistry");
@@ -302,7 +302,7 @@ All five layers are opt-in. The dataset layer is the most granular: it enforces 
 - `contracts/AMLOracle.sol` — wired (`setDatasetRegistry`, `isApproved` loop, `datasetHashes` in result, `getResultDatasetHashes`)
 - `contracts/CreditRiskOracle.sol` — wired (all fulfill paths gated via `_validateAndSetStatus`)
 - `contracts/LegalOracle.sol`, `contracts/ClientSetupOracle.sol` — wired (same pattern)
-- `scripts/deploy-registries.js` — deploys and wires all oracle contracts (step 9)
+- `scripts/deploy.js` — deploys and wires all oracle contracts
 - `test/DatasetRegistry.test.js` — 50 tests covering all functions + oracle integrations + all-gates revert order + end-to-end cycles
-- `agents_implementation/aml-bridge.js` — **not yet** (bridge passes empty `datasetHashes: []`)
-- `agents_implementation/credit-risk-bridge.js` — **not yet**
+- `agents_implementation_py/bridges/aml_bridge.py` — **not yet** (bridge passes empty `datasetHashes: []`)
+- `agents_implementation_py/bridges/credit_risk_bridge.py` — **not yet**

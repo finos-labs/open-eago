@@ -28,8 +28,8 @@ The four anomaly types divide cleanly into two enforcement paths:
 |--------------|--------------------------------------------|-------------------------------------------|
 | Loop         | `ExecutionTraceLog.recordHop()` (on-chain) | Revert — transaction never lands          |
 | Max hops     | `ExecutionTraceLog.recordHop()` (on-chain) | Revert — transaction never lands          |
-| Burst        | `bounds-monitor.js` (off-chain)            | `AutonomyBoundsRegistry.disableTool()`    |
-| Stuck/timeout| `bounds-monitor.js` (off-chain)            | `AutonomyBoundsRegistry.disableTool()`    |
+| Burst        | `bounds_monitor.py` (off-chain)            | `AutonomyBoundsRegistry.disableTool()`    |
+| Stuck/timeout| `bounds_monitor.py` (off-chain)            | `AutonomyBoundsRegistry.disableTool()`    |
 
 **Why loops and max hops are on-chain:** `ExecutionTraceLog` sees every hop across all agents in a flow — it is the natural enforcement point. An on-chain revert guarantees no partial state lands anywhere. The bridge catches the error in its outer try/catch and logs it; no special handling is needed.
 
@@ -84,12 +84,12 @@ Each tool's `autonomy_bounds` gains an optional `flow` block:
 ```
 
 Field routing:
-- `max_hops`, `loop_detection` → read by `sync-autonomy-bounds.js`, written to `ExecutionTraceLog` on-chain
-- `max_requests_per_minute`, `response_timeout_seconds` → read by `bounds-monitor.js` at startup for off-chain enforcement
+- `max_hops`, `loop_detection` → read by `scripts/deploy.js`, written to `ExecutionTraceLog` on-chain
+- `max_requests_per_minute`, `response_timeout_seconds` → read by `bounds_monitor.py` at startup for off-chain enforcement
 
 ---
 
-## `bounds-monitor.js` — burst and timeout detection
+## `bounds_monitor.py` — burst and timeout detection
 
 ### Burst detection
 
@@ -113,7 +113,7 @@ A timeout suspension means the bridge's `isToolEnabled()` pre-flight will fail f
 
 ---
 
-## `sync-autonomy-bounds.js` — configuring ExecutionTraceLog
+## `scripts/deploy.js` — configuring ExecutionTraceLog
 
 The script reads `autonomy_bounds.flow` from all tool entries across both MCP specs and applies the most-restrictive policy:
 - `max_hops`: minimum non-zero value across all tools that declare it

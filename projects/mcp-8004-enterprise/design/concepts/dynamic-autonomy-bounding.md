@@ -44,7 +44,7 @@ Each tool entry gains an optional `autonomy_bounds` block:
 }
 ```
 
-**This is not an extension to the MCP protocol.** The JSON-RPC API (`tools/list`, `tools/call`) is unchanged; MCP clients see standard tool definitions and ignore `autonomy_bounds`. The ERC-8004 governance toolchain — `sync-autonomy-bounds.js` and `bounds-monitor.js` — reads the block at deploy time and at runtime respectively.
+**This is not an extension to the MCP protocol.** The JSON-RPC API (`tools/list`, `tools/call`) is unchanged; MCP clients see standard tool definitions and ignore `autonomy_bounds`. The ERC-8004 governance toolchain — `scripts/deploy.js` and `bounds_monitor.py` — reads the block at deploy time and at runtime respectively.
 
 The MCP spec thereby serves two audiences simultaneously:
 
@@ -63,7 +63,7 @@ This makes the spec the **single source of truth** for both capability definitio
 
 **Source:** `ReputationRegistryUpgradeable` — existing on-chain feedback ledger.
 
-**Mechanism:** `ReputationGate` already enforces score thresholds per capability on-chain (layer 4 of the oracle stack). The `autonomy_bounds.reputation` block makes the MCP spec the canonical source for what gets loaded into `ReputationGate`. `sync-autonomy-bounds.js` reads the block and calls `ReputationGate.setThreshold(capability, minScore, decimals, minCount, tag)`.
+**Mechanism:** `ReputationGate` already enforces score thresholds per capability on-chain (layer 4 of the oracle stack). The `autonomy_bounds.reputation` block makes the MCP spec the canonical source for what gets loaded into `ReputationGate`. `scripts/deploy.js` reads the block and calls `ReputationGate.setThreshold(capability, minScore, decimals, minCount, tag)`.
 
 No new contracts needed — the existing gate handles enforcement.
 
@@ -71,13 +71,13 @@ No new contracts needed — the existing gate handles enforcement.
 
 **Source:** `FulfillmentFailed(traceId, agentId, reason)` events emitted by oracle contracts.
 
-**Mechanism:** `bounds-monitor.js` maintains a sliding window of outcomes per agent per tool. When the error rate over `window_requests` exceeds `max_error_rate_pct`, the monitor calls `AutonomyBoundsRegistry.disableTool(agentId, toolHash, reason)`. The oracle checks `isToolEnabled()` before accepting fulfillment; the bridge performs the same check off-chain as a pre-flight.
+**Mechanism:** `bounds_monitor.py` maintains a sliding window of outcomes per agent per tool. When the error rate over `window_requests` exceeds `max_error_rate_pct`, the monitor calls `AutonomyBoundsRegistry.disableTool(agentId, toolHash, reason)`. The oracle checks `isToolEnabled()` before accepting fulfillment; the bridge performs the same check off-chain as a pre-flight.
 
 ### 3. Performance degradation
 
 **Source:** `FulfillmentSucceeded(traceId, agentId)` events — same oracle contracts.
 
-**Mechanism:** Same sliding window. When the success rate over `window_requests` drops below `min_success_rate_pct`, the monitor calls `disableTool`. Recovery is automatic: when the window fully satisfies both thresholds again, the monitor calls `enableTool`.
+**Mechanism:** Same sliding window. When the success rate over `window_requests` drops below `min_success_rate_pct`, `bounds_monitor.py` calls `disableTool`. Recovery is automatic: when the window fully satisfies both thresholds again, the monitor calls `enableTool`.
 
 ---
 
@@ -99,7 +99,7 @@ setMonitor(address)                       // owner sets trusted monitor
 
 Tools start enabled by default (`disabledAt == 0` → `isToolEnabled` returns `true`). Only an explicit `disableTool()` call makes the registry return `false`.
 
-### `bounds-monitor.js` (new off-chain process)
+### `bounds_monitor.py` (off-chain process)
 
 - Subscribes to `FulfillmentSucceeded` / `FulfillmentFailed` events from both oracle contracts
 - Maintains a circular outcome buffer per `(agentId, toolName)`
@@ -138,28 +138,25 @@ State is read from `bounds-state.json` on every request — no RPC dependency, n
 
 ---
 
-## `sync-autonomy-bounds.js`
+## `scripts/deploy.js` — autonomy bounds wiring
 
-Run after deploy or whenever MCP spec thresholds change:
+Run after compile or whenever MCP spec thresholds change:
 
 ```bash
-REPUTATION_GATE_ADDRESS=0x...
-AML_CONTRACT_ADDRESS=0x...
-CREDIT_CONTRACT_ADDRESS=0x...
-npx hardhat run scripts/sync-autonomy-bounds.js --network localhost
+npx hardhat node          # terminal 1
+node scripts/deploy.js    # terminal 2
 ```
 
-What it does:
-1. Reads `autonomy_bounds.reputation` from each tool in both MCP specs
+Relevant steps in `deploy.js`:
+1. Reads `autonomy_bounds.reputation` from each tool in the MCP specs
 2. Calls `ReputationGate.setThreshold()` for each capability
-3. Deploys `AutonomyBoundsRegistry` if `AUTONOMY_BOUNDS_ADDRESS` is not set
-4. Calls `setAutonomyBounds()` on both oracle contracts
+3. Deploys `AutonomyBoundsRegistry` and calls `setAutonomyBounds()` on oracle contracts
 
 ---
 
 ## Recovery
 
-When signals recover — score rises, error/success rates normalize over a full window — `bounds-monitor.js` calls `enableTool()` automatically. The tool reappears in `tools/list` without `x_suspended`. No manual intervention required.
+When signals recover — score rises, error/success rates normalize over a full window — `bounds_monitor.py` calls `enableTool()` automatically. The tool reappears in `tools/list` without `x_suspended`. No manual intervention required.
 
 Recovery requires the *window to fully satisfy the threshold*, not just one good event. A window of 50 requests that briefly dips below threshold and then recovers must complete 50 clean requests before re-enabling.
 

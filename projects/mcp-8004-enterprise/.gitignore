@@ -18,3 +18,9 @@
 
 # Hardhat coverage reports
 /coverage
+
+# Python
+__pycache__/
+*.pyc
+*.egg-info/
+.venv/

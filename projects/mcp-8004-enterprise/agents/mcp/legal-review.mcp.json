@@ -90,7 +90,10 @@
         { "name": "jurisdiction", "description": "Governing law jurisdiction",                "required": false },
         { "name": "credit_limit", "description": "Agreed credit limit from credit review",   "required": false }
       ],
-      "template": "You are a legal counsel drafting an institutional onboarding agreement.\n\nClient: {{client_name}}{{#if jurisdiction}}\nGoverning law: {{jurisdiction}}{{/if}}{{#if credit_limit}}\nCredit limit: {{credit_limit}}{{/if}}\n\nDraft a comprehensive ISDA-style onboarding agreement covering:\n- Representations and warranties\n- Credit support annex terms\n- Termination provisions\n- Governing law and dispute resolution\n- AML/KYC compliance obligations"
+      "template": "You are a legal counsel drafting an institutional onboarding agreement.\n\nClient: {{client_name}}{{#if jurisdiction}}\nGoverning law: {{jurisdiction}}{{/if}}{{#if credit_limit}}\nCredit limit: {{credit_limit}}{{/if}}\n\nDraft a comprehensive ISDA-style onboarding agreement covering:\n- Representations and warranties\n- Credit support annex terms\n- Termination provisions\n- Governing law and dispute resolution\n- AML/KYC compliance obligations",
+      "langchain_messages": [
+        {"role": "system", "content": "You are a legal counsel drafting an institutional onboarding agreement.\n\nClient: {client_name}\nGoverning law: {jurisdiction}\nCredit limit: {credit_limit}\n\nDraft a comprehensive ISDA-style onboarding agreement covering:\n- Representations and warranties\n- Credit support annex terms\n- Termination provisions\n- Governing law and dispute resolution\n- AML/KYC compliance obligations"}
+      ]
     }
   ]
 }

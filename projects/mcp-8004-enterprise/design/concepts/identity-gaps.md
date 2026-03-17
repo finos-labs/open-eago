@@ -37,7 +37,7 @@ content is the specification of the agent; if it can be changed without an on-ch
 the audit record is incomplete.
 
 **Fix (Concept 9).** Add a `cardHash` reserved key storing `keccak256(rawCardFileBytes)`.
-Set it at deploy time via `register-mocks.js`; validate it at bridge startup. See Concept 9
+Set it at deploy time via `scripts/deploy.js`; validate it at bridge startup. See Concept 9
 section below for full design.
 
 **Status:** Implemented in Concept 9.
@@ -58,7 +58,7 @@ schemas, tool descriptions, and `autonomy_bounds` configuration. A spec change t
 modifies a schema or threshold boundary is currently undetected.
 
 **Partial mitigation.** Concept 5 catches prompt template changes. Concept 7 catches
-threshold drift (since `sync-autonomy-bounds.js` re-reads the spec and updates
+threshold drift (since `scripts/deploy.js` re-reads the spec and updates
 `ReputationGate` / `ExecutionTraceLog`). The gap that remains is schema and tool
 definition drift.
 
@@ -181,7 +181,7 @@ skips the check (opt-in per agent — agents with no committed hash are unaffect
 
 **Solution.** Add a `cardHash` reserved key to `IdentityRegistryUpgradeable` that stores
 `keccak256(rawCardFileBytes)`. The hash is set by the deployer at registration time
-(via `register-mocks.js`) and can be updated by the token owner or approved operator
+(via `scripts/deploy.js`) and can be updated by the token owner or approved operator
 (via `setCardHash(agentId, cardHash_)`). Like `agentWallet` and `oracleAddress`, the
 `cardHash` is cleared on token transfer.
 
@@ -200,7 +200,7 @@ desired sensitivity — the on-chain hash is a commitment to an exact byte seque
 |---|---|---|---|
 | `agentWallet` | `address` (20 bytes, `abi.encodePacked`) | `register()` or `setAgentWallet()` | Yes |
 | `oracleAddress` | `address` (20 bytes, `abi.encodePacked`) | `register()` or `setOracleAddress()` | Yes |
-| `cardHash` | `bytes32` (ABI-encoded) | `register-mocks.js` after `register()`, or `setCardHash()` | Yes |
+| `cardHash` | `bytes32` (ABI-encoded) | `scripts/deploy.js` after `register()`, or `setCardHash()` | Yes |
 
 **Concept 9b — implemented.** Oracle-level card hash enforcement is now in place.
 All agent-called fulfillment functions across the four B2B oracle contracts accept a

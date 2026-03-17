@@ -63,30 +63,33 @@ botman_8004/
 │       ├── hf-credit-negotiator.mcp.json
 │       └── hf-legal.mcp.json
 │
-├── agents_implementation/                     # Off-chain MCP servers + oracle bridges
-│   ├── aml-server.js                          #   MCP server — AML screening
-│   ├── credit-risk-server.js                  #   MCP server — credit risk assessment
-│   ├── legal-server.js                        #   MCP server — legal document review
-│   ├── onboarding-orchestrator-server.js      #   MCP server — flow orchestration
-│   ├── client-setup-server.js                 #   MCP server — legal entity / account / product setup
-│   ├── hf-document-server.js                  #   MCP server — HF document submission
-│   ├── hf-credit-negotiator-server.js         #   MCP server — HF credit term negotiation
-│   ├── hf-legal-server.js                     #   MCP server — HF legal markup / approval
-│   ├── aml-bridge.js                          #   Bridge: ReviewRequested → fulfillReview
-│   ├── credit-risk-bridge.js                  #   Bridge: AssessmentRequested → fulfillAssessment / proposeTerms
-│   ├── legal-bridge.js                        #   Bridge: DraftRequested → submitDraft / approveBankSide
-│   ├── onboarding-orchestrator-bridge.js      #   Bridge: REST POST /initiate → OnboardingRegistry.initiate()
-│   ├── client-setup-bridge.js                 #   Bridge: PhaseCompleted → setupLegalEntity / setupAccount / setupProducts
-│   ├── hf-document-bridge.js                  #   Bridge: DocumentRequested → submitDocumentHash
-│   ├── hf-credit-negotiator-bridge.js         #   Bridge: TermsProposed → submitCounterProposal / acceptTerms
-│   ├── hf-legal-bridge.js                     #   Bridge: MarkupRequested → submitMarkup / approveClientSide
-│   ├── mcp-server-base.js                     #   Shared HTTP/JSON-RPC 2.0 factory
-│   ├── bridge-base.js                         #   Shared bridge bootstrap + governance preflight
-│   ├── vault-signer.js                        #   VaultSigner — local or HSM (Vault) backend
-│   ├── action-gateway.js                      #   ActionGateway — action-permit pre-flight
-│   ├── audit-exporter.js                      #   Event indexer + REST API for audit trail export
-│   ├── launch-agents.js                       #   Spawns one server process per agent card
-│   └── launch-bridges.js                      #   Spawns all 8 bridge processes
+├── agents_implementation_py/                  # Off-chain MCP servers + oracle bridges (Python)
+│   ├── servers/
+│   │   ├── aml_server.py                      #   MCP server — AML screening
+│   │   ├── credit_risk_server.py              #   MCP server — credit risk assessment
+│   │   ├── legal_server.py                    #   MCP server — legal document review
+│   │   ├── onboarding_orchestrator_server.py  #   MCP server — flow orchestration
+│   │   ├── client_setup_server.py             #   MCP server — legal entity / account / product setup
+│   │   ├── hf_document_server.py              #   MCP server — HF document submission
+│   │   ├── hf_credit_negotiator_server.py     #   MCP server — HF credit term negotiation
+│   │   └── hf_legal_server.py                 #   MCP server — HF legal markup / approval
+│   ├── bridges/
+│   │   ├── aml_bridge.py                      #   Bridge: ReviewRequested → fulfillReview
+│   │   ├── credit_risk_bridge.py              #   Bridge: AssessmentRequested → fulfillAssessment / proposeTerms
+│   │   ├── legal_bridge.py                    #   Bridge: DraftRequested → submitDraft / approveBankSide
+│   │   ├── onboarding_orchestrator_bridge.py  #   Bridge: REST POST /initiate → OnboardingRegistry.initiate()
+│   │   ├── client_setup_bridge.py             #   Bridge: PhaseCompleted → setupLegalEntity / setupAccount / setupProducts
+│   │   ├── hf_document_bridge.py              #   Bridge: DocumentRequested → submitDocumentHash
+│   │   ├── hf_credit_negotiator_bridge.py     #   Bridge: TermsProposed → submitCounterProposal / acceptTerms
+│   │   └── hf_legal_bridge.py                 #   Bridge: MarkupRequested → submitMarkup / approveClientSide
+│   ├── shared/
+│   │   ├── server_base.py                     #   FastMCP factory + @suspended_when_revoked decorator
+│   │   ├── bridge_base.py                     #   Bridge bootstrap + governance preflight
+│   │   ├── vault_signer.py                    #   LocalSigner / VaultSigner — local or HSM backend
+│   │   └── bounds_monitor_client.py           #   Reads bounds-state.json, POSTs to :9090/report
+│   ├── graph/                                 #   LangGraph onboarding state machine
+│   ├── launch_servers.py                      #   Spawns one server process per agent card
+│   └── launch_bridges.py                      #   Spawns all 8 bridge processes
 │
 ├── contracts/
 │   ├── oracles/
@@ -132,16 +135,14 @@ botman_8004/
 
 ## Quick start
 
-> Requires: **Node.js >= 18**, **npm**
+> Requires: **Node.js >= 18** (Hardhat toolchain), **Python >= 3.11** (off-chain layer)
 
 ### 1 — Install dependencies
 
 ```bash
 npm install
-cd agents_implementation && npm install && cd ..
+cd agents_implementation_py && pip install -e . && cd ..
 ```
-
-> Two independent npm workspaces: the root is CommonJS (Hardhat toolchain); `agents_implementation/` is `"type": "module"` (ESM).
 
 ### 2 — Compile contracts
 
@@ -177,29 +178,35 @@ See the test fixtures in `test/AMLOracle.test.js`, `test/OnboardingRegistry.test
 
 ```bash
 # Foreground (Ctrl-C stops all)
-node agents_implementation/launch-agents.js
+python agents_implementation_py/launch_servers.py
 ```
 
-The launcher reads every `.json` file in `agents/`, maps each capability to a server script, and spawns one process per card. Capability → server mapping:
+The launcher reads every `.json` file in `agents/`, maps each capability to a server module, and spawns one process per card. Capability → server mapping:
 
 | Capability | Server |
 |---|---|
-| `aml-review` | `aml-server.js` |
-| `credit-risk` | `credit-risk-server.js` |
-| `legal-review` | `legal-server.js` |
-| `onboarding` | `onboarding-orchestrator-server.js` |
-| `client-setup` | `client-setup-server.js` |
-| `hf-document` | `hf-document-server.js` |
-| `hf-credit-negotiator` | `hf-credit-negotiator-server.js` |
-| `hf-legal` | `hf-legal-server.js` |
+| `aml-review` | `aml_server.py` |
+| `credit-risk` | `credit_risk_server.py` |
+| `legal-review` | `legal_server.py` |
+| `onboarding` | `onboarding_orchestrator_server.py` |
+| `client-setup` | `client_setup_server.py` |
+| `hf-document` | `hf_document_server.py` |
+| `hf-credit-negotiator` | `hf_credit_negotiator_server.py` |
+| `hf-legal` | `hf_legal_server.py` |
 
 ### 7 — Launch oracle bridges
 
 ```bash
-node agents_implementation/launch-bridges.js \
-  --rpc                http://127.0.0.1:8545 \
-  --privkey            0x<OraclePrivateKey>
+python agents_implementation_py/launch_bridges.py \
+  --rpc                  http://127.0.0.1:8545 \
+  --privkey              0x<OraclePrivateKey> \
+  --onboarding-registry  0x... \
+  --aml-contract         0x... \
+  --credit-contract      0x... \
+  --legal-contract       0x...
 ```
+
+> `--setup-contract` is optional; `client_setup_bridge` is skipped if not provided.
 
 Optional flags (also readable from environment variables):
 
@@ -210,7 +217,7 @@ Optional flags (also readable from environment variables):
 | `--action-permit` | `ACTION_PERMIT_ADDRESS` | Action-level pre-flight |
 | `--trace-log` | `TRACE_LOG_ADDRESS` | Flow anomaly policy |
 
-`vault-signer.js` (`VaultSigner`) supports both a local private key and a HashiCorp Vault (HSM) backend. Set `VAULT_ADDR` + `VAULT_TOKEN` + `VAULT_KEY_NAME` to use Vault.
+`VaultSigner` (`shared/vault_signer.py`) supports both a local private key and a HashiCorp Vault (HSM) backend. Set `VAULT_ADDR` + `VAULT_TOKEN` + `VAULT_KEY_NAME` to use Vault.
 
 ---
 
@@ -295,6 +302,12 @@ curl -X POST http://localhost:8010/mcp \
   -H "Content-Type: application/json" \
   -d '{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"requestReview","arguments":{"traceId":"0xabc..."}}}'
 ```
+
+---
+
+## Off-chain components
+
+A parallel Python implementation (`agents_implementation_py/`) ships alongside the Node.js layer. It uses LangChain LCEL chains (`ChatPromptTemplate | ChatOpenAI`) for real LLM inference, web3.py AsyncWeb3 for event watching, and a LangGraph StateGraph for the onboarding orchestrator. Both layers consume the same on-chain contracts, agent cards, and MCP spec files. The Python layer targets ports 8010–8022 by default and supports `--smoke-test` mode (ports 8110+) for parallel validation.
 
 ---
 

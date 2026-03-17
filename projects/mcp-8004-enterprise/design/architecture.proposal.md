@@ -500,7 +500,7 @@ The new owner must re-bind their own wallet and oracle. This prevents a transfer
 
 | Item | Notes |
 |---|---|
-| `deploy-registries.js` deploying oracles with identity registry address | Done; `register-mocks.js` also wires cards and oracle addresses in one script |
+| `scripts/deploy.js` deploying oracles, wiring cards and oracle addresses | Done |
 | Bridges pass `agentId` on every `fulfill*()` call | Done; agentId is stored in every result struct |
 | 10-layer governance stack | Flow authorization, reputation gating, prompt governance, dataset control, autonomy bounding, flow anomaly detection, card integrity, action-level authorization — all implemented; see [concepts.md](./concepts.md) |
 | MCP spec extensions (`autonomy_bounds`, `action_permits`) | Documented in [mcp.extension.md](./mcp.extension.md) |
@@ -510,7 +510,7 @@ The new owner must re-bind their own wallet and oracle. This prevents a transfer
 
 | Priority | Item |
 |---|---|
-| High | Replace stub `review_pr` / `approve_pr` tool handlers with real LLM API calls (Anthropic / OpenAI) |
+| Medium | Activate prompt hash v1 in `scripts/deploy.js` — `PromptRegistry.setActiveVersion()` not yet called post-deploy |
 | Medium | Add a `deployed-addresses.json` output from deploy scripts so bridges read contract addresses without CLI flags |
 | Medium | Extract `MCPOracle.sol` base contract — `onlyRegisteredOracle` modifier, `requestId` generation, shared 10-layer auth stack — to avoid duplication between `CodeReviewerOracle` and `CodeApproverOracle` |
 | Medium | Replace raw `bytes` payload storage in oracle contracts with `payloadHash` only (prerequisite for cross-bank deployment; see [b2b.agentic.flow.md](./b2b.agentic.flow.md)) |
@@ -523,4 +523,14 @@ The new owner must re-bind their own wallet and oracle. This prevents a transfer
 For analysis of extending this architecture to a permissioned inter-institutional blockchain, see [b2b.agentic.flow.md](./b2b.agentic.flow.md).
 
 For the reference implementation of this architecture — an institutional client onboarding flow (bank ↔ hedge fund) with 10 agents across both institutions, parallel AML / Credit / Legal sub-workflows, iterative negotiation, human-in-the-loop approvals, and sequential setup phases — see [onboarding.flow.md](./onboarding.flow.md).
+
+---
+
+## 13. Off-Chain Runtime
+
+The off-chain layer is implemented in Python (`agents_implementation_py/`) using web3.py AsyncWeb3, LangChain LCEL chains (`ChatPromptTemplate | ChatOpenAI.with_structured_output`), and a LangGraph `StateGraph` for the onboarding orchestrator. The Node.js reference implementation has been archived (git tag: `node-js-runtime-archive`).
+
+The Python layer consumes the same on-chain contracts, agent cards (`agents/*.json`), and MCP specs (`agents/mcp/*.mcp.json`). MCP specs carry a `langchain_messages` field (alongside the original `template` field) used by Python servers to build `ChatPromptTemplate` instances. Prompt hash v1 is registered in `scripts/deploy.js` but not yet activated.
+
+The bounds monitor (`bounds_monitor.py`) runs alongside bridges and servers. It reads `autonomy_bounds` blocks from MCP specs, maintains sliding windows, and writes `bounds-state.json`. Optionally calls `disableTool`/`enableTool` on `AutonomyBoundsRegistry` on-chain. HTTP API on `:9090` (`/report`, `/state`, `/metrics`, `/reset`). Use `--mock` to skip on-chain calls during local development.
 

@@ -33,13 +33,13 @@ traceId is born
 AMLOracle.requestAMLReview(flowId, bankAmlAgentId, hfDocAgentId, traceId)
       │  event AMLReviewRequested(..., traceId)
       ▼
-aml-bridge.js  ←  receives event with traceId
+aml_bridge.py  ←  receives event with traceId
       │  POST /mcp  { screen_client, headers: X-Trace-Id }
       ▼
-aml-server.js  ←  logs traceId
+aml_server.py  ←  logs traceId
       │  returns { action: 'submit_recommendation', result_hash, cleared: true }
       ▼
-aml-bridge.js  →  submitRecommendation(bankAmlAgentId, requestId, resultHash)
+aml_bridge.py  →  submitRecommendation(bankAmlAgentId, requestId, resultHash)
       │  contract reads traceId from storage
       │  event AMLReviewFulfilled(..., traceId)
       │
@@ -49,12 +49,12 @@ aml-bridge.js  →  submitRecommendation(bankAmlAgentId, requestId, resultHash)
 CreditRiskOracle.requestCreditReview(flowId, bankCreditAgentId, hfCreditAgentId, traceId)
       │  event CreditReviewRequested(..., traceId)
       ▼
-credit-risk-bridge.js  →  POST /mcp  { assess_credit, headers: X-Trace-Id }
+credit_risk_bridge.py  →  POST /mcp  { assess_credit, headers: X-Trace-Id }
       ▼
-credit-risk-server.js  ←  logs traceId
+credit_risk_server.py  ←  logs traceId
       │  returns { action: 'propose_terms', terms_hash }
       ▼
-credit-risk-bridge.js  →  proposeTerms(bankCreditAgentId, requestId, termsHash)
+credit_risk_bridge.py  →  proposeTerms(bankCreditAgentId, requestId, termsHash)
       │  contract reads traceId from storage
       │  event TermsProposed(..., traceId)
       │
@@ -163,8 +163,8 @@ const allEvents = [
 
 The bridge reads the `traceId` from the emitted event and passes it to the MCP server as a header and tool argument:
 
-```javascript
-// aml-bridge.js
+```python
+# aml_bridge.py (JavaScript shown for brevity — actual implementation uses web3.py AsyncWeb3)
 amlOracle.on("AMLReviewRequested", async (requestId, flowId, bankAgentId, clientAgentId, timestamp) => {
     const traceId = flowId;                           // flowId carries the traceId
     const agentEndpoint = pickEndpoint("aml-review");
@@ -399,13 +399,13 @@ On a private/enterprise chain (Besu, etc.), the full transaction input data is a
 
 | File | Change |
 |---|---|
-| `aml-bridge.js` | Read `traceId` from event (`flowId`), pass as `X-Trace-Id` header and tool argument. `submitRecommendation()` no longer takes `traceId` — contract reads it from storage. |
-| `credit-risk-bridge.js` | Same pattern. `proposeTerms()` / `fulfillReview()` read `traceId` from storage. |
-| `legal-bridge.js` | Same pattern across draft / markup / execution events. |
-| `client-setup-bridge.js` | Same pattern across three setup phase events. |
-| `aml-server.js` | Log `traceId` from header/argument on every tool call |
-| `credit-risk-server.js` | Same pattern |
-| `deploy-registries.js` | Deploy `ExecutionTraceLog` and pass its address to oracle constructors |
+| `bridges/aml_bridge.py` | Read `traceId` from event (`flowId`), pass as `X-Trace-Id` header and tool argument. `submitRecommendation()` no longer takes `traceId` — contract reads it from storage. |
+| `bridges/credit_risk_bridge.py` | Same pattern. `proposeTerms()` / `fulfillReview()` read `traceId` from storage. |
+| `bridges/legal_bridge.py` | Same pattern across draft / markup / execution events. |
+| `bridges/client_setup_bridge.py` | Same pattern across three setup phase events. |
+| `servers/aml_server.py` | Log `traceId` from header/argument on every tool call |
+| `servers/credit_risk_server.py` | Same pattern |
+| `scripts/deploy.js` | Deploy `ExecutionTraceLog` and pass its address to oracle constructors |
 
 ### Agent cards / MCP specs
 
@@ -421,7 +421,7 @@ No changes required. The `traceId` is an infrastructure concern — it flows thr
 | High | Update bridges to propagate `traceId` from event → MCP call → fulfillment tx | ✅ Done |
 | Medium | Implement `ExecutionTraceLog.sol` and integrate with oracle contracts | ✅ Done |
 | Medium | Add `traceId` to MCP server structured logs | ✅ Done |
-| Medium | Update `deploy-registries.js` to deploy `ExecutionTraceLog` and pass to oracle constructors | ✅ Done |
+| Medium | `scripts/deploy.js` deploys `ExecutionTraceLog` and passes its address to oracle constructors | ✅ Done |
 | Low | Build a trace viewer — reads `ExecutionTraceLog.getTrace(traceId)` and renders the execution chain | Planned |
 | Low | Add trace-based alerting — flag traces that lack a terminal event after N blocks | Planned |
 

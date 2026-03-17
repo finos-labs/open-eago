@@ -95,7 +95,10 @@
         { "name": "client_name", "description": "Legal name of the institutional client", "required": true },
         { "name": "jurisdiction", "description": "Client jurisdiction (e.g. 'Cayman Islands')", "required": false }
       ],
-      "template": "You are an AML compliance officer performing sanctions and PEP screening.\n\nClient: {{client_name}}{{#if jurisdiction}}\nJurisdiction: {{jurisdiction}}{{/if}}\n\nScreen this client against all applicable sanctions lists and PEP databases.\nAssess beneficial ownership structure and source of funds.\nProvide a recommendation: CLEARED or REQUIRES_REVIEW, with justification."
+      "template": "You are an AML compliance officer performing sanctions and PEP screening.\n\nClient: {{client_name}}{{#if jurisdiction}}\nJurisdiction: {{jurisdiction}}{{/if}}\n\nScreen this client against all applicable sanctions lists and PEP databases.\nAssess beneficial ownership structure and source of funds.\nProvide a recommendation: CLEARED or REQUIRES_REVIEW, with justification.",
+      "langchain_messages": [
+        {"role": "system", "content": "You are an AML compliance officer performing sanctions and PEP screening.\n\nClient: {client_name}\nJurisdiction: {jurisdiction}\n\nScreen this client against all applicable sanctions lists and PEP databases.\nAssess beneficial ownership structure and source of funds.\nProvide a recommendation: CLEARED or REQUIRES_REVIEW, with justification."}
+      ]
     }
   ]
 }

@@ -212,6 +212,33 @@ async function main() {
         });
     }
 
+    // ── Register LangChain prompt hash v1 (NOT activated — activate when Python bridges go live) ──
+    console.log("\n── Registering LangChain prompt hash v1 ─────────────────────────────────");
+
+    const mcpDir     = path.join(__dirname, '..', 'agents', 'mcp');
+    const amlSpec    = JSON.parse(fs.readFileSync(path.join(mcpDir, 'aml-review.mcp.json'),   'utf8'));
+    const creditSpec = JSON.parse(fs.readFileSync(path.join(mcpDir, 'credit-risk.mcp.json'),  'utf8'));
+    const legalSpec  = JSON.parse(fs.readFileSync(path.join(mcpDir, 'legal-review.mcp.json'), 'utf8'));
+
+    const CAP_AML_REVIEW    = hre.ethers.id('aml_review');
+    const CAP_CREDIT_REVIEW = hre.ethers.id('credit_review');
+    const CAP_LEGAL_REVIEW  = hre.ethers.id('legal_review');
+
+    function langchainHash(spec) {
+        const msgs = spec.prompts?.[0]?.langchain_messages;
+        if (!msgs) throw new Error(`No langchain_messages found in spec: ${spec.name}`);
+        // JSON.stringify (no spaces) matches Python json.dumps(separators=(',',':'))
+        const canonical = JSON.stringify(msgs);
+        return hre.ethers.keccak256(hre.ethers.toUtf8Bytes(canonical));
+    }
+
+    await (await promptReg.registerPrompt(CAP_AML_REVIEW,    langchainHash(amlSpec),    'agents/mcp/aml-review.mcp.json#v1-langchain')).wait();
+    await (await promptReg.registerPrompt(CAP_CREDIT_REVIEW, langchainHash(creditSpec), 'agents/mcp/credit-risk.mcp.json#v1-langchain')).wait();
+    await (await promptReg.registerPrompt(CAP_LEGAL_REVIEW,  langchainHash(legalSpec),  'agents/mcp/legal-review.mcp.json#v1-langchain')).wait();
+    console.log("PromptRegistry: LangChain hash v1 registered for AML, Credit, Legal (not yet activated) ✓");
+    console.log("  → To activate: promptReg.setActiveVersion(CAP_*, 0)  (version 0 = first registered)");
+    console.log("  → Rollback:    promptReg.deactivate(CAP_*)");
+
     // ── Write simulation-addresses.json ───────────────────────────────────────
     const addresses = {
         identityRegistry:          identityAddr,

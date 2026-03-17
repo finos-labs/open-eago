@@ -205,8 +205,8 @@ req.status = newStatus;
 
 When `--reputation-gate` is provided, bridges perform an off-chain pre-flight check before submitting any fulfillment transaction:
 
-```javascript
-// aml-bridge.js
+```python
+# aml_bridge.py (JavaScript shown for brevity — actual implementation uses web3.py AsyncWeb3)
 const REPUTATION_GATE_ABI = [
     'function meetsThreshold(uint256 agentId, bytes32 capability) view returns (bool)',
 ];
@@ -226,7 +226,7 @@ This is **defense-in-depth**: the on-chain contract performs the same check. The
 
 ## 7. Deployment
 
-`deploy-registries.js` deploys `ReputationGate` after `ReputationRegistryUpgradeable` (it needs the registry address) and wires it into both oracle contracts:
+`scripts/deploy.js` deploys `ReputationGate` after `ReputationRegistryUpgradeable` (it needs the registry address) and wires it into both oracle contracts:
 
 ```javascript
 // 7. Reputation Gate
@@ -308,8 +308,8 @@ The four layers are complementary and independently optional. A deployment can u
 | `AMLOracle` — `setReputationGate`, inline check | ✅ Done |
 | `CreditRiskOracle` — `setReputationGate`, inline check via `_validateAndSetStatus` | ✅ Done |
 | `LegalOracle`, `ClientSetupOracle` — `setReputationGate`, inline check | ✅ Done |
-| Bridge pre-flight check (`--reputation-gate` / `REPUTATION_GATE_ADDRESS`) in `aml-bridge.js`, `credit-risk-bridge.js`, `legal-bridge.js`, `client-setup-bridge.js` | ✅ Done |
-| `deploy-registries.js` — deploy + wire to all four oracles | ✅ Done |
+| Bridge pre-flight check (`--reputation-gate` / `REPUTATION_GATE_ADDRESS`) in `bridges/aml_bridge.py`, `bridges/credit_risk_bridge.py`, `bridges/legal_bridge.py`, `bridges/client_setup_bridge.py` | ✅ Done |
+| `scripts/deploy.js` — deploy + wire to all four oracles | ✅ Done |
 | `test/ReputationGate.test.js` — 38 tests including oracle integration and end-to-end | ✅ Done |
 | Per-capability threshold management UI / admin tool | Planned |
 | Automated threshold adjustment based on sliding window | Planned |

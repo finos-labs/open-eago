@@ -234,7 +234,7 @@ Every contract in the stack applies unchanged:
 - `ActionPermitRegistry` — action-level tiering is *more* important internally where agents touch live systems
 - `ExecutionTraceLog` — immutable audit trail satisfies internal compliance and change-management requirements
 - `FlowAuthorizationRegistry` — scoped authorization prevents an agent invoked in one flow from acting in another
-- `AutonomyBoundsRegistry` + `bounds-monitor.js` — dynamic revocation on anomaly detection applies equally to internal agents
+- `AutonomyBoundsRegistry` + `bounds_monitor.py` — dynamic revocation on anomaly detection applies equally to internal agents
 - MCP spec format (`autonomy_bounds`, `action_permits`) — unchanged; internal MCP servers consume the same spec
 
 The only structural simplification is dropping the consortium governance layer (`ConsortiumGovernance`, `ParticipantRegistry`, cross-bank bilateral consent) — a single organization can govern contracts with a standard internal multi-sig or admin role rather than an M-of-N cross-bank quorum.
