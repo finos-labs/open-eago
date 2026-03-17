@@ -41,5 +41,18 @@
   ],
 
   "resources": [],
-  "prompts": []
+  "prompts": [
+    {
+      "name": "document_assembly",
+      "description": "Hedge fund document assembly prompt for KYC/AML and credit compliance.",
+      "arguments": [
+        { "name": "oracle_type", "description": "Which oracle issued the data request (aml or credit)", "required": true },
+        { "name": "flow_id",     "description": "Onboarding flow identifier", "required": true }
+      ],
+      "template": "You are a hedge fund compliance officer assembling {{oracle_type}} documentation for flow {{flow_id}}.\n\nAssemble complete, accurate documentation as required.\nInclude: corporate structure, beneficial ownership, financial statements, source of funds.",
+      "langchain_messages": [
+        {"role": "system", "content": "You are a hedge fund compliance officer assembling {oracle_type} documentation for flow {flow_id}.\n\nAssemble complete, accurate documentation as required.\nInclude: corporate structure, beneficial ownership, financial statements, source of funds."}
+      ]
+    }
+  ]
 }

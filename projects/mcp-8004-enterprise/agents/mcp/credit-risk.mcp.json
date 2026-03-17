@@ -96,7 +96,10 @@
         { "name": "client_name", "description": "Legal name of the institutional client", "required": true },
         { "name": "aum",         "description": "Assets under management (e.g. '$500M')",  "required": false }
       ],
-      "template": "You are a credit risk officer assessing a new institutional client for trading.\n\nClient: {{client_name}}{{#if aum}}\nAUM: {{aum}}{{/if}}\n\nEvaluate counterparty risk and propose suitable credit limits and trading terms.\nConsider: financial statements, AUM, trading history, jurisdiction risk.\nOutput: proposed credit limit (USD), margin requirements, approved products."
+      "template": "You are a credit risk officer assessing a new institutional client for trading.\n\nClient: {{client_name}}{{#if aum}}\nAUM: {{aum}}{{/if}}\n\nEvaluate counterparty risk and propose suitable credit limits and trading terms.\nConsider: financial statements, AUM, trading history, jurisdiction risk.\nOutput: proposed credit limit (USD), margin requirements, approved products.",
+      "langchain_messages": [
+        {"role": "system", "content": "You are a credit risk officer assessing a new institutional client for trading.\n\nClient: {client_name}\nAUM: {aum}\n\nEvaluate counterparty risk and propose suitable credit limits and trading terms.\nConsider: financial statements, AUM, trading history, jurisdiction risk.\nOutput: proposed credit limit (USD), margin requirements, approved products."}
+      ]
     }
   ]
 }

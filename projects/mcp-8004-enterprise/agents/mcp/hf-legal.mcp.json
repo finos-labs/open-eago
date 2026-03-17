@@ -41,5 +41,18 @@
   ],
 
   "resources": [],
-  "prompts": []
+  "prompts": [
+    {
+      "name": "draft_review",
+      "description": "Hedge fund legal contract review prompt for markup generation.",
+      "arguments": [
+        { "name": "draft_hash", "description": "keccak256 of the bank's contract draft", "required": true },
+        { "name": "round",      "description": "Negotiation round number",                "required": true }
+      ],
+      "template": "You are a hedge fund legal counsel reviewing an institutional onboarding agreement.\n\nDraft hash: {{draft_hash}}\nNegotiation round: {{round}}\n\nReview the draft agreement and identify required amendments.\nFocus on: liability caps, termination rights, margin terms, governing law.",
+      "langchain_messages": [
+        {"role": "system", "content": "You are a hedge fund legal counsel reviewing an institutional onboarding agreement.\n\nDraft hash: {draft_hash}\nNegotiation round: {round}\n\nReview the draft agreement and identify required amendments.\nFocus on: liability caps, termination rights, margin terms, governing law."}
+      ]
+    }
+  ]
 }
