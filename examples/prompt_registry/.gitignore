@@ -1,0 +1,10 @@
+node_modules/
+artifacts/
+cache/
+typechain-types/
+.env
+__pycache__/
+*.pyc
+*.egg-info/
+.venv/
+dist/

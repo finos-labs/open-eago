@@ -90,35 +90,36 @@ IDENTITY_REGISTRY_ABI = [
 
 PROMPT_REGISTRY_ABI = [
     {
-        "name": "isActive",
+        "name": "register",
+        "type": "function",
+        "stateMutability": "nonpayable",
+        "inputs": [
+            {"name": "promptId",    "type": "bytes32"},
+            {"name": "version",     "type": "string"},
+            {"name": "contentHash", "type": "bytes32"},
+        ],
+        "outputs": [],
+    },
+    {
+        "name": "getHash",
         "type": "function",
         "stateMutability": "view",
         "inputs": [
-            {"name": "capability",   "type": "bytes32"},
-            {"name": "templateHash", "type": "bytes32"},
+            {"name": "promptId", "type": "bytes32"},
+            {"name": "version",  "type": "string"},
+        ],
+        "outputs": [{"name": "", "type": "bytes32"}],
+    },
+    {
+        "name": "verify",
+        "type": "function",
+        "stateMutability": "view",
+        "inputs": [
+            {"name": "promptId",    "type": "bytes32"},
+            {"name": "version",     "type": "string"},
+            {"name": "contentHash", "type": "bytes32"},
         ],
         "outputs": [{"name": "", "type": "bool"}],
-    },
-    {
-        "name": "registerPrompt",
-        "type": "function",
-        "stateMutability": "nonpayable",
-        "inputs": [
-            {"name": "capability",   "type": "bytes32"},
-            {"name": "templateHash", "type": "bytes32"},
-            {"name": "metadataUri",  "type": "string"},
-        ],
-        "outputs": [{"name": "version", "type": "uint256"}],
-    },
-    {
-        "name": "setActiveVersion",
-        "type": "function",
-        "stateMutability": "nonpayable",
-        "inputs": [
-            {"name": "capability", "type": "bytes32"},
-            {"name": "version",    "type": "uint256"},
-        ],
-        "outputs": [],
     },
 ]
 

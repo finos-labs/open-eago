@@ -140,6 +140,8 @@ async def main() -> None:
         contract_env="AML_CONTRACT_ADDRESS",
         agent_id_env="AML_AGENT_ID",
         card_glob="bank-aml-agent.json",
+        prompt_name="bank-aml-agent",
+        prompt_version_env="AML_PROMPT_VERSION",
     )
 
     oracle = ctx.w3.eth.contract(address=ctx.contract_address, abi=AML_ORACLE_ABI)
