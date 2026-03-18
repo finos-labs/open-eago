@@ -1,14 +1,14 @@
 # Prompt Registry
 
-Closes the **prompt governance gap** identified in the `mcp-8004-enterprise` research paper by binding LangSmith prompt versions to on-chain keccak256 hashes. This is a standalone implementation of **Layer 4 (Prompt Governance)** from the nine-layer authorization stack.
+Closes the **prompt governance gap** identified in the `mcp-erc8004-enterprise` research paper by binding LangSmith prompt versions to on-chain keccak256 hashes. This is a standalone implementation of **Layer 4 (Prompt Governance)** from the nine-layer authorization stack.
 
-## Design connection: mcp-8004-enterprise
+## Design connection: mcp-erc8004-enterprise
 
 ### The problem this solves
 
-The [paper](../mcp-8004-enterprise/paper/paper.md) (§8 — "The LLM Inference Gap") identifies a fundamental blind spot: on-chain governance can verify *that* an agent ran, but cannot see *what prompt* was used to drive the LLM. An attacker who modifies a prompt template after it has been reviewed and approved can subvert agent behavior without triggering any on-chain alarm.
+The [paper](../mcp-erc8004-enterprise/paper/paper.md) (§8 — "The LLM Inference Gap") identifies a fundamental blind spot: on-chain governance can verify *that* an agent ran, but cannot see *what prompt* was used to drive the LLM. An attacker who modifies a prompt template after it has been reviewed and approved can subvert agent behavior without triggering any on-chain alarm.
 
-[Layer 4 of the nine-layer stack](../mcp-8004-enterprise/CLAUDE.md) (`PromptRegistry`) is designed to close this gap. This example provides the full implementation of that layer.
+[Layer 4 of the nine-layer stack](../mcp-erc8004-enterprise/CLAUDE.md) (`PromptRegistry`) is designed to close this gap. This example provides the full implementation of that layer.
 
 ### Where Layer 4 sits in the stack
 
@@ -26,15 +26,15 @@ The [paper](../mcp-8004-enterprise/paper/paper.md) (§8 — "The LLM Inference G
 
 ### Design documents
 
-- [architecture.proposal.md](../mcp-8004-enterprise/design/architecture.proposal.md) — full ERC-8004 + MCP design; introduces the nine governance layers
-- [concepts/prompt-governance.md](../mcp-8004-enterprise/design/concepts/prompt-governance.md) — deep dive on Layer 4 rationale
-- [paper/paper.md §8](../mcp-8004-enterprise/paper/paper.md) — the inference gap and why on-chain hashing is the mitigation
+- [architecture.proposal.md](../mcp-erc8004-enterprise/design/architecture.proposal.md) — full ERC-8004 + MCP design; introduces the nine governance layers
+- [concepts/prompt-governance.md](../mcp-erc8004-enterprise/design/concepts/prompt-governance.md) — deep dive on Layer 4 rationale
+- [paper/paper.md §8](../mcp-erc8004-enterprise/paper/paper.md) — the inference gap and why on-chain hashing is the mitigation
 
-## Code connection: mcp-8004-enterprise
+## Code connection: mcp-erc8004-enterprise
 
-This example's bridge code has been directly integrated into the `mcp-8004-enterprise` agent implementation:
+This example's bridge code has been directly integrated into the `mcp-erc8004-enterprise` agent implementation:
 
-| This example | mcp-8004-enterprise counterpart | Role |
+| This example | mcp-erc8004-enterprise counterpart | Role |
 |---|---|---|
 | `bridge/langsmith_client.py` | `shared/prompt_verifier.py` | LangSmith fetch + keccak256 |
 | `bridge/runtime_verifier.py` | `shared/prompt_verifier.py` | `verify_prompt_at_startup()` + `PromptTamperError` |
@@ -152,10 +152,10 @@ python registry_bridge.py --prompt-name bank-aml-agent --no-langsmith
 python runtime_verifier.py --prompt-name bank-aml-agent --version <langsmith-commit>
 ```
 
-### 5. Wire into mcp-8004-enterprise bridges
+### 5. Wire into mcp-erc8004-enterprise bridges
 
 ```bash
-# In mcp-8004-enterprise/agents_implementation_py/
+# In mcp-erc8004-enterprise/agents_implementation_py/
 export PROMPT_REGISTRY_ADDRESS=0x...
 export AML_PROMPT_VERSION=<langsmith-commit>   # printed by seed_langsmith.py / registry_bridge.py
 

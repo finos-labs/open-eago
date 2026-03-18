@@ -4,7 +4,7 @@
 
 ## What this example is
 
-`prompt_registry` demonstrates how to close the **prompt governance gap** (Layer 4 of the nine-layer stack in `mcp-8004-enterprise`) by:
+`prompt_registry` demonstrates how to close the **prompt governance gap** (Layer 4 of the nine-layer stack in `mcp-erc8004-enterprise`) by:
 
 1. Storing approved prompt template hashes on-chain in `PromptRegistry.sol`.
 2. Fetching prompts from **LangSmith** at CI/CD time, computing `keccak256` of their canonical content, and registering the hash on-chain (`registry_bridge.py`).
