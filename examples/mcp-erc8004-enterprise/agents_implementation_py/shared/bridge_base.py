@@ -31,6 +31,7 @@ from shared.abis import (
     IDENTITY_REGISTRY_ABI,
     REPUTATION_GATE_ABI,
 )
+from shared.prompt_verifier import PromptTamperError, verify_prompt_at_startup
 from shared.vault_signer import BaseSigner, create_signer
 
 logger = logging.getLogger(__name__)
@@ -197,6 +198,8 @@ async def bootstrap_bridge(
     contract_env: str,
     agent_id_env: str,
     card_glob: Optional[str] = None,
+    prompt_name: Optional[str] = None,
+    prompt_version_env: str = "PROMPT_VERSION",
 ) -> BridgeContext:
     """
     Parse common CLI flags, build web3 provider / signer / governance contracts.
@@ -213,6 +216,7 @@ async def bootstrap_bridge(
     autonomy_addr      = arg("--autonomy-bounds",  "AUTONOMY_BOUNDS_ADDRESS")
     action_permit_addr = arg("--action-permit",    "ACTION_PERMIT_ADDRESS")
     identity_addr      = arg("--identity-registry","IDENTITY_REGISTRY_ADDRESS")
+    prompt_registry_addr = arg("--prompt-registry","PROMPT_REGISTRY_ADDRESS")
 
     contract_address = arg(contract_flag, contract_env)
     raw_agent_id     = arg("--agent-id", agent_id_env, "0")
@@ -265,6 +269,27 @@ async def bootstrap_bridge(
             else:
                 logger.info("[%s] Card hash OK agentId=%s: %s", label, agent_id, local_hash)
 
+    # Prompt hash startup check (Layer 4)
+    if prompt_registry_addr and prompt_name:
+        prompt_ver = arg("--prompt-version", prompt_version_env)
+        if prompt_ver:
+            try:
+                await verify_prompt_at_startup(
+                    label,
+                    w3,
+                    registry_address=prompt_registry_addr,
+                    prompt_name=prompt_name,
+                    prompt_version=prompt_ver,
+                )
+            except PromptTamperError as exc:
+                logger.error("%s", exc)
+                sys.exit(1)
+        else:
+            logger.warning(
+                "[%s] --prompt-version / %s not set — skipping prompt hash check",
+                label, prompt_version_env,
+            )
+
     logger.info("[%s] RPC        : %s", label, rpc_url)
     logger.info("[%s] Contract   : %s", label, contract_address)
     logger.info("[%s] Signer     : %s (%s)", label, signer_type, signer.address)
@@ -273,6 +298,7 @@ async def bootstrap_bridge(
     logger.info("[%s] RepGate    : %s", label, reputation_addr or "(disabled)")
     logger.info("[%s] AutoBounds : %s", label, autonomy_addr or "(disabled)")
     logger.info("[%s] ActionPerm : %s", label, action_permit_addr or "(disabled)")
+    logger.info("[%s] PromptReg  : %s", label, prompt_registry_addr or "(disabled)")
 
     return BridgeContext(
         w3=w3,

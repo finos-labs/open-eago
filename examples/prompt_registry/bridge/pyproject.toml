@@ -3,24 +3,16 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "eago-agents"
+name = "prompt-registry-bridge"
 version = "0.1.0"
 requires-python = ">=3.11"
 dependencies = [
-    "langchain>=0.3",
-    "langchain-core>=0.3",
-    "langchain-openai>=0.2",
-    "langgraph>=0.2",
     "langsmith>=0.1",
-    "mcp[cli]>=1.0",
+    "langchain-core>=0.3",
     "web3>=7.0",
-    "httpx>=0.27",
+    "eth-abi>=5.0",
+    "python-dotenv>=1.0",
     "pydantic>=2.0",
-    "eth-account>=0.13",
-    "typing_extensions>=4.0",
-    # FastMCP streamable-http transport deps (pulled transitively by mcp[cli])
-    "starlette>=0.40",
-    "uvicorn>=0.30",
 ]
 
 [project.optional-dependencies]
