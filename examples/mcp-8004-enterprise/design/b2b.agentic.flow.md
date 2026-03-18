@@ -2,8 +2,8 @@
 
 > **Status:** Partially implemented — P2 (bilateral flow authorization, credentialed Tier 2 approvers), P3 (reputation anti-gaming, audit exporter), and P4 (ConsortiumGovernance) are implemented in contracts/tests. P0 (payload privacy, ParticipantRegistry minting gate on IdentityRegistry) and P1 (multi-sig governance, HSM) are infrastructure concerns not yet wired.
 > **Context:** Does the ERC-8004 / MCP stack extend naturally to a cross-bank, permissioned blockchain running inter-bank agentic workflows? What controls are missing?
-> **Baseline:** [architecture.proposal.md](./architecture.proposal.md) — current system design; [concepts.md](./concepts.md) — 10 governance layers
-> **Reference implementation:** [onboarding.flow.md](./onboarding.flow.md) — institutional client onboarding flow; full agent roster, oracle contracts, and topology for a bank ↔ hedge fund onboarding scenario
+> **Baseline:** [architecture.proposal.md](architecture.proposal.md) — current system design; [concepts.md](concepts.md) — 10 governance layers
+> **Reference implementation:** [onboarding.flow.md](onboarding.flow.md) — institutional client onboarding flow; full agent roster, oracle contracts, and topology for a bank ↔ hedge fund onboarding scenario
 
 ---
 
@@ -31,7 +31,7 @@ The proposed network topology maps cleanly onto established financial DMZ archit
 
 **Internal tier bridges** submit transactions only — no inbound events from counterparty institutions ever reach them. **External tier bridges** subscribe to chain events from both their own institution and counterparties; all inter-institution communication is mediated by the chain, never direct bridge-to-bridge.
 
-For the concrete agent-to-tier mapping, see [onboarding.flow.md — Network Topology](./onboarding.flow.md).
+For the concrete agent-to-tier mapping, see [onboarding.flow.md — Network Topology](onboarding.flow.md).
 
 **What goes on-chain:** agent NFT IDs, wallet addresses, `bytes32` hashes (traceIds, cardHashes, promptHashes, datasetHashes), approval/reject decisions, reputation counts, execution hop log.
 
@@ -82,7 +82,7 @@ The foundation is sound. The following sections identify what must be added or c
 - Agent NFTs carry implicit institutional provenance: `participantOf(agentId)` reads through `ParticipantRegistry`
 - The `deploymentTier` field makes the network topology machine-readable: ops tooling uses it to determine which DMZ tier and firewall rules apply to each agent's bridge
 - Minting permission is separate from validator node membership
-- For the full `ParticipantRegistry` interface, see [onboarding.flow.md — ParticipantRegistry](./onboarding.flow.md)
+- For the full `ParticipantRegistry` interface, see [onboarding.flow.md — ParticipantRegistry](onboarding.flow.md)
 
 ### P1 — Multi-sig contract governance
 
