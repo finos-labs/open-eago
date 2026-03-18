@@ -2,7 +2,7 @@
 
 > **Status:** Implemented
 > **Context:** Reference implementation for the ERC-8004 / MCP agentic workflow stack in a realistic cross-institutional scenario. Replaces the simple code-review/approve mock with a production-grade institutional onboarding flow.
-> **Baseline:** [b2b.agentic.flow.md](./b2b.agentic.flow.md) — consortium architecture and B2B controls; [concepts.md](./concepts.md) — 10 governance layers
+> **Baseline:** [b2b.agentic.flow.md](b2b.agentic.flow.md) — consortium architecture and B2B controls; [concepts.md](concepts.md) — 10 governance layers
 
 ---
 
@@ -34,7 +34,7 @@ A hedge fund wishes to begin trading with a bank. The onboarding flow spans thre
 | `HedgeFundCreditNegotiatorAgent` | `credit_negotiation` | External (bidirectional) | `CreditRiskAgent` |
 | `HedgeFundLegalAgent` | `legal_negotiation` | External (bidirectional) | `LegalAgent` |
 
-All agents — bank and hedge fund — are registered as ERC-721 NFTs in the shared `IdentityRegistryUpgradeable`. Provenance is tracked by `ParticipantRegistry` (see [b2b.agentic.flow.md](./b2b.agentic.flow.md)), which records each agent's owning institution and deployment tier.
+All agents — bank and hedge fund — are registered as ERC-721 NFTs in the shared `IdentityRegistryUpgradeable`. Provenance is tracked by `ParticipantRegistry` (see [b2b.agentic.flow.md](b2b.agentic.flow.md)), which records each agent's owning institution and deployment tier.
 
 ---
 
@@ -422,7 +422,7 @@ The orchestrator bridge runs a LangGraph `StateGraph` (see `graph/`) modelling t
 
 ## ParticipantRegistry
 
-This flow requires `BankRegistry` (from [b2b.agentic.flow.md](./b2b.agentic.flow.md)) to be generalised to `ParticipantRegistry`, since both banks and institutional clients are first-class registered participants.
+This flow requires `BankRegistry` (from [b2b.agentic.flow.md](b2b.agentic.flow.md)) to be generalised to `ParticipantRegistry`, since both banks and institutional clients are first-class registered participants.
 
 ```
 struct Participant {
@@ -451,7 +451,7 @@ The `defaultAgentTier` field makes the deployment topology machine-readable: ops
 
 ## Relationship to B2B Controls
 
-All B2B additional controls from [b2b.agentic.flow.md](./b2b.agentic.flow.md) apply to this flow. Priority order for implementation:
+All B2B additional controls from [b2b.agentic.flow.md](b2b.agentic.flow.md) apply to this flow. Priority order for implementation:
 
 | Control | Relevance to onboarding flow |
 |---|---|

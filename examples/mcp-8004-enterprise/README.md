@@ -9,7 +9,7 @@ standards:
 
 The two standards are linked: every agent card points to an MCP spec, every MCP spec drives a Solidity oracle contract, and the identity registry binds the agent identity to that oracle in a single transaction.
 
-See [`paper/paper.md`](./paper/paper.md) for the complete technical reference and [`design/concepts.md`](./design/concepts.md) as the index of all R&D design documents.
+See [`paper/paper.md`](paper/paper.md) for the complete technical reference and [`design/concepts.md`](design/concepts.md) as the index of all R&D design documents.
 
 ---
 
@@ -506,13 +506,13 @@ npm install
 
 | Document | Contents |
 |---|---|
-| [`design/concepts.md`](./design/concepts.md) | Index of all R&D concepts — start here |
-| [`design/architecture.proposal.md`](./design/architecture.proposal.md) | Full ERC-8004 + MCP design rationale |
-| [`design/8004.refactor.md`](./design/8004.refactor.md) | Identity registry refactor notes |
-| [`design/mcp.extension.md`](./design/mcp.extension.md) | MCP extensions — autonomy bounds, action permits, card hash |
-| [`design/b2b.agentic.flow.md`](./design/b2b.agentic.flow.md) | B2B agentic controls (P0–P4) |
-| [`design/onboarding.flow.md`](./design/onboarding.flow.md) | Onboarding flow walkthrough |
-| [`paper/paper.md`](./paper/paper.md) | Research paper with complete architecture description |
+| [`design/concepts.md`](design/concepts.md) | Index of all R&D concepts — start here |
+| [`design/architecture.proposal.md`](design/architecture.proposal.md) | Full ERC-8004 + MCP design rationale |
+| [`design/8004.refactor.md`](design/8004.refactor.md) | Identity registry refactor notes |
+| [`design/mcp.extension.md`](design/mcp.extension.md) | MCP extensions — autonomy bounds, action permits, card hash |
+| [`design/b2b.agentic.flow.md`](design/b2b.agentic.flow.md) | B2B agentic controls (P0–P4) |
+| [`design/onboarding.flow.md`](design/onboarding.flow.md) | Onboarding flow walkthrough |
+| [`paper/paper.md`](paper/paper.md) | Research paper with complete architecture description |
 
 ---
 
