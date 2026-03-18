@@ -65,31 +65,48 @@ When `PROMPT_REGISTRY_ADDRESS` and `AML_PROMPT_VERSION` are set, `bootstrap_brid
 
 ## How it works
 
-```
-CI/CD pipeline
-  └── registry_bridge.py
-        ├── pull prompt from LangSmith (name:commit)
-        ├── compute keccak256(canonical_content)
-        └── register(promptId, version, hash) → PromptRegistry.sol
+Prompt text lives in this repo (`prompts/`) as the single source of truth, reviewed via git PRs. From there it flows to LangSmith for versioned runtime delivery, and a hash of the content is anchored on-chain for tamper detection.
 
-Agent startup
-  └── bridge_base.bootstrap_bridge()       [mcp-8004-enterprise]
-        └── shared/prompt_verifier.py
-              ├── pull same prompt from LangSmith
-              ├── recompute keccak256
-              └── verify(promptId, version, hash) → exit on mismatch
 ```
+prompts/<agent>.yaml          git — PR-reviewed source of truth
+        │
+        ├── seed_langsmith.py      → LangSmith (versioned delivery, returns commit hash)
+        │
+        └── registry_bridge.py    → push to LangSmith + register hash on-chain
+                                            ↓
+                                      PromptRegistry.sol
+                                            ↓
+                          runtime_verifier / bridge_base verify at agent startup
+```
+
+### Three-way consistency
+
+| Store | What lives there | Role |
+|---|---|---|
+| `prompts/*.yaml` | Canonical prompt text | Audit trail, PR review, diff history |
+| LangSmith | Versioned prompt snapshots | Runtime delivery, commit-pinned references |
+| `PromptRegistry.sol` | `keccak256(canonical_content)` | Tamper detection at agent startup |
+
+The on-chain hash is computed from the local YAML, not from LangSmith, so git is the root of trust.
 
 ## Structure
 
 ```
-contracts/          PromptRegistry.sol — on-chain hash store
-scripts/            deploy.js          — Hardhat deploy + example registration
-test/               PromptRegistry.test.js — 11 Hardhat/Chai unit tests
+prompts/
+  bank-aml-agent.yaml           canonical prompt text (source of truth)
+  bank-credit-risk-agent.yaml
+  bank-legal-agent.yaml
+contracts/
+  PromptRegistry.sol            on-chain hash store
+scripts/
+  deploy.js                     Hardhat deploy + example registration
+test/
+  PromptRegistry.test.js        11 Hardhat/Chai unit tests
 bridge/
-  langsmith_client.py   fetch + canonical hash
-  registry_bridge.py    CI/CD: register hash on-chain
-  runtime_verifier.py   standalone runtime verifier (verify_or_raise)
+  langsmith_client.py           load from prompts/, push to LangSmith, fetch + hash
+  registry_bridge.py            CI/CD: load → push to LangSmith → register hash on-chain
+  seed_langsmith.py             push all local prompts to LangSmith (initial setup / testing)
+  runtime_verifier.py           standalone runtime verifier (verify_or_raise)
   pyproject.toml
   .env.example
 ```
@@ -105,26 +122,42 @@ npx hardhat node                 # start local node (separate terminal)
 npm run deploy                   # deploy PromptRegistry, prints address
 ```
 
-### 2. Bridge
+### 2. Seed LangSmith
 
 ```bash
 cd bridge
 pip install -e .
 cp .env.example .env             # fill in LANGCHAIN_API_KEY, RPC_URL, REGISTRY_PRIVATE_KEY, PROMPT_REGISTRY_ADDRESS
 
-# CI/CD: fetch from LangSmith and register hash on-chain
-python registry_bridge.py --prompt-name bank-aml-agent --version <langsmith-commit>
+# Push all prompts from prompts/ to LangSmith and print commit hashes
+python seed_langsmith.py
 
-# Standalone runtime check
+# Or push a single prompt
+python seed_langsmith.py --prompt-name bank-aml-agent
+```
+
+### 3. Register hashes on-chain (CI/CD)
+
+```bash
+# Load from prompts/, push to LangSmith, register hash on-chain in one step
+python registry_bridge.py --prompt-name bank-aml-agent
+
+# Skip LangSmith push (local dev, no API key needed)
+python registry_bridge.py --prompt-name bank-aml-agent --no-langsmith
+```
+
+### 4. Verify at runtime (standalone)
+
+```bash
 python runtime_verifier.py --prompt-name bank-aml-agent --version <langsmith-commit>
 ```
 
-### 3. Wiring into mcp-8004-enterprise bridges
+### 5. Wire into mcp-8004-enterprise bridges
 
 ```bash
 # In mcp-8004-enterprise/agents_implementation_py/
 export PROMPT_REGISTRY_ADDRESS=0x...
-export AML_PROMPT_VERSION=<langsmith-commit>
+export AML_PROMPT_VERSION=<langsmith-commit>   # printed by seed_langsmith.py / registry_bridge.py
 
 python launch_bridges.py --rpc http://127.0.0.1:8545 --privkey 0x... \
   --aml-contract 0x... \
@@ -133,6 +166,7 @@ python launch_bridges.py --rpc http://127.0.0.1:8545 --privkey 0x... \
 
 ## Security notes
 
-- Pin `--version` to a **LangSmith commit hash**, not a mutable tag — tags can be reassigned, commit hashes cannot.
+- The `prompts/*.yaml` files are the root of trust — changes must go through a PR and be reviewed before `registry_bridge.py` is run.
+- Pin to a **LangSmith commit hash**, not a mutable tag — tags can be reassigned, commit hashes cannot.
 - The `REGISTRY_PRIVATE_KEY` account is the contract owner — restrict it to CI/CD only; never use it at runtime.
 - A missing on-chain registration logs a warning but does not abort (dev-friendly). A hash mismatch exits immediately (`PromptTamperError`) — this is the tamper signal.
