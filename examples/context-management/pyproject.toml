@@ -1,0 +1,16 @@
+[project]
+name = "openEAGO-context-management"
+version = "0.1.0"
+description = "Context & State Management example for OpenEAGO Phase 5 — CRDT + event sourcing via Automerge"
+requires-python = ">=3.11"
+dependencies = [
+    "pydantic>=2.0",
+]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["context_management*"]

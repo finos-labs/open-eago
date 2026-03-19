@@ -1,2 +1,11 @@
 /examples/agent-registry/target
 /examples/agent-registry/spire-*
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+.venv/
