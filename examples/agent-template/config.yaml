@@ -73,4 +73,5 @@ spire:
 # Registry: use https when registry runs with mTLS.
 bootstrap:
   urls: ["https://127.0.0.1:8443"]
-  sync_interval: 30
+  sync_interval: 30   # Full re-registration interval (seconds)
+  status_interval: 10  # Live reliability/health push via PUT /status (seconds)

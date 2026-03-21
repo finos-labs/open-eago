@@ -19,14 +19,15 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import signal
 import ssl
 import sys
 import threading
-import time
 from datetime import datetime
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from pathlib import Path
 from typing import Any
+from urllib.parse import quote
 from urllib.request import Request, urlopen
 from urllib.error import HTTPError, URLError
 
@@ -68,7 +69,7 @@ DEFAULTS = {
         "key_path": os.environ.get("SPIRE_KEY_PATH", "/tmp/svid.0.key"),
         "bundle_path": os.environ.get("SPIRE_BUNDLE_PATH", "/tmp/bundle.0.pem"),
     },
-    "bootstrap": {"urls": [], "sync_interval": 30},
+    "bootstrap": {"urls": [], "sync_interval": 30, "status_interval": 10},
 }
 
 
@@ -161,11 +162,43 @@ def _ssl_context_for_registry(spire: dict):
     return ctx
 
 
-def build_agent_details(config: dict, address: str) -> dict:
+def _registry_request(config: dict, url: str, method: str, body: dict | None = None) -> dict | None:
+    """Send a single HTTP(S) request to the registry. Returns parsed JSON or None on failure."""
+    spire = config.get("spire") or {}
+    use_mtls = spire.get("enabled") and not config.get("_allow_insecure")
+    data = json.dumps(body).encode("utf-8") if body is not None else None
+    headers = {"Content-Type": "application/json"} if data is not None else {}
+    req = Request(url, data=data, method=method, headers=headers)
+    try:
+        ctx = (_ssl_context_for_registry(spire)
+               if use_mtls and Path(spire.get("cert_path", "")).exists() else None)
+        with urlopen(req, timeout=10, **({"context": ctx} if ctx else {})) as resp:
+            return json.loads(resp.read().decode("utf-8"))
+    except HTTPError as e:
+        print(f"[demo-agent] {method} {url} failed: {e.code} {e.read().decode()}", file=sys.stderr)
+    except URLError as e:
+        print(f"[demo-agent] {method} {url} error: {e.reason}", file=sys.stderr)
+    except Exception as e:
+        print(f"[demo-agent] {method} {url} error: {e}", file=sys.stderr)
+    return None
+
+
+def build_agent_details(config: dict, address: str, runtime: "AgentRuntime | None" = None) -> dict:
     a = config.get("agent") or {}
     meta = config.get("metadata") or {}
     endpoints = a.get("endpoints") or {}
     scheme = "https" if config.get("spire", {}).get("enabled") else "http"
+
+    # Prefer live runtime values over static config when available.
+    if runtime is not None:
+        reliability = runtime.reliability()
+        health_status = "healthy" if runtime.running else "unhealthy"
+        uptime_percentage = runtime.uptime_percentage()
+    else:
+        reliability = a.get("reliability", 0.99)
+        health_status = a.get("health_status", "healthy")
+        uptime_percentage = a.get("uptime_percentage")
+
     return {
         "instance_id": a.get("instance_id"),
         "capability_codes": a.get("capability_codes") or meta.get("capabilities") or [],
@@ -173,9 +206,9 @@ def build_agent_details(config: dict, address: str) -> dict:
         "jurisdiction": a.get("jurisdiction"),
         "data_center": a.get("data_center"),
         "compliance": a.get("compliance") if isinstance(a.get("compliance"), list) else [],
-        "reliability": a.get("reliability", 0.99),
-        "health_status": a.get("health_status", "healthy"),
-        "uptime_percentage": a.get("uptime_percentage"),
+        "reliability": reliability,
+        "health_status": health_status,
+        "uptime_percentage": uptime_percentage,
         "endpoints": {
             "http": endpoints.get("http") or f"http://{address}",
             "https": endpoints.get("https") or f"{scheme}://{address}",
@@ -188,45 +221,79 @@ def build_agent_details(config: dict, address: str) -> dict:
     }
 
 
-def register_with_registry(config: dict, address: str) -> None:
+def register_with_registry(config: dict, address: str, runtime: "AgentRuntime | None" = None) -> None:
     urls = (config.get("bootstrap") or {}).get("urls") or []
     if not urls:
         return
     body = {
         "address": address,
         "known_bootstrap_urls": urls,
-        "agent_details": build_agent_details(config, address),
+        "agent_details": build_agent_details(config, address, runtime=runtime),
     }
-    data = json.dumps(body).encode("utf-8")
-    spire = config.get("spire") or {}
-    use_mtls = spire.get("enabled") and not config.get("_allow_insecure")
-
     for base in urls:
-        base = base.rstrip("/")
-        url = f"{base}/register"
-        try:
-            req = Request(url, data=data, method="POST", headers={"Content-Type": "application/json"})
-            if use_mtls and Path(spire.get("cert_path", "")).exists():
-                ctx = _ssl_context_for_registry(spire)
-                with urlopen(req, timeout=10, context=ctx) as resp:
-                    _ = resp.read()
-                print(f"[demo-agent] Registered with {url}")
-            else:
-                with urlopen(req, timeout=10) as resp:
-                    _ = resp.read()
-                print(f"[demo-agent] Registered with {url}")
-        except HTTPError as e:
-            print(f"[demo-agent] Register {url} failed: {e.code} {e.read().decode()}", file=sys.stderr)
-        except URLError as e:
-            print(f"[demo-agent] Register {url} error: {e.reason}", file=sys.stderr)
-        except Exception as e:
-            print(f"[demo-agent] Register {url} error: {e}", file=sys.stderr)
+        url = f"{base.rstrip('/')}/register"
+        resp = _registry_request(config, url, "POST", body)
+        if resp is None:
+            continue
+        print(f"[demo-agent] Registered with {url}")
+        # Quarantine detection: warn if registry considers this agent quarantined.
+        for entry in resp.get("known_addresses") or []:
+            if entry.get("address") == address and entry.get("health_status") == "quarantine":
+                print(
+                    f"[demo-agent] WARNING: registry has quarantined {address}. "
+                    "Check TTL and network connectivity.",
+                    file=sys.stderr,
+                )
 
 
-def sync_loop(config: dict, address: str, stop: threading.Event) -> None:
+def push_status_to_registry(config: dict, address: str, runtime: "AgentRuntime | None") -> None:
+    """Push live reliability, health, and uptime to the registry via PUT /status."""
+    urls = (config.get("bootstrap") or {}).get("urls") or []
+    if not urls or runtime is None:
+        return
+    body = {
+        "address": address,
+        "reliability": runtime.reliability(),
+        "health_status": "healthy" if runtime.running else "unhealthy",
+        "uptime_percentage": runtime.uptime_percentage(),
+    }
+    for base in urls:
+        url = f"{base.rstrip('/')}/status"
+        resp = _registry_request(config, url, "PUT", body)
+        if resp:
+            print(f"[demo-agent] Status pushed to {url}: "
+                  f"reliability={body['reliability']:.3f} "
+                  f"health={body['health_status']} "
+                  f"uptime={body['uptime_percentage']:.1f}%")
+
+
+def deregister_from_registry(config: dict, address: str) -> None:
+    """Gracefully remove this agent from all bootstrap registries on shutdown."""
+    urls = (config.get("bootstrap") or {}).get("urls") or []
+    if not urls:
+        return
+    encoded = quote(address, safe="")
+    for base in urls:
+        url = f"{base.rstrip('/')}/register/{encoded}"
+        resp = _registry_request(config, url, "DELETE")
+        if resp is not None:
+            print(f"[demo-agent] Deregistered from {url}")
+        else:
+            # Registry may not have DELETE yet; log and continue.
+            print(f"[demo-agent] Deregister from {url} skipped (endpoint not available)", file=sys.stderr)
+
+
+def sync_loop(config: dict, address: str, stop: threading.Event, runtime: "AgentRuntime | None" = None) -> None:
     interval = (config.get("bootstrap") or {}).get("sync_interval") or 30
     while not stop.wait(interval):
-        register_with_registry(config, address)
+        register_with_registry(config, address, runtime=runtime)
+
+
+def status_loop(config: dict, address: str, stop: threading.Event, runtime: "AgentRuntime | None") -> None:
+    """Push live status updates to the registry at status_interval cadence."""
+    interval = (config.get("bootstrap") or {}).get("status_interval") or 10
+    while not stop.wait(interval):
+        push_status_to_registry(config, address, runtime)
 
 
 # -----------------------------------------------------------------------------
@@ -527,21 +594,40 @@ def main() -> None:
     print("[demo-agent] POST /api/execute → OpenEMCP-style execute endpoint")
     print("[demo-agent] GET /health, GET /metrics → OpenEMCP-style health/metrics")
 
-    if config.get("_do_register") and ((config.get("bootstrap") or {}).get("urls")):
-        register_with_registry(config, address)
-        stop = threading.Event()
-        t = threading.Thread(target=sync_loop, args=(config, address, stop), daemon=True)
-        t.start()
-        print(f"[demo-agent] Registry sync every {(config.get('bootstrap') or {}).get('sync_interval') or 30}s")
+    bootstrap_cfg = config.get("bootstrap") or {}
+    stop = threading.Event()
+
+    if config.get("_do_register") and bootstrap_cfg.get("urls"):
+        register_with_registry(config, address, runtime=runtime)
+        t_sync = threading.Thread(
+            target=sync_loop, args=(config, address, stop, runtime), daemon=True,
+        )
+        t_sync.start()
+        t_status = threading.Thread(
+            target=status_loop, args=(config, address, stop, runtime), daemon=True,
+        )
+        t_status.start()
+        print(f"[demo-agent] Registry sync every {bootstrap_cfg.get('sync_interval') or 30}s")
+        print(f"[demo-agent] Status push every {bootstrap_cfg.get('status_interval') or 10}s")
     elif config.get("_do_register"):
         print("[demo-agent] No bootstrap.urls configured; skip registration.")
+
+    def _shutdown(sig=None, frame=None):
+        print(f"[demo-agent] Shutting down (signal={sig})…")
+        stop.set()
+        if config.get("_do_register") and bootstrap_cfg.get("urls"):
+            deregister_from_registry(config, address)
+        runtime.stop()
+        server.shutdown()
+
+    signal.signal(signal.SIGTERM, _shutdown)
 
     try:
         server.serve_forever()
     except KeyboardInterrupt:
         pass
-    runtime.stop()
-    server.shutdown()
+    finally:
+        _shutdown()
 
 
 if __name__ == "__main__":
