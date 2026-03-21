@@ -65,4 +65,5 @@ spire:
 # Optional: bootstrap URLs for self-registration with agent-registry
 bootstrap:
   urls: []
-  sync_interval: 30
+  sync_interval: 30   # Full re-registration interval (seconds)
+  status_interval: 10  # Live reliability/health push via PUT /status (seconds)
