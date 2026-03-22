@@ -1,0 +1,17 @@
+[project]
+name = "openEAGO-provenance-manifest"
+version = "0.1.0"
+description = "Provenance Manifest example for OpenEAGO — signed, audit-grade inference records for regulated deployments"
+requires-python = ">=3.11"
+dependencies = [
+    "pydantic>=2.0",
+    "cryptography>=42.0",
+]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["provenance_manifest*"]
