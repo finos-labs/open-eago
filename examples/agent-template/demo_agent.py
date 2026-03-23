@@ -85,6 +85,58 @@ def deep_merge(target: dict, source: dict | None) -> dict:
     return out
 
 
+CANONICAL_PHASES = {
+    "contract_management",
+    "planning_negotiation",
+    "validation_compliance",
+    "execution_resilience",
+    "context_state_management",
+    "communication_delivery",
+}
+
+
+def validate_config(config: dict) -> None:
+    """Validate config fields at startup and exit with a clear error on failure."""
+    errors: list[str] = []
+
+    meta = config.get("metadata") or {}
+    if not meta.get("name"):
+        errors.append("metadata.name is required")
+    if not meta.get("version"):
+        errors.append("metadata.version is required")
+    for phase in meta.get("eago_phases") or []:
+        if phase not in CANONICAL_PHASES:
+            errors.append(
+                f"metadata.eago_phases: '{phase}' is not a canonical OpenEAGO phase. "
+                f"Valid values: {sorted(CANONICAL_PHASES)}"
+            )
+
+    agent = config.get("agent") or {}
+    reliability = agent.get("reliability")
+    if reliability is not None and not (0.0 <= float(reliability) <= 1.0):
+        errors.append(f"agent.reliability must be in 0.0..1.0, got {reliability}")
+    uptime = agent.get("uptime_percentage")
+    if uptime is not None and not (0.0 <= float(uptime) <= 100.0):
+        errors.append(f"agent.uptime_percentage must be in 0.0..100.0, got {uptime}")
+
+    bootstrap = config.get("bootstrap") or {}
+    if (bootstrap.get("sync_interval") or 30) <= 0:
+        errors.append("bootstrap.sync_interval must be > 0")
+    if (bootstrap.get("status_interval") or 10) <= 0:
+        errors.append("bootstrap.status_interval must be > 0")
+
+    spire = config.get("spire") or {}
+    if spire.get("enabled") and not config.get("_allow_insecure"):
+        for key in ("cert_path", "key_path", "bundle_path"):
+            if not spire.get(key):
+                errors.append(f"spire.{key} must be set when spire.enabled is true")
+
+    if errors:
+        for e in errors:
+            print(f"[demo-agent] Config error: {e}", file=sys.stderr)
+        sys.exit(1)
+
+
 def load_config(args: argparse.Namespace) -> dict:
     config_path = args.config or (SCRIPT_DIR / "config.yaml")
     if not config_path.exists():
@@ -99,6 +151,7 @@ def load_config(args: argparse.Namespace) -> dict:
         config["server"]["port"] = args.port
     config["_do_register"] = not args.no_register
     config["_allow_insecure"] = getattr(args, "allow_insecure", False)
+    validate_config(config)
     return config
 
 
@@ -145,6 +198,37 @@ def build_tools_from_spec(mcp_spec: dict, config: dict) -> dict:
             "handler": handler,
         }
     return tools
+
+
+def build_resources_from_spec(mcp_spec: dict) -> dict:
+    """Build a resource map keyed by URI from the MCP spec's resources array."""
+    resources = {}
+    for r in mcp_spec.get("resources") or []:
+        uri = r.get("uri", "")
+        if not uri:
+            continue
+        resources[uri] = {
+            "name": r.get("name") or uri,
+            "description": r.get("description") or "",
+            "mime_type": r.get("mimeType") or "text/plain",
+            "contents": r.get("contents") or "",
+        }
+    return resources
+
+
+def build_prompts_from_spec(mcp_spec: dict) -> dict:
+    """Build a prompt map keyed by name from the MCP spec's prompts array."""
+    prompts = {}
+    for p in mcp_spec.get("prompts") or []:
+        name = p.get("name", "")
+        if not name:
+            continue
+        prompts[name] = {
+            "description": p.get("description") or "",
+            "arguments": p.get("arguments") or [],
+            "messages": p.get("messages") or [],
+        }
+    return prompts
 
 
 # -----------------------------------------------------------------------------
@@ -387,8 +471,11 @@ def handle_mcp(
     body: dict,
     agent_card: dict,
     tools: dict,
+    resources: dict,
+    prompts: dict,
     config: dict,
     port: int,
+    caller: str | None = None,
 ) -> dict:
     method = body.get("method")
     id_ = body.get("id")
@@ -398,17 +485,23 @@ def handle_mcp(
         return rpc_error(id_, -32600, "Invalid Request")
 
     if method == "initialize":
+        caps: dict = {"tools": {}}
+        if resources:
+            caps["resources"] = {}
+        if prompts:
+            caps["prompts"] = {}
         return rpc_result(
             id_,
             {
                 "protocolVersion": (config.get("mcp") or {}).get("protocol_version") or "2024-11-05",
                 "serverInfo": {"name": agent_card["name"], "version": agent_card["version"]},
-                "capabilities": {"tools": {}, "resources": {}, "prompts": {}},
+                "capabilities": caps,
             },
         )
     if method == "notifications/initialized":
         return rpc_result(id_, None)
 
+    # --- tools ---
     if method == "tools/list":
         builtins = [
             {"name": "agent/info", "description": "Returns the agent card.", "inputSchema": {"type": "object", "properties": {}, "required": []}},
@@ -434,6 +527,40 @@ def handle_mcp(
         except Exception as e:
             return rpc_error(id_, -32000, f"Tool error: {e}")
 
+    # --- resources ---
+    if method == "resources/list":
+        return rpc_result(id_, {
+            "resources": [
+                {"uri": uri, "name": r["name"], "description": r["description"], "mimeType": r["mime_type"]}
+                for uri, r in resources.items()
+            ]
+        })
+
+    if method == "resources/read":
+        uri = params.get("uri")
+        if uri not in resources:
+            return rpc_error(id_, -32601, f"Unknown resource: {uri}")
+        r = resources[uri]
+        return rpc_result(id_, {
+            "contents": [{"uri": uri, "mimeType": r["mime_type"], "text": r["contents"]}]
+        })
+
+    # --- prompts ---
+    if method == "prompts/list":
+        return rpc_result(id_, {
+            "prompts": [
+                {"name": n, "description": p["description"], "arguments": p["arguments"]}
+                for n, p in prompts.items()
+            ]
+        })
+
+    if method == "prompts/get":
+        name = params.get("name")
+        if name not in prompts:
+            return rpc_error(id_, -32601, f"Unknown prompt: {name}")
+        p = prompts[name]
+        return rpc_result(id_, {"description": p["description"], "messages": p["messages"]})
+
     return rpc_error(id_, -32601, f"Method not found: {method}")
 
 
@@ -456,9 +583,22 @@ class MCPHandler(BaseHTTPRequestHandler):
     protocol_version = "HTTP/1.1"
     agent_card: dict = {}
     tools: dict = {}
+    resources: dict = {}
+    prompts: dict = {}
     config: dict = {}
     port: int = 9000
     runtime: AgentRuntime | None = None
+
+    def _get_caller_spiffe_id(self) -> str | None:
+        """Extract SPIFFE ID (URI SAN) from the peer's TLS client certificate, if present."""
+        try:
+            cert = self.connection.getpeercert()  # type: ignore[attr-defined]
+            for san_type, san_value in cert.get("subjectAltName", []):
+                if san_type == "URI" and san_value.startswith("spiffe://"):
+                    return san_value
+        except Exception:
+            pass
+        return None
 
     def _send_json(self, status: int, obj: Any) -> None:
         body = json.dumps(obj).encode("utf-8")
@@ -476,7 +616,10 @@ class MCPHandler(BaseHTTPRequestHandler):
         self.end_headers()
 
     def do_GET(self):
-        # openemcp-clm BaseAgent endpoints
+        caller = self._get_caller_spiffe_id()
+        if caller:
+            print(f"[demo-agent] GET {self.path} caller={caller}")
+
         if self.path == "/health":
             rt = self.runtime
             payload = rt.health_payload() if rt else {"status": "unhealthy"}
@@ -495,6 +638,10 @@ class MCPHandler(BaseHTTPRequestHandler):
         self._send_json(404, {"error": "Not found"})
 
     def do_POST(self):
+        caller = self._get_caller_spiffe_id()
+        if caller:
+            print(f"[demo-agent] POST {self.path} caller={caller}")
+
         # openemcp-clm BaseAgent endpoint: POST /api/execute
         if self.path == "/api/execute":
             length = int(self.headers.get("Content-Length", 0))
@@ -533,7 +680,13 @@ class MCPHandler(BaseHTTPRequestHandler):
             return
         is_batch = isinstance(parsed, list)
         reqs = parsed if is_batch else [parsed]
-        resps = [handle_mcp(r, self.agent_card, self.tools, self.config, self.port) for r in reqs]
+        resps = [
+            handle_mcp(
+                r, self.agent_card, self.tools, self.resources, self.prompts,
+                self.config, self.port, caller=caller,
+            )
+            for r in reqs
+        ]
         self._send_json(200, resps if is_batch else resps[0])
 
     def log_message(self, format, *args):
@@ -560,7 +713,11 @@ def main() -> None:
     address = f"{host}:{port}"
 
     tools = build_tools_from_spec(mcp_spec, config)
+    resources = build_resources_from_spec(mcp_spec)
+    prompts = build_prompts_from_spec(mcp_spec)
     MCPHandler.tools = tools
+    MCPHandler.resources = resources
+    MCPHandler.prompts = prompts
     MCPHandler.config = config
     MCPHandler.port = port
 
