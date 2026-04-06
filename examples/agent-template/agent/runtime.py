@@ -15,6 +15,9 @@ class AgentRuntime:
         self.error_count = 0
         # Populated when a risk config section is present and risk context is active.
         self.risk_context: dict | None = None
+        # Authenticated caller identity tracking (SPIFFE IDs observed over mTLS).
+        self.last_caller: str | None = None
+        self._caller_ids: list[str] = []  # ordered, deduplicated audit trail
 
     def start(self) -> None:
         self.running = True
@@ -22,6 +25,12 @@ class AgentRuntime:
 
     def stop(self) -> None:
         self.running = False
+
+    def record_caller(self, spiffe_id: str) -> None:
+        """Record an authenticated caller's SPIFFE ID for audit purposes."""
+        self.last_caller = spiffe_id
+        if spiffe_id not in self._caller_ids:
+            self._caller_ids.append(spiffe_id)
 
     def uptime_seconds(self) -> float:
         if not self.start_time:
@@ -49,6 +58,7 @@ class AgentRuntime:
             "running": self.running,
             "start_time": self.start_time.isoformat() if self.start_time else None,
             "risk_context": self.risk_context,
+            "caller_spiffe_id": self.last_caller,
         }
 
     def metrics_payload(self) -> dict:
@@ -61,4 +71,5 @@ class AgentRuntime:
             "uptime_seconds": self.uptime_seconds(),
             "uptime_percentage": self.uptime_percentage(),
             "risk_context": self.risk_context,
+            "caller_ids": list(self._caller_ids),
         }

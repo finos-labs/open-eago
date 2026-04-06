@@ -55,8 +55,9 @@ def deep_merge(target: dict, source: dict | None) -> dict:
         return target
     out = dict(target)
     for k, v in source.items():
-        if isinstance(v, dict) and not isinstance(v.get("_"), type):
-            out[k] = deep_merge(out.get(k) or {}, v)
+        if isinstance(v, dict):
+            base = out.get(k) if isinstance(out.get(k), dict) else {}
+            out[k] = deep_merge(base, v)
         else:
             out[k] = v
     return out

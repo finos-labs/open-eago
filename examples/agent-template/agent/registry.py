@@ -57,7 +57,7 @@ def build_agent_details(
     a = config.get("agent") or {}
     meta = config.get("metadata") or {}
     endpoints = a.get("endpoints") or {}
-    scheme = "https" if config.get("spire", {}).get("enabled") else "http"
+    use_mtls = (config.get("spire") or {}).get("enabled") and not config.get("_allow_insecure")
 
     # Prefer live runtime values over static config when available.
     if runtime is not None:
@@ -80,8 +80,8 @@ def build_agent_details(
         "health_status": health_status,
         "uptime_percentage": uptime_percentage,
         "endpoints": {
-            "http": endpoints.get("http") or f"http://{address}",
-            "https": endpoints.get("https") or f"{scheme}://{address}",
+            "http": endpoints.get("http") or (f"http://{address}" if not use_mtls else None),
+            "https": endpoints.get("https") or (f"https://{address}" if use_mtls else None),
             "grpc": endpoints.get("grpc"),
             "websocket": endpoints.get("websocket"),
             "custom": endpoints.get("custom") or {},

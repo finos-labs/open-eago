@@ -4,8 +4,8 @@
 
 server:
   host: "127.0.0.1"
-  port: 9000                    # MCP JSON-RPC over HTTP/SSE or stdio
-  transport: "stdio"             # "stdio" | "sse" | "streamable-http"
+  port: 9000                    # MCP JSON-RPC endpoint on /mcp
+  transport: "stdio"             # Informational for roadmap transports; runtime currently serves HTTP(S)
 
 # OpenEAGO metadata — aligns with spec/v0.1.0/spec.json and agent registry
 metadata:
@@ -49,11 +49,13 @@ agent:
 # MCP server — standard MCP 1.0 + OpenEAGO extensions
 mcp:
   protocol_version: "2024-11-05"
-  schema: "https://modelcontextprotocol.io/schema/v1/server.json"
-  # OpenEAGO extensions (see README: comparison with MCP, what was extended)
-  eago_envelope: true            # Wrap requests/responses in EAGO base envelope
-  phase_header: "X-EAGO-Phase"   # Optional phase context header
-  risk_context_header: "X-EAGO-Risk-Context"  # Propagate risk_context when present
+  schema: "https://modelcontextprotocol.io/schema/v1/server.json"  # Informational reference
+  # OpenEAGO extensions (see README: envelope semantics)
+  # When true: /mcp expects an OpenEAGO envelope request body and responds with an envelope.
+  # When false: /mcp uses plain MCP JSON-RPC request/response bodies.
+  eago_envelope: true
+  phase_header: "X-EAGO-Phase"   # Planned extension (not consumed by current runtime)
+  risk_context_header: "X-EAGO-Risk-Context"  # Planned extension (not consumed by current runtime)
 
 # SPIRE mTLS (required for production). Override paths via SPIRE_CERT_PATH, SPIRE_KEY_PATH, SPIRE_BUNDLE_PATH.
 spire:

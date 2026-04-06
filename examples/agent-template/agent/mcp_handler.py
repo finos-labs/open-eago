@@ -7,6 +7,13 @@ from datetime import datetime
 from http.server import BaseHTTPRequestHandler
 from typing import TYPE_CHECKING, Any
 
+from agent.envelope import (
+    EnvelopeValidationError,
+    envelope_validation_error_body,
+    unwrap_envelope,
+    wrap_envelope,
+)
+
 if TYPE_CHECKING:
     from agent.runtime import AgentRuntime
 
@@ -27,7 +34,6 @@ def handle_mcp(
     prompts: dict,
     config: dict,
     port: int,
-    caller: str | None = None,
 ) -> dict:
     method = body.get("method")
     id_ = body.get("id")
@@ -165,6 +171,36 @@ def make_ssl_context_server(spire: dict) -> ssl.SSLContext:
     return ctx
 
 
+def dispatch_mcp_requests(
+    parsed: dict | list,
+    agent_card: dict,
+    tools: dict,
+    resources: dict,
+    prompts: dict,
+    config: dict,
+    port: int,
+) -> dict | list:
+    is_batch = isinstance(parsed, list)
+    reqs = parsed if is_batch else [parsed]
+    resps: list[dict] = []
+    for req in reqs:
+        if not isinstance(req, dict):
+            resps.append(rpc_error(None, -32600, "Invalid Request"))
+            continue
+        resps.append(
+            handle_mcp(
+                req,
+                agent_card,
+                tools,
+                resources,
+                prompts,
+                config,
+                port,
+            )
+        )
+    return resps if is_batch else resps[0]
+
+
 class MCPHandler(BaseHTTPRequestHandler):
     protocol_version = "HTTP/1.1"
     agent_card: dict = {}
@@ -205,6 +241,8 @@ class MCPHandler(BaseHTTPRequestHandler):
         caller = self._get_caller_spiffe_id()
         if caller:
             print(f"[demo-agent] GET {self.path} caller={caller}")
+            if self.runtime:
+                self.runtime.record_caller(caller)
 
         if self.path == "/health":
             rt = self.runtime
@@ -228,6 +266,8 @@ class MCPHandler(BaseHTTPRequestHandler):
         caller = self._get_caller_spiffe_id()
         if caller:
             print(f"[demo-agent] POST {self.path} caller={caller}")
+            if self.runtime:
+                self.runtime.record_caller(caller)
 
         # openemcp-clm BaseAgent endpoint: POST /api/execute
         if self.path == "/api/execute":
@@ -265,16 +305,43 @@ class MCPHandler(BaseHTTPRequestHandler):
             self._send_json(400, rpc_error(None, -32700, "Parse error"))
             return
 
-        is_batch = isinstance(parsed, list)
-        reqs = parsed if is_batch else [parsed]
-        resps = [
-            handle_mcp(
-                r, self.agent_card, self.tools, self.resources, self.prompts,
-                self.config, self.port, caller=caller,
+        mcp_cfg = self.config.get("mcp") or {}
+        use_envelope = bool(mcp_cfg.get("eago_envelope"))
+
+        if use_envelope:
+            try:
+                payload, env_ctx = unwrap_envelope(parsed)
+            except EnvelopeValidationError as e:
+                self._send_json(400, envelope_validation_error_body(str(e)))
+                return
+
+            rpc_response = dispatch_mcp_requests(
+                payload,
+                self.agent_card,
+                self.tools,
+                self.resources,
+                self.prompts,
+                self.config,
+                self.port,
             )
-            for r in reqs
-        ]
-        self._send_json(200, resps if is_batch else resps[0])
+            wrapped = wrap_envelope(
+                rpc_response,
+                phase=env_ctx["phase"],
+                correlation_id=env_ctx["message_id"],
+            )
+            self._send_json(200, wrapped)
+            return
+
+        rpc_response = dispatch_mcp_requests(
+            parsed,
+            self.agent_card,
+            self.tools,
+            self.resources,
+            self.prompts,
+            self.config,
+            self.port,
+        )
+        self._send_json(200, rpc_response)
 
     def log_message(self, format, *args):
         pass  # quiet by default; set to super().log_message for debug
