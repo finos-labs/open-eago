@@ -10,13 +10,29 @@ A template and reference design for building **MCP (Model Context Protocol) RPC 
 
 ### What this is
 
-- **RPC agent**: Exposes tools (and optionally resources/prompts) over the [Model Context Protocol](https://modelcontextprotocol.io/) — JSON-RPC 2.0 over stdio, SSE, or Streamable HTTP.
-- **OpenEAGO-aligned**: Metadata and configuration follow the OpenEAGO spec: six phases, base envelope (`message_id`, `phase`, `timestamp`, `payload`, `metadata`), and optional risk context propagation.
-- **Configuration-first**: Agent identity, capabilities, and EAGO options are defined in YAML config and/or MCP spec JSON so the same binary can serve different roles (e.g. contract vs execution phase agent).
+- **Working Python demo agent**: Includes a runnable HTTP(S) MCP JSON-RPC server (`/mcp`) with tools/resources/prompts support, plus OpenEMCP-style endpoints (`/api/execute`, `/health`, `/metrics`).
+- **OpenEAGO-aligned metadata**: Configuration and MCP spec include OpenEAGO phase metadata, capability declarations, and registry-compatible agent details.
+- **Configuration-first**: Agent identity, capabilities, and runtime options are defined in YAML config and MCP spec JSON so the same code can serve different roles.
 
 ### What it is not
 
-- Not a full implementation: this example provides **config layout**, **MCP spec shape**, and **documentation**. Implement the actual MCP server (e.g. with an MCP SDK) in the language of your choice.
+- Not production-complete: this demo is intentionally minimal and currently focuses on HTTP(S) JSON-RPC + registry integration. Some documented OpenEAGO behaviors are roadmap items (see **Planned extensions**).
+
+### Implemented now
+
+- MCP JSON-RPC endpoints: `initialize`, `tools/list`, `tools/call`, `resources/list`, `resources/read`, `prompts/list`, `prompts/get`.
+- Built-in tools: `agent/info`, `agent/ping`, plus custom tools from `agent.mcp.json` (for example `eago_health`).
+- OpenEMCP-style HTTP endpoints: `POST /api/execute`, `GET /health`, `GET /metrics`.
+- SPIRE mTLS support for agent serving and registry calls (with `--allow-insecure` development mode).
+- Config validation for phase enum and reliability/uptime bounds.
+- Registration/status/deregistration loops against OpenEAGO Agent Registry when `bootstrap.urls` is configured.
+
+### Planned extensions
+
+- EAGO base-envelope wrapping of MCP payloads controlled by `mcp.eago_envelope`.
+- Explicit phase/risk context propagation via headers such as `X-EAGO-Phase` and `X-EAGO-Risk-Context`.
+- Additional transports beyond HTTP(S) runtime (for example stdio/SSE).
+- Expanded OpenEAGO conformance checks and richer enterprise policy hooks.
 
 ---
 
@@ -40,7 +56,8 @@ A template and reference design for building **MCP (Model Context Protocol) RPC 
 
 - **Config**: Drives server bindings, transport, metadata, agent registration fields, and EAGO options.
 - **MCP spec**: Declares tools (and optionally resources/prompts) and an `open_eago` extension block for phase list and envelope semantics.
-- **Runtime**: Implement an MCP server that reads this config and spec, and optionally wraps requests/responses in the OpenEAGO base envelope when `eago_envelope: true`.
+- **Runtime (current)**: Python HTTP(S) server that loads config + MCP spec and serves JSON-RPC methods plus OpenEMCP-style health/metrics/execute endpoints.
+- **Runtime (planned)**: Optional OpenEAGO base-envelope wrapping when `eago_envelope: true`.
 
 ---
 
@@ -52,10 +69,10 @@ Configuration is YAML. Example: [config.example.yaml](./config.example.yaml). Co
 
 | Section      | Purpose |
 |-------------|---------|
-| `server`    | Host, port, transport (`stdio` \| `sse` \| `streamable-http`). |
+| `server`    | Host, port, and transport metadata (runtime currently serves HTTP(S) endpoint `/mcp`). |
 | `metadata`  | OpenEAGO-aligned: `name`, `version`, `description`, `spec_version`, `eago_phases`, `capabilities`, `tags`. Must match [spec/v0.1.0/spec.json](../../spec/v0.1.0/spec.json) phase enum and metadata style. |
 | `agent`     | Agent registry payload: `instance_id`, `capability_codes`, `version`, `jurisdiction`, `compliance`, `reliability`, `endpoints`, etc. Same shape as [agent-registry](../../examples/agent-registry) `agent_details`. |
-| `mcp`       | MCP protocol version, schema URL, and OpenEAGO extensions: `eago_envelope`, `phase_header`, `risk_context_header`. |
+| `mcp`       | MCP protocol version and OpenEAGO extension flags (currently used for metadata/compatibility; envelope/header behavior is planned). |
 | `spire`     | Optional mTLS: `enabled`, `cert_path`, `key_path`, `bundle_path` (e.g. for registry or EAGO transport). |
 | `bootstrap` | Optional registry bootstrap URLs and `sync_interval` for self-registration. |
 
@@ -63,8 +80,8 @@ Configuration is YAML. Example: [config.example.yaml](./config.example.yaml). Co
 
 - **Phases**: `metadata.eago_phases` MUST use the canonical list from the spec:
   - `contract_management`, `planning_negotiation`, `validation_compliance`, `execution_resilience`, `context_state_management`, `communication_delivery`
-- **Envelope**: When `mcp.eago_envelope` is true, the implementation SHOULD wrap MCP request/response payloads in the [base envelope](https://finos-labs.github.io/open-eago/spec/v0.1.0/schemas/base-envelope.schema.json): `message_id`, `phase`, `timestamp`, `payload`, optional `metadata` and `correlation_id`.
-- **Risk context**: If the orchestrator sends risk context (e.g. in a header or in the envelope `metadata`), the agent SHOULD propagate it (e.g. via `mcp.risk_context_header`) as per SPECIFICATION.md § E.5.
+- **Envelope (planned)**: `mcp.eago_envelope` is available in config and intended to control wrapping MCP payloads in the [base envelope](https://finos-labs.github.io/open-eago/spec/v0.1.0/schemas/base-envelope.schema.json).
+- **Risk context (planned)**: Header-based/context propagation (`risk_context_header`) is planned for fuller SPECIFICATION.md Appendix E.5 alignment.
 
 ---
 
@@ -84,12 +101,12 @@ Configuration is YAML. Example: [config.example.yaml](./config.example.yaml). Co
 | **Protocol**      | JSON-RPC 2.0          | Same; no change to wire format. |
 | **Tools**         | `name`, `description`, `inputSchema` | Same; plus optional `open_eago` / tool-level extensions in spec. |
 | **Metadata**      | Server `name`/`version` in init      | Full metadata in **config**: phases, capabilities, tags, spec_version. |
-| **Envelope**      | None                  | Optional EAGO base envelope around payloads (`message_id`, `phase`, `timestamp`, `payload`, `metadata`). |
-| **Phase**         | N/A                   | Explicit `eago_phases` in config and MCP spec; optional `X-EAGO-Phase` (or equivalent) for request context. |
-| **Risk / audit**  | N/A                   | Optional propagation of `risk_context` (header or envelope metadata). |
+| **Envelope**      | None                  | Planned: optional EAGO base envelope around payloads (`message_id`, `phase`, `timestamp`, `payload`, `metadata`). |
+| **Phase**         | N/A                   | Implemented metadata (`eago_phases`); planned request-context headers. |
+| **Risk / audit**  | N/A                   | Planned propagation of `risk_context` (header or envelope metadata). |
 | **Registry**      | N/A                   | Optional: register with [OpenEAGO Agent Registry](../../examples/agent-registry) using `agent` config and bootstrap URLs. |
 
-So: **protocol remains MCP**; **configuration and optional wrapping** add OpenEAGO metadata, phase alignment, envelope, and registry integration.
+So: **protocol remains MCP**; current implementation already adds OpenEAGO metadata and optional registry integration, with envelope/header propagation planned.
 
 ---
 
@@ -112,18 +129,18 @@ Relative to plain MCP, the following are **added or extended** in this template 
      - `base_envelope` (required/optional fields).
    - Standard MCP clients ignore unknown keys; EAGO-aware tooling can use this for discovery and validation.
 
-4. **EAGO envelope (optional)**
-   - When `mcp.eago_envelope` is true, the server can wrap MCP payloads in the [base envelope](https://finos-labs.github.io/open-eago/spec/v0.1.0/schemas/base-envelope.schema.json).
-   - Aligns message shape with OpenEAGO Phase 5/6 and audit expectations.
+4. **EAGO envelope (planned)**
+  - `mcp.eago_envelope` is available and reserved for wrapping MCP payloads in the [base envelope](https://finos-labs.github.io/open-eago/spec/v0.1.0/schemas/base-envelope.schema.json).
+  - This behavior is planned and not yet enforced by the current demo runtime.
 
-5. **Phase and risk context**
-   - Optional headers (e.g. `X-EAGO-Phase`, `X-EAGO-Risk-Context`) for request/response context.
-   - Supports SPECIFICATION.md risk context propagation (Appendix E.5) without changing MCP method names or parameters.
+5. **Phase and risk context (planned)**
+  - Optional headers (e.g. `X-EAGO-Phase`, `X-EAGO-Risk-Context`) for request/response context.
+  - Intended to support SPECIFICATION.md risk context propagation (Appendix E.5) without changing MCP method names or parameters.
 
 6. **SPIRE / bootstrap**
    - Optional `spire` and `bootstrap` config for mTLS and registry sync, consistent with the [agent-registry](../../examples/agent-registry) example.
 
-These extensions stay **additive**: a standard MCP client can still use the agent; an OpenEAGO orchestrator can use config + envelope + headers for phase-aware, auditable flows.
+These extensions stay **additive**: a standard MCP client can use the agent today, while OpenEAGO-aware orchestrators can already consume metadata and registry integration, with envelope/header features planned.
 
 ---
 
@@ -271,7 +288,7 @@ You should see the demo agent (e.g. `127.0.0.1:9000`) with its `agent_details` f
 2. Run the **demo agent** for a working reference, or implement your own MCP server that:
    - Loads `config.yaml` and `agent.mcp.json`.
    - Serves `tools/list` and `tools/call` (and optionally resources/prompts) per the spec.
-   - Optionally wraps messages in the EAGO base envelope when `mcp.eago_envelope` is true.
+  - Optionally (planned) wraps messages in the EAGO base envelope when `mcp.eago_envelope` is enabled.
    - Optionally registers with the OpenEAGO Agent Registry using the `agent` section and `bootstrap.urls`.
 3. For strict conformance, ensure `metadata.eago_phases` and any phase-specific behaviour match [SPECIFICATION.md](../../SPECIFICATION.md) and the [schema catalog](../../spec/v0.1.0/spec.json).
 
