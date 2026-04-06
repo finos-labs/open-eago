@@ -151,6 +151,25 @@ TOKEN=$(spire-server token generate -spiffeID spiffe://example.org/agent | awk '
 spire-agent run -config ./spire-${SPIRE_VERSION}/conf/agent/agent.conf -joinToken "$TOKEN" &
 ```
 
+Optional (expired certificated in development mode in container/WSL etc.)
+
+```bash
+# 1. Kill the crashed agent if still backgrounded
+kill %2 2>/dev/null
+
+# 2. Wipe the stale agent data (bundle + keys)
+rm -rf ./spire-1.14.1/data/agent/*
+
+# 3. Generate a fresh join token
+TOKEN=$(spire-server token generate -spiffeID spiffe://example.org/agent | awk '{print $2}')
+echo $TOKEN
+
+# 4. Start the agent fresh with the new token
+spire-agent run \
+  -config ./spire-1.14.1/conf/agent/agent.conf \
+  -joinToken "$TOKEN" &
+```
+
 3. **Wait for the agent to join**, then create the workload registration (UID must match the user that will run the registry):
 
 ```bash

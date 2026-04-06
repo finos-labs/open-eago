@@ -13,7 +13,6 @@ Run:
 
 import http.client
 import json
-import os
 import signal
 import subprocess
 import sys
@@ -25,6 +24,7 @@ AGENT_DIR = Path(__file__).resolve().parent
 AGENT_SCRIPT = AGENT_DIR / "demo_agent.py"
 HOST = "127.0.0.1"
 PORT = 19001  # dedicated test port, avoids collision with dev port 9000
+ENVELOPE_PORT = 19002
 ADDRESS = f"{HOST}:{PORT}"
 
 
@@ -32,27 +32,36 @@ ADDRESS = f"{HOST}:{PORT}"
 # Helpers
 # ---------------------------------------------------------------------------
 
-def _post_mcp(payload: dict) -> tuple[int, dict]:
-    conn = http.client.HTTPConnection(HOST, PORT, timeout=5)
+def _post_mcp(payload: dict, port: int = PORT) -> tuple[int, dict]:
+    conn = http.client.HTTPConnection(HOST, port, timeout=5)
     body = json.dumps(payload).encode()
     conn.request("POST", "/mcp", body=body, headers={"Content-Type": "application/json"})
     resp = conn.getresponse()
     return resp.status, json.loads(resp.read())
 
 
-def _get(path: str) -> tuple[int, dict]:
-    conn = http.client.HTTPConnection(HOST, PORT, timeout=5)
+def _get(path: str, port: int = PORT) -> tuple[int, dict]:
+    conn = http.client.HTTPConnection(HOST, port, timeout=5)
     conn.request("GET", path)
     resp = conn.getresponse()
     return resp.status, json.loads(resp.read())
 
 
-def _post(path: str, payload: dict) -> tuple[int, dict]:
-    conn = http.client.HTTPConnection(HOST, PORT, timeout=5)
+def _post(path: str, payload: dict, port: int = PORT) -> tuple[int, dict]:
+    conn = http.client.HTTPConnection(HOST, port, timeout=5)
     body = json.dumps(payload).encode()
     conn.request("POST", path, body=body, headers={"Content-Type": "application/json"})
     resp = conn.getresponse()
     return resp.status, json.loads(resp.read())
+
+
+def _env(payload: dict | list, message_id: str = "req-1", phase: str = "planning_negotiation") -> dict:
+    return {
+        "message_id": message_id,
+        "phase": phase,
+        "timestamp": "2026-04-05T10:00:00Z",
+        "payload": payload,
+    }
 
 
 # ---------------------------------------------------------------------------
@@ -126,6 +135,16 @@ class TestHTTPEndpoints(AgentTestCase):
         self.assertIsNotNone(u)
         self.assertGreaterEqual(float(u), 0.0)
         self.assertLessEqual(float(u), 100.0)
+
+    def test_health_contains_caller_spiffe_id_field(self):
+        _, body = _get("/health")
+        # Field must be present; None is expected in insecure (no-mTLS) test mode.
+        self.assertIn("caller_spiffe_id", body)
+
+    def test_metrics_contains_caller_ids_field(self):
+        _, body = _get("/metrics")
+        self.assertIn("caller_ids", body)
+        self.assertIsInstance(body["caller_ids"], list)
 
     def test_metrics_returns_200(self):
         status, _ = _get("/metrics")
@@ -290,23 +309,161 @@ class TestMCPProtocol(AgentTestCase):
         self.assertEqual(body["error"]["code"], -32601)
 
 
+class EnvelopeAgentTestCase(unittest.TestCase):
+    _proc: subprocess.Popen | None = None
+    _config_path: str | None = None
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        import tempfile
+        import yaml
+
+        with open(AGENT_DIR / "config.yaml", encoding="utf-8") as f:
+            cfg = yaml.safe_load(f)
+        cfg.setdefault("mcp", {})["eago_envelope"] = True
+        cfg.setdefault("spire", {})["enabled"] = False
+        cfg.setdefault("bootstrap", {})["urls"] = []
+
+        with tempfile.NamedTemporaryFile(
+            mode="w", suffix=".yaml", dir=str(AGENT_DIR), delete=False
+        ) as f:
+            yaml.safe_dump(cfg, f)
+            cls._config_path = f.name
+
+        cls._proc = subprocess.Popen(
+            [
+                sys.executable,
+                str(AGENT_SCRIPT),
+                "--allow-insecure",
+                "--no-register",
+                f"--port={ENVELOPE_PORT}",
+                f"--config={cls._config_path}",
+            ],
+            cwd=str(AGENT_DIR),
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+
+        deadline = time.monotonic() + 5.0
+        while time.monotonic() < deadline:
+            try:
+                conn = http.client.HTTPConnection(HOST, ENVELOPE_PORT, timeout=1)
+                conn.request("GET", "/health")
+                conn.getresponse()
+                break
+            except Exception:
+                time.sleep(0.1)
+        else:
+            cls._proc.terminate()
+            raise RuntimeError(f"Envelope agent did not start on {HOST}:{ENVELOPE_PORT} within 5s")
+
+    @classmethod
+    def tearDownClass(cls) -> None:
+        if cls._proc and cls._proc.poll() is None:
+            cls._proc.send_signal(signal.SIGTERM)
+            try:
+                cls._proc.wait(timeout=5)
+            except subprocess.TimeoutExpired:
+                cls._proc.kill()
+        if cls._config_path:
+            Path(cls._config_path).unlink(missing_ok=True)
+
+
+class TestMCPEnvelope(EnvelopeAgentTestCase):
+
+    def test_enveloped_initialize_success(self):
+        req = _env({"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {}}, "req-init")
+        status, body = _post_mcp(req, port=ENVELOPE_PORT)
+        self.assertEqual(status, 200)
+        self.assertIn("message_id", body)
+        self.assertEqual(body.get("correlation_id"), "req-init")
+        self.assertEqual(body.get("phase"), "planning_negotiation")
+        self.assertIn("payload", body)
+        self.assertIn("result", body["payload"])
+        self.assertIn("protocolVersion", body["payload"]["result"])
+
+    def test_enveloped_tools_list_success(self):
+        req = _env({"jsonrpc": "2.0", "id": 2, "method": "tools/list", "params": {}}, "req-list")
+        status, body = _post_mcp(req, port=ENVELOPE_PORT)
+        self.assertEqual(status, 200)
+        self.assertEqual(body.get("correlation_id"), "req-list")
+        tools = body["payload"].get("result", {}).get("tools", [])
+        self.assertGreater(len(tools), 0)
+
+    def test_enveloped_tools_call_success(self):
+        req = _env(
+            {
+                "jsonrpc": "2.0",
+                "id": 3,
+                "method": "tools/call",
+                "params": {"name": "agent/ping", "arguments": {}},
+            },
+            "req-call",
+            "execution_resilience",
+        )
+        status, body = _post_mcp(req, port=ENVELOPE_PORT)
+        self.assertEqual(status, 200)
+        self.assertEqual(body.get("phase"), "execution_resilience")
+        text = body["payload"]["result"]["content"][0]["text"]
+        result = json.loads(text)
+        self.assertEqual(result.get("status"), "pong")
+
+    def test_enveloped_batch_returns_payload_array(self):
+        batch = [
+            {"jsonrpc": "2.0", "id": 10, "method": "tools/list", "params": {}},
+            {"jsonrpc": "2.0", "id": 11, "method": "tools/list", "params": {}},
+        ]
+        status, body = _post_mcp(_env(batch, "req-batch"), port=ENVELOPE_PORT)
+        self.assertEqual(status, 200)
+        self.assertIsInstance(body.get("payload"), list)
+        self.assertEqual(len(body["payload"]), 2)
+
+    def test_missing_required_field_returns_400(self):
+        bad = {
+            "phase": "planning_negotiation",
+            "timestamp": "2026-04-05T10:00:00Z",
+            "payload": {"jsonrpc": "2.0", "id": 1, "method": "tools/list", "params": {}},
+        }
+        status, body = _post_mcp(bad, port=ENVELOPE_PORT)
+        self.assertEqual(status, 400)
+        self.assertEqual(body.get("error", {}).get("code"), "invalid_envelope")
+
+    def test_invalid_phase_returns_400(self):
+        bad = _env(
+            {"jsonrpc": "2.0", "id": 1, "method": "tools/list", "params": {}},
+            message_id="req-phase",
+            phase="not_a_phase",
+        )
+        status, body = _post_mcp(bad, port=ENVELOPE_PORT)
+        self.assertEqual(status, 400)
+        self.assertEqual(body.get("error", {}).get("code"), "invalid_envelope")
+
+    def test_invalid_payload_type_returns_400(self):
+        bad = {
+            "message_id": "req-payload",
+            "phase": "planning_negotiation",
+            "timestamp": "2026-04-05T10:00:00Z",
+            "payload": "not-jsonrpc",
+        }
+        status, body = _post_mcp(bad, port=ENVELOPE_PORT)
+        self.assertEqual(status, 400)
+        self.assertEqual(body.get("error", {}).get("code"), "invalid_envelope")
+
+    def test_invalid_jsonrpc_inside_envelope_returns_payload_error(self):
+        bad_rpc = _env({"jsonrpc": "1.0", "id": 99, "method": "tools/list", "params": {}}, "req-badrpc")
+        status, body = _post_mcp(bad_rpc, port=ENVELOPE_PORT)
+        self.assertEqual(status, 200)
+        self.assertEqual(body.get("correlation_id"), "req-badrpc")
+        self.assertIn("error", body["payload"])
+        self.assertEqual(body["payload"]["error"]["code"], -32600)
+
+
 # ---------------------------------------------------------------------------
 # Group 3: Config validation
 # ---------------------------------------------------------------------------
 
 class TestConfigValidation(unittest.TestCase):
     """Runs the agent with deliberately invalid configs and checks it exits with error."""
-
-    def _run_agent(self, extra_env: dict) -> subprocess.CompletedProcess:
-        env = {**os.environ, **extra_env}
-        return subprocess.run(
-            [sys.executable, str(AGENT_SCRIPT), "--allow-insecure", "--no-register", f"--port={PORT + 1}"],
-            cwd=str(AGENT_DIR),
-            capture_output=True,
-            text=True,
-            timeout=5,
-            env=env,
-        )
 
     def test_invalid_phase_causes_exit(self):
         """Patch config by writing a temp config with a bad phase value."""

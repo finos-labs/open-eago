@@ -5,7 +5,7 @@
 server:
   host: "127.0.0.1"
   port: 9000
-  transport: "streamable-http"
+  transport: "streamable-http"  # Informational; runtime serves HTTP(S) /mcp today
 
 metadata:
   name: "open-eago-mcp-agent"
@@ -61,6 +61,7 @@ agent:
 
 mcp:
   protocol_version: "2024-11-05"
+  # Demo uses plain MCP bodies by default. Set true to require OpenEAGO envelope I/O on /mcp.
   eago_envelope: false
 
 # SPIRE mTLS: required for production. Paths overridable via env (SPIRE_CERT_PATH, etc.).
