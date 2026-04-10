@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OpenEAGO — Enterprise Agent Governance & Orchestration</title>
+  <meta name="description" content="OpenEAGO is an open specification for secure, scalable, and compliant multi-agent workflows in regulated enterprise environments." />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="#" class="logo">
+        <!-- <img src="https://raw.githubusercontent.com/finos-labs/open-eago/main/docs/images/eago_gs.png" alt="OpenEAGO" class="logo-img" onerror="this.style.display='none'" /> -->
+        <span class="logo-text">OpenEAGO</span>
+      </a>
+      <nav class="main-nav" aria-label="Main navigation">
+        <a href="#features">Features</a>
+        <a href="#architecture">Architecture</a>
+        <a href="#blog">Blog</a>
+        <a href="#community">Community</a>
+      </nav>
+      <div class="header-actions">
+        <a href="https://github.com/finos-labs/open-eago" target="_blank" rel="noreferrer" class="btn btn-outline">
+          <svg class="icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+          GitHub
+        </a>
+        <a href="https://github.com/finos-labs/open-eago" target="_blank" rel="noreferrer" class="btn btn-primary">
+          Get started
+          <svg class="icon icon-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+      <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- HERO -->
+    <section class="hero">
+      <div class="hero-gradient" aria-hidden="true"></div>
+      <div class="container hero-inner">
+        <div class="hero-content">
+          <div class="badge">
+            Built by the open-source community · FINOS project
+          </div>
+          <h1>Open Enterprise Specification for <span class="gradient-text">AI Multi-agent</span> Orchestration</h1>
+          <p class="hero-description">
+            OpenEAGO is an open standard for secure, scalable, and compliant multi-agent workflows in regulated enterprise environments. Designed for regulated industries with comprehensive governance, auditability, and cross-border compliance.
+          </p>
+          <div class="hero-actions">
+            <a href="https://github.com/finos-labs/open-eago" target="_blank" rel="noreferrer" class="btn btn-primary btn-lg">
+              Start building
+              <svg class="icon icon-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
+            <a href="https://github.com/finos-labs/open-eago/releases" target="_blank" rel="noreferrer" class="btn btn-outline btn-lg">
+              Read the release notes
+            </a>
+          </div>
+          <div class="hero-stats">
+            <div class="stat">
+              <span class="stat-value">0.1.0</span>
+              <span class="stat-label">Version</span>
+            </div>
+            <div class="stat">
+              <span class="stat-value">Apache 2.0</span>
+              <span class="stat-label">License</span>
+            </div>
+          </div>
+        </div>
+        <div class="hero-card-wrap">
+          <div class="hero-card">
+            <div class="hero-card-header">
+              <span class="hero-card-title">OpenEAGO</span>
+              <span class="hero-card-version">v0.1.0</span>
+            </div>
+            <div class="hero-card-body">
+              <div class="spec-block">
+                <p class="spec-block-title">Envelope</p>
+                <p>Signed payload + policy bundle + trace context + compliance metadata.</p>
+              </div>
+              <div class="spec-block">
+                <p class="spec-block-title">Negotiation</p>
+                <p>Capability discovery, cost budgets, compliance validation, and policy enforcement.</p>
+              </div>
+              <div class="spec-block">
+                <p class="spec-block-title">Handoff</p>
+                <p>Deterministic routing with replayable state snapshots and audit trails.</p>
+              </div>
+              <div class="spec-block">
+                <p class="spec-block-title">Governance</p>
+                <p>Human-in-the-loop controls, explainability, and bias monitoring aligned with EU AI Act.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- COMMUNITY LOGOS -->
+    <section class="logos-bar">
+      <div class="container">
+        <p class="logos-label">Inspired by the best open-source communities</p>
+        <div class="logos-row">
+          <a href="https://agntcy.org/" target="_blank" rel="noreferrer" class="logo-link">
+            <img src="agntcy.svg" alt="AGNTCY" onerror="this.style.display='none'" />
+            <!-- <span class="logo-fallback">AGNTCY</span> -->
+          </a>
+          <a href="https://schema.oasf.outshift.com/" target="_blank" rel="noreferrer" class="logo-link">
+            <img src="oasf.png" alt="OASF" onerror="this.style.display='none'" style="height:3rem" />
+            <!-- <span class="logo-fallback">OASF</span> -->
+          </a>
+          <a href="https://spiffe.io/" target="_blank" rel="noreferrer" class="logo-link">
+            <img src="spiffe.png" alt="SPIFFE" onerror="this.style.display='none'" />
+            <!-- <span class="logo-fallback">SPIFFE</span> -->
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- FEATURES -->
+    <section id="features" class="section bg-slate">
+      <div class="container">
+        <div class="section-header">
+          <p class="section-label">Features</p>
+          <h2>Everything enterprise teams need to ship safely in regulated environments</h2>
+          <p class="section-description">
+            OpenEAGO addresses critical gaps in enterprise AI infrastructure by providing a universal standard for AI agent interoperability that operates within regulatory boundaries and enterprise security requirements.
+          </p>
+        </div>
+        <div class="cards-grid cards-grid-3">
+
+          <div class="card">
+            <div class="card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253M3 12a8.959 8.959 0 0 1 .284-2.253"/></svg>
+            </div>
+            <h3>Framework-Agnostic Integration</h3>
+            <p>Support for LangChain, LangGraph, custom agents, and legacy system wrappers with seamless interoperability across any AI framework.</p>
+          </div>
+
+          <div class="card">
+            <div class="card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z"/></svg>
+            </div>
+            <h3>Enterprise-Grade Security</h3>
+            <p>Built-in authentication (OAuth2, SAML, mTLS), authorization (RBAC/ABAC), and end-to-end encryption for regulated enterprise environments.</p>
+          </div>
+
+          <div class="card">
+            <div class="card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 0 1-2.25 2.25M16.5 7.5V18a2.25 2.25 0 0 0 2.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 0 0 2.25 2.25h13.5M6 7.5h3v3H6v-3Z"/></svg>
+            </div>
+            <h3>Regulatory Compliance</h3>
+            <p>Native support for GDPR, HIPAA, PCI-DSS, CCPA, and financial services regulations with automated compliance validation and reporting.</p>
+          </div>
+
+          <div class="card">
+            <div class="card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z"/></svg>
+            </div>
+            <h3>Resilient Orchestration</h3>
+            <p>Multi-agent workflow coordination with circuit breakers, retry policies, fallback routing, and compensating transactions for high availability.</p>
+          </div>
+
+          <div class="card">
+            <div class="card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M20.893 13.393l-1.135-1.135a2.252 2.252 0 0 1-.421-.585l-1.08-2.16a.414.414 0 0 0-.663-.107.827.827 0 0 1-.812.21l-1.273-.363a.89.89 0 0 0-.738 1.595l.587.39c.59.395.674 1.23.172 1.732l-.2.2c-.212.212-.33.498-.33.796v.41c0 .409-.11.809-.32 1.158l-1.315 2.191a2.11 2.11 0 0 1-1.81 1.025 1.055 1.055 0 0 1-1.055-1.055v-1.172c0-.92-.56-1.747-1.414-2.089l-.655-.261a2.25 2.25 0 0 1-1.383-2.46l.007-.042a2.25 2.25 0 0 1 .29-.787l.09-.15a2.25 2.25 0 0 1 2.37-1.048l1.178.236a1.125 1.125 0 0 0 1.302-.795l.208-.73a1.125 1.125 0 0 0-.578-1.315l-.665-.332-.091.091a2.25 2.25 0 0 1-1.591.659h-.18c-.249 0-.487.1-.662.274a.931.931 0 0 1-1.458-1.137l1.279-2.132Z"/></svg>
+            </div>
+            <h3>Cross-Border Data Governance</h3>
+            <p>Automated compliance with data sovereignty and localization requirements across jurisdictions for global agent collaboration.</p>
+          </div>
+
+          <div class="card">
+            <div class="card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg>
+            </div>
+            <h3>AI Governance</h3>
+            <p>Human-in-the-loop controls, explainability features, and bias monitoring aligned with EU AI Act and NIST AI RMF requirements.</p>
+          </div>
+
+          <div class="card">
+            <div class="card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244"/></svg>
+            </div>
+            <h3>Agent Farms &amp; Registry</h3>
+            <p>Dynamic agent discovery, registration with mTLS, bi-directional communication, reliability scoring, and capability management.</p>
+          </div>
+
+          <div class="card">
+            <div class="card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z"/></svg>
+            </div>
+            <h3>Arbitrary Complex Orchestration</h3>
+            <p>Support for complex workflows involving multiple agents, tasks, and dependencies with deterministic handoffs and full audit trails.</p>
+          </div>
+
+          <div class="card">
+            <div class="card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z"/></svg>
+            </div>
+            <h3>Context &amp; State Management</h3>
+            <p>Hierarchical state capture across session, conversation, agent, and task layers with CRDT-based synchronization and audit anchoring.</p>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ADOPTERS -->
+    <section class="adopters-bar">
+      <div class="container">
+        <p class="logos-label">Adopters &amp; Sponsors</p>
+        <div class="logos-row">
+          <span class="adopter-name">Citi</span>
+          <span class="adopter-name">FINOS Labs</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ARCHITECTURE -->
+    <section id="architecture" class="section">
+      <div class="container arch-inner">
+        <div class="arch-content">
+          <p class="section-label">Architecture</p>
+          <h2>A specification stack designed for regulated enterprise AI</h2>
+          <p class="section-description">
+            Agents exchange signed envelopes, negotiate capabilities, and synchronize state through a comprehensive layered architecture. Every step is observable, compliant, and replayable.
+          </p>
+          <ol class="arch-steps">
+            <li>
+              <div class="step-number">1</div>
+              <div>
+                <strong>Contract layer</strong>
+                <p>Standard message schema with signatures, policy bundles, and regulatory compliance metadata.</p>
+              </div>
+            </li>
+            <li>
+              <div class="step-number">2</div>
+              <div>
+                <strong>Planning layer</strong>
+                <p>Dynamic capability discovery, cost budgeting, guardrail enforcement, and optimal agent selection.</p>
+              </div>
+            </li>
+            <li>
+              <div class="step-number">3</div>
+              <div>
+                <strong>Verification layer</strong>
+                <p>Plan validation with authorization, SLA/SLO agreements, policy compliance, and risk assessments.</p>
+              </div>
+            </li>
+            <li>
+              <div class="step-number">4</div>
+              <div>
+                <strong>Execution layer</strong>
+                <p>Executes tasks with deterministic routing, state snapshots, multi-region failover, and compliance monitoring.</p>
+              </div>
+            </li>
+            <li>
+              <div class="step-number">5</div>
+              <div>
+                <strong>Context layer</strong>
+                <p>Manages contextual information and state across sessions, conversations, and agent layers with audit trails.</p>
+              </div>
+            </li>
+            <li>
+              <div class="step-number">6</div>
+              <div>
+                <strong>Communication layer</strong>
+                <p>Standardized agent communication specification ensuring interoperability and secure context sharing.</p>
+              </div>
+            </li>
+          </ol>
+        </div>
+        <div class="arch-code-wrap">
+          <div class="code-card">
+            <div class="code-card-header">
+              <span class="code-card-title">Developer experience</span>
+              <span class="code-card-sub">Readable, auditable, and designed for regulatory compliance.</span>
+            </div>
+            <div class="code-block">
+              <p class="code-filename">openeago.json</p>
+              <pre><code>{
+  "contract_id": "&lt;uuid-v4&gt;",
+  "version": "0.1.0",
+  "client_info": {
+    "agent_id": "...",
+    "identity": "spiffe://..."
+  },
+  "business_requirements": {
+    "task": "...",
+    "sla": "...",
+    "compliance": [...]
+  },
+  "workflow_tasks": [
+    { "id": "task-1", ... },
+    { "id": "task-2", ... }
+  ],
+  "execution_constraints": {
+    "timeout_ms": 30000,
+    "retry_policy": "exponential"
+  },
+  "regulatory_compliance": {
+    "gdpr": true,
+    "pci_dss": true
+  },
+  "data_governance": {
+    "jurisdiction": "EU",
+    "data_residency": "eu-west-1"
+  }
+}</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- USE CASES -->
+    <section class="section bg-slate">
+      <div class="container usecases-inner">
+        <div class="usecases-left">
+          <p class="section-label">Use cases</p>
+          <h2>Built for regulated, high-trust environments</h2>
+          <p class="section-description">
+            From multinational banking to healthcare, OpenEAGO enables compliant agentic workflows that meet global regulatory requirements.
+          </p>
+          <div class="usecase-cards">
+            <div class="usecase-card">
+              <strong>Regulated multi-agent finance operations</strong>
+              <p>Coordinate risk assessment, AML/KYC compliance, and analytics agents with deterministic handoffs and full audit trails.</p>
+            </div>
+            <div class="usecase-card">
+              <strong>Cross-border banking workflows</strong>
+              <p>Enable secure agent collaboration across jurisdictions while maintaining data sovereignty and regulatory compliance.</p>
+            </div>
+            <div class="usecase-card">
+              <strong>Healthcare data orchestration</strong>
+              <p>Connect patient data agents, diagnostic models, and clinical decision systems with HIPAA-compliant communication and consent management.</p>
+            </div>
+            <div class="usecase-card">
+              <strong>Enterprise DevSecOps with governance</strong>
+              <p>Bridge security scanners, CI/CD agents, and incident responders with comprehensive policy enforcement and compliance validation.</p>
+            </div>
+          </div>
+        </div>
+        <div class="why-card">
+          <h3>Why teams adopt OpenEAGO</h3>
+          <div class="why-items">
+            <div class="why-item">
+              <strong>Regulatory confidence</strong>
+              <p>Deploy autonomous agents with consistent compliance checks, automated policy enforcement, and reversible actions across global jurisdictions.</p>
+            </div>
+            <div class="why-item">
+              <strong>Enterprise-grade security</strong>
+              <p>Comprehensive identity management, mTLS authentication, and zero-trust architecture with agent registry and capability validation.</p>
+            </div>
+            <div class="why-item">
+              <strong>Operational transparency</strong>
+              <p>Trace every decision with deterministic replay, compliance audit logs, and explainability features for regulatory reporting.</p>
+            </div>
+            <div class="why-item">
+              <strong>Cross-border compliance</strong>
+              <p>Automated handling of data sovereignty, localization requirements, and jurisdiction-specific regulations for global agent collaboration.</p>
+            </div>
+            <div class="why-item">
+              <strong>Audit blockchain</strong>
+              <p>Immutable audit trails with cryptographic verification ensure tamper-proof compliance records and regulatory reporting across multi-agent workflows.</p>
+            </div>
+          </div>
+          <a href="https://github.com/finos-labs/open-eago/blob/main/SPECIFICATION.md" target="_blank" rel="noreferrer" class="btn btn-outline">
+            Explore the specification
+            <svg class="icon icon-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- BLOG -->
+    <section id="blog" class="section">
+      <div class="container">
+        <div class="blog-header">
+          <div>
+            <p class="section-label">Blog</p>
+            <h2>Latest updates</h2>
+            <p class="section-description">Short updates on releases, roadmap milestones, documentation, and news.</p>
+          </div>
+        </div>
+        <div class="cards-grid cards-grid-4">
+
+          <div class="blog-card">
+            <div class="blog-card-type">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/></svg>
+              Release
+            </div>
+            <h4>OpenEAGO 0.1.0 — Initial release with core specification</h4>
+            <p>Initial release of OpenEAGO 0.1.0, featuring the core specification and documentation to get started.</p>
+            <span class="blog-date">Feb 14, 2026</span>
+          </div>
+
+          <div class="blog-card">
+            <div class="blog-card-type">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5"/></svg>
+              Roadmap
+            </div>
+            <h4>Q1 2026 goals: Initial 0.1.0 release and agent registry</h4>
+            <p>Focus on core specification features, reference implementation, and community building.</p>
+            <span class="blog-date">Feb 10, 2026</span>
+          </div>
+
+          <div class="blog-card">
+            <div class="blog-card-type">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25"/></svg>
+              Docs
+            </div>
+            <h4>First commit to the OpenEAGO specification and reference implementation</h4>
+            <p>Initial commit laying the foundation for future development and community contributions.</p>
+            <span class="blog-date">Jan 20, 2026</span>
+          </div>
+
+          <div class="blog-card">
+            <div class="blog-card-type">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M10.34 15.84c-.688-.06-1.386-.09-2.09-.09H7.5a4.5 4.5 0 1 1 0-9h.75c.704 0 1.402-.03 2.09-.09m0 9.18c.253.962.584 1.892.985 2.783.247.55.06 1.21-.463 1.511l-.657.38c-.551.318-1.26.117-1.527-.461a20.845 20.845 0 0 1-1.44-4.282m3.102.069a18.03 18.03 0 0 1-.59-4.59c0-1.586.205-3.124.59-4.59m0 9.18a23.848 23.848 0 0 1 8.835 2.535M10.34 6.66a23.847 23.847 0 0 1 8.835-2.535m0 0A23.74 23.74 0 0 1 18.795 3m.38 1.125a23.91 23.91 0 0 1 1.014 5.395m-1.014 8.855c-.118.38-.245.754-.38 1.125m.38-1.125a23.91 23.91 0 0 0 1.014-5.395m0-3.46c.495.413.811 1.035.811 1.73 0 .695-.316 1.317-.811 1.73m0-3.46a24.347 24.347 0 0 1 0 3.46"/></svg>
+              News
+            </div>
+            <h4>FINOS Labs welcomes OpenEAGO as the newest project in the foundation</h4>
+            <p>Join maintainers and contributors to shape the next-gen enterprise multi-agent standard.</p>
+            <span class="blog-date">Dec 16, 2025</span>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- COMMUNITY -->
+    <section id="community" class="section section-dark">
+      <div class="container community-inner">
+        <div class="community-content">
+          <p class="section-label-light">Community</p>
+          <h2>Build the future together</h2>
+          <p class="section-description-light">
+            Join the OpenEAGO community to shape the next generation of enterprise multi-agent standards.
+          </p>
+          <div class="community-actions">
+            <a href="https://github.com/finos-labs/open-eago" target="_blank" rel="noreferrer" class="btn btn-white btn-lg">
+              <svg class="icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+              Contribute on GitHub
+            </a>
+            <a href="https://github.com/finos-labs/open-eago/blob/main/ROADMAP.md" target="_blank" rel="noreferrer" class="btn btn-outline-light btn-lg">
+              View roadmap
+            </a>
+          </div>
+        </div>
+        <div class="community-checklist">
+          <h3>Community checklist</h3>
+          <ul>
+            <li>
+              <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/></svg>
+              Review the OpenEAGO specification and share feedback.
+            </li>
+            <li>
+              <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/></svg>
+              Join weekly design calls and RFC reviews.
+            </li>
+            <li>
+              <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/></svg>
+              Ship reference implementations for your stack.
+            </li>
+            <li>
+              <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/></svg>
+              Sign contributions with DCO and open pull requests.
+            </li>
+            <li>
+              <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/></svg>
+              Report issues and propose new RFCs on GitHub.
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <span class="logo-text">OpenEAGO</span>
+        <span class="footer-copy">© 2026 FINOS · Apache 2.0 License</span>
+      </div>
+      <nav class="footer-nav" aria-label="Footer navigation">
+        <a href="#features">Features</a>
+        <a href="#architecture">Architecture</a>
+        <a href="#blog">Blog</a>
+        <a href="#community">Community</a>
+        <a href="https://github.com/finos-labs/open-eago" target="_blank" rel="noreferrer">GitHub</a>
+        <a href="https://github.com/finos-labs/open-eago/blob/main/SPECIFICATION.md" target="_blank" rel="noreferrer">Specification</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script src="main.js"></script>
+</body>
+</html>
