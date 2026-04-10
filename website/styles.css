@@ -425,11 +425,7 @@ p { color: #475569; }
 .logo-link {
   display: flex;
   align-items: center;
-  opacity: 0.6;
-  transition: opacity 0.15s;
 }
-
-.logo-link:hover { opacity: 1; }
 
 .logo-link img {
   height: 2.5rem;
