@@ -1,4 +1,4 @@
-use crate::models::{AddressInfo, AgentDetails, AgentStatus, AppState, BootstrapUrls, RegisterRequest, Registry, Timestamp};
+use crate::models::{AddressInfo, AgentDetails, AgentStatus, AppState, BootstrapUrls, DiscoverRequest, RegisterRequest, Registry, Timestamp};
 use actix_web::{HttpRequest, HttpResponse};
 use tracing::{info, warn};
 
@@ -8,6 +8,11 @@ pub const MAX_TAGS_COUNT: usize = 50;
 pub const MAX_LIST_FIELD_LEN: usize = 100;
 pub const MAX_STRING_VALUE_LEN: usize = 512;
 pub const ALLOWED_BOOTSTRAP_SCHEMES: &[&str] = &["http", "https"];
+
+/// Minimum reliability score (0.0–1.0) required for an agent to be discoverable (spec §4.2).
+pub const SPEC_MIN_RELIABILITY: f64 = 0.95;
+/// Minimum uptime percentage required for an agent to be discoverable (spec §4.2).
+pub const SPEC_MIN_UPTIME_PCT: f64 = 99.0;
 
 #[derive(PartialEq)]
 pub enum RegistryUpdate {
@@ -165,6 +170,66 @@ pub fn cleanup_and_build_list(
             details: details.clone(),
         })
         .collect()
+}
+
+/// Returns agents matching all filters in `req`, enforcing the spec §4.2 reliability and uptime
+/// floors even when the caller requests a looser threshold. The second return value is the number
+/// of registry entries that were excluded by at least one filter.
+pub fn discover_agents(
+    registry: &Registry,
+    req: &DiscoverRequest,
+    local_address: &str,
+    current_ts: Timestamp,
+) -> (Vec<AddressInfo>, usize) {
+    let reg = registry.lock().unwrap();
+    let mut total: usize = 0;
+
+    let matching: Vec<AddressInfo> = reg.iter()
+        .filter(|(_, d)| {
+            total += 1;
+            // Enforce spec floors — callers cannot relax below the specification minimum.
+            let rel_floor = req.min_reliability
+                .map(|r| r.max(SPEC_MIN_RELIABILITY))
+                .unwrap_or(SPEC_MIN_RELIABILITY);
+            let up_floor = req.min_uptime_pct
+                .map(|u| u.max(SPEC_MIN_UPTIME_PCT))
+                .unwrap_or(SPEC_MIN_UPTIME_PCT);
+
+            let rel_ok = d.reliability.map_or(false, |r| r >= rel_floor);
+            let up_ok  = d.uptime_percentage.map_or(false, |u| u >= up_floor);
+
+            let cap_ok = req.capability_codes.as_ref()
+                .map_or(true, |caps| caps.iter().any(|c| d.capability_codes.contains(c)));
+
+            let comp_ok = req.compliance.as_ref()
+                .map_or(true, |reqs| reqs.iter().all(|r| d.compliance.contains(r)));
+
+            let jur_ok = req.jurisdiction.as_ref()
+                .map_or(true, |j| d.jurisdiction.as_deref() == Some(j.as_str()));
+
+            let residency_ok = req.data_residency.as_ref()
+                .map_or(true, |r| d.data_center.as_deref() == Some(r.as_str()));
+
+            let latency_ok = req.max_latency_p99_ms.map_or(true, |max_ms| {
+                d.sla_guarantees.as_ref()
+                    .and_then(|s| s.latency_p99_ms)
+                    .map_or(false, |p99| p99 <= max_ms)
+            });
+
+            let status_ok = req.exclude_status.as_ref()
+                .map_or(true, |ex| !ex.contains(&d.health_status));
+
+            rel_ok && up_ok && cap_ok && comp_ok && jur_ok && residency_ok && latency_ok && status_ok
+        })
+        .map(|(addr, details)| AddressInfo {
+            address: addr.clone(),
+            last_seen_seconds: if addr == local_address { 0 } else { current_ts.saturating_sub(details.last_seen) },
+            details: details.clone(),
+        })
+        .collect();
+
+    let filtered_out = total.saturating_sub(matching.len());
+    (matching, filtered_out)
 }
 
 pub fn evict_stale_entries(

@@ -1,10 +1,10 @@
 use crate::models::{
-    AddressInfo, AgentDetails, AppState, HealthResponse, ListResponse,
-    RegisterRequest, RegisterResponse, UpdateStatusRequest, UpdateStatusResponse,
+    AddressInfo, AgentDetails, AppState, DiscoverRequest, DiscoverResponse, HealthResponse,
+    ListResponse, RegisterRequest, RegisterResponse, UpdateStatusRequest, UpdateStatusResponse,
 };
 use crate::registry::{
-    cleanup_and_build_list, learn_bootstrap_urls, update_registry, validate_register_request,
-    verify_caller_owns_address, RegistryUpdate, MAX_REGISTRY_ENTRIES,
+    cleanup_and_build_list, discover_agents, learn_bootstrap_urls, update_registry,
+    validate_register_request, verify_caller_owns_address, RegistryUpdate, MAX_REGISTRY_ENTRIES,
 };
 use actix_web::{get, post, put, web, HttpRequest, HttpResponse, Responder};
 use tracing::{info, instrument, warn};
@@ -12,9 +12,10 @@ use utoipa::OpenApi;
 
 #[derive(OpenApi)]
 #[openapi(
-    paths(health, register, list, update_status),
+    paths(health, register, list, discover, update_status),
     components(schemas(
         HealthResponse, RegisterRequest, RegisterResponse, ListResponse,
+        DiscoverRequest, DiscoverResponse,
         AddressInfo, AgentDetails, UpdateStatusRequest, UpdateStatusResponse
     )),
     tags(
@@ -109,6 +110,49 @@ pub async fn list(data: web::Data<AppState>) -> impl Responder {
         count: addresses.len(),
         addresses,
         bootstrap_urls,
+    })
+}
+
+#[utoipa::path(
+    post,
+    path = "/discover",
+    request_body = DiscoverRequest,
+    responses(
+        (status = 200, description = "Agents matching all filters", body = DiscoverResponse),
+        (status = 400, description = "Invalid filter values")
+    ),
+    tag = "Registry"
+)]
+#[post("/discover")]
+#[instrument(skip(data))]
+pub async fn discover(data: web::Data<AppState>, req: web::Json<DiscoverRequest>) -> impl Responder {
+    if let Some(rel) = req.min_reliability {
+        if !(0.0..=1.0).contains(&rel) {
+            return HttpResponse::BadRequest()
+                .json(serde_json::json!({"error": "min_reliability must be between 0.0 and 1.0"}));
+        }
+    }
+    if let Some(up) = req.min_uptime_pct {
+        if !(0.0..=100.0).contains(&up) {
+            return HttpResponse::BadRequest()
+                .json(serde_json::json!({"error": "min_uptime_pct must be between 0.0 and 100.0"}));
+        }
+    }
+    if let Some(lat) = req.max_latency_p99_ms {
+        if lat < 0.0 {
+            return HttpResponse::BadRequest()
+                .json(serde_json::json!({"error": "max_latency_p99_ms must not be negative"}));
+        }
+    }
+
+    let current_ts = AppState::current_timestamp();
+    let (agents, filtered_out) =
+        discover_agents(&data.registry, &req, &data.local_address, current_ts);
+
+    HttpResponse::Ok().json(DiscoverResponse {
+        count: agents.len(),
+        agents,
+        filtered_out,
     })
 }
 

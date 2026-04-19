@@ -1,5 +1,9 @@
+# Runtime
 /examples/agent-registry/target
 /examples/agent-registry/spire-*
+
+# Temporary
+/examples/agent-framework
 
 # Python
 __pycache__/

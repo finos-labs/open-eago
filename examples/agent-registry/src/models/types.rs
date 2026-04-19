@@ -45,6 +45,18 @@ pub struct ResourceLimits {
     pub max_storage_gb: Option<u64>,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema, Default)]
+pub struct SlaGuarantees {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub latency_p99_ms: Option<f64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub availability_pct: Option<f64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub throughput_rps: Option<f64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub error_rate_max: Option<f64>,
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
 pub struct GeoLocation {
     pub latitude: f64,
@@ -94,6 +106,8 @@ pub struct AgentDetails {
     pub dependencies: Vec<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub quarantined_at: Option<u64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sla_guarantees: Option<SlaGuarantees>,
 }
 
 impl AgentDetails {
@@ -117,6 +131,7 @@ impl AgentDetails {
             geographic_location: None,
             dependencies: vec![],
             quarantined_at: None,
+            sla_guarantees: None,
         }
     }
 
@@ -365,6 +380,33 @@ pub struct ListResponse {
     pub addresses: Vec<AddressInfo>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub bootstrap_urls: Option<Vec<String>>,
+}
+
+#[derive(Debug, Deserialize, Serialize, ToSchema)]
+pub struct DiscoverRequest {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub capability_codes: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub compliance: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub jurisdiction: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub min_reliability: Option<f64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub min_uptime_pct: Option<f64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub max_latency_p99_ms: Option<f64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub exclude_status: Option<Vec<AgentStatus>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub data_residency: Option<String>,
+}
+
+#[derive(Serialize, ToSchema)]
+pub struct DiscoverResponse {
+    pub count: usize,
+    pub agents: Vec<AddressInfo>,
+    pub filtered_out: usize,
 }
 
 #[derive(Debug, Deserialize, Serialize, ToSchema)]

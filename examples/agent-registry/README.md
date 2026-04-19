@@ -10,11 +10,12 @@ A reference implementation of a distributed agent registry for the [OpenEAGO](..
 
 ```log
 Bootstrap server          Node agent
-┌─────────────────┐          ┌──────────────┐
-│  POST /register ◄──────────┤  on startup  │
-│  GET  /list                │  sync loop   │
-│  PUT  /status   ◄──────────┤  liveness    │
-└─────────────────┘          └──────────────┘
+┌──────────────────┐          ┌──────────────┐
+│  POST /register  ◄──────────┤  on startup  │
+│  GET  /list      │          │  sync loop   │
+│  POST /discover  │          │  ad-hoc      │
+│  PUT  /status    ◄──────────┤  liveness    │
+└──────────────────┘          └──────────────┘
 ```
 
 **Bootstrap mode** (`bootstrap: true`) — accepts registrations, serves the full registry, and gossips peer lists back to callers.  
@@ -221,6 +222,14 @@ agent:                 # metadata advertised when this instance registers
   version: ~
   jurisdiction: ~
   data_center: ~
+  compliance: []
+  reliability: ~          # 0.0–1.0 (required for /discover results)
+  uptime_percentage: ~    # 0.0–100.0 (required for /discover results)
+  sla_guarantees:         # optional; used by POST /discover latency filter
+    latency_p99_ms: ~
+    availability_pct: ~
+    throughput_rps: ~
+    error_rate_max: ~
 
 spire:                 # SPIRE workload API certificate paths
   cert_path: /tmp/svid.0.pem    # SVID certificate (PEM)
@@ -279,10 +288,25 @@ Use **bootstrap** mode so `POST /register` is enabled (e.g. `config.bootstrap.ya
       "reliability": 0.99,
       "version": "0.1.0",
       "health_status": "healthy",
-      "uptime_percentage": 99.9
+      "uptime_percentage": 99.9,
+      "sla_guarantees": {
+        "latency_p99_ms": 150,
+        "availability_pct": 0.999
+      }
     }
   }
   ```
+- **POST /discover** — Filter the registry by capability, compliance, jurisdiction, SLA, and health status. All fields are optional; omitted fields are not filtered. Example body:
+  ```json
+  {
+    "capability_codes": ["SPIRE_ENABLED"],
+    "compliance": ["SOC2"],
+    "jurisdiction": "US",
+    "max_latency_p99_ms": 200,
+    "exclude_status": ["degraded", "quarantine", "unhealthy"]
+  }
+  ```
+  Returns `{"count": N, "agents": [...], "filtered_out": M}`. The `filtered_out` field reports how many registry entries were excluded, useful for debugging planning decisions. The `min_reliability` and `min_uptime_pct` filters are enforced at the spec §4.2 floors (0.95 and 99.0) even if lower values are requested.
 - **PUT /status** — Updates reliability/health for an existing address. The backend checks that the **caller’s IP** matches the address; when using Swagger the connection comes from the proxy (127.0.0.1), so use an address that resolves to 127.0.0.1 (e.g. `127.0.0.1:8091` or `localhost:8091`) and ensure that address is already registered. Example body: `{"address": "127.0.0.1:8091", "health_status": "degraded", "reliability": 0.85}`.
 
 > `--insecure` skips hostname verification only. SPIFFE SVIDs use URI SANs (`spiffe://…`), not DNS SANs. CA-chain trust is still enforced by the bundle.
@@ -307,6 +331,7 @@ Use **bootstrap** mode so `POST /register` is enabled (e.g. `config.bootstrap.ya
 | --- | --- | --- | --- |
 | `GET` | `/health` | mTLS | Liveness check |
 | `GET` | `/list` | mTLS | List all registered agents |
+| `POST` | `/discover` | mTLS | Filter agents by capability, compliance, jurisdiction, SLA, and status |
 | `POST` | `/register` | mTLS | Register or refresh an agent (bootstrap only) |
 | `PUT` | `/status` | mTLS (owner) | Update reliability / health for own address |
 
@@ -343,6 +368,24 @@ curl -s https://localhost:8443/list \
   --cert /tmp/svid.0.pem --key /tmp/svid.0.key \
   --cacert /tmp/bundle.0.pem --insecure | jq
 ```
+
+### Example: discover agents by capability and SLA
+
+```bash
+curl -s -X POST https://localhost:8443/discover \
+  -H "Content-Type: application/json" \
+  --cert /tmp/svid.0.pem --key /tmp/svid.0.key \
+  --cacert /tmp/bundle.0.pem --insecure \
+  -d '{
+    "capability_codes": ["SPIRE_ENABLED"],
+    "compliance": ["SOC2"],
+    "jurisdiction": "US",
+    "max_latency_p99_ms": 200,
+    "exclude_status": ["degraded", "quarantine", "unhealthy"]
+  }' | jq
+```
+
+All filter fields are optional. The response includes `filtered_out` — the count of agents excluded by at least one filter — useful for debugging why expected agents were not returned. The `min_reliability` and `min_uptime_pct` filters are enforced at the spec §4.2 floors (0.95 and 99.0) regardless of the requested value.
 
 ### Example: continuous monitoring (every 2 seconds)
 

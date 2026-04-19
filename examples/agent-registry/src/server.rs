@@ -1,4 +1,4 @@
-use crate::handlers::{health, list, register, update_status, ApiDoc};
+use crate::handlers::{health, list, register, update_status, discover, ApiDoc};
 use crate::models::AppState;
 use crate::proxy::proxy_handler;
 use crate::tls::load_spire_tls_config;
@@ -20,6 +20,7 @@ pub async fn start_server(port: u16, app_state: web::Data<AppState>) -> std::io:
             .wrap(tracing_actix_web::TracingLogger::default())
             .service(health)
             .service(list)
+            .service(discover)
             .service(update_status);
         if is_bootstrap {
             app = app.service(register);
