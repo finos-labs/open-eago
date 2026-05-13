@@ -1,0 +1,14 @@
+{
+  "name": "sui-a2a-scripts",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "register": "node register.mjs",
+    "read": "node read-agent.mjs",
+    "serve": "node serve.mjs"
+  },
+  "dependencies": {
+    "@mysten/sui": "^1.0.0"
+  }
+}

@@ -1,0 +1,21 @@
+sui:
+  rpc_url: "https://fullnode.testnet.sui.io:443"
+  network: "testnet"
+
+registry:
+  package_id: "0xffc720800328035a338bed002d1a2d0ab62cd5d25c40c5d88034d15e446c5d85"
+  identity_object_id: "0xa2f954548badde685bc80a9ccefaf87cde671a4cf8805b214743e6a141c4f67e"
+  reputation_object_id: "0x6aa124094a9ad902ed9e52743634ef9c3c4b72f5543e98e0f0998dc0f258af0e"
+  validation_object_id: "0x750c483a1c4dc453a192f45de5e85edc7e5634bb526deeb5492cdd090c97dd1a"
+
+server:
+  port: 3000
+  host: "0.0.0.0"
+  swagger: true
+  swagger_path: "/docs"
+
+sync:
+  # Polling interval in milliseconds for re-fetching on-chain state
+  poll_interval_ms: 30000
+  # Maximum number of events to fetch per query
+  events_limit: 200

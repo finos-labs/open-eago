@@ -1,0 +1,11 @@
+[package]
+name = "sui_a2a_registry"
+edition = "2024.beta"
+version = "0.1.0"
+license = "Apache-2.0"
+authors = ["sui-a2a-registry contributors"]
+
+[dependencies]
+
+[addresses]
+sui_a2a_registry = "0x0"

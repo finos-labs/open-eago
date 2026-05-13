@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SUI A2A Registry — Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- ─── Background effects ──────────────────────────────────────────────────── -->
+<div class="bg-grid"></div>
+<div class="bg-glow glow-1"></div>
+<div class="bg-glow glow-2"></div>
+
+<!-- ─── Header ──────────────────────────────────────────────────────────────── -->
+<header class="header">
+  <div class="header-inner">
+    <div class="header-brand">
+      <div class="logo">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+          <circle cx="14" cy="14" r="12" stroke="url(#logoGrad)" stroke-width="2"/>
+          <path d="M9 14h10M14 9v10" stroke="url(#logoGrad)" stroke-width="2" stroke-linecap="round"/>
+          <circle cx="14" cy="14" r="3" fill="url(#logoGrad)"/>
+          <defs>
+            <linearGradient id="logoGrad" x1="0" y1="0" x2="28" y2="28">
+              <stop offset="0%" stop-color="#6366f1"/>
+              <stop offset="100%" stop-color="#06b6d4"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+      <div>
+        <h1 class="brand-title">SUI A2A Registry</h1>
+        <span class="brand-sub">Agent Monitoring Dashboard</span>
+      </div>
+    </div>
+
+    <div class="header-meta">
+      <div class="network-badge" id="networkBadge">
+        <span class="pulse-dot"></span>
+        <span id="networkName">testnet</span>
+      </div>
+
+      <!-- Auto-refresh interval selector -->
+      <div class="interval-group" id="intervalGroup">
+        <span class="interval-label">Auto</span>
+        <button class="interval-btn" data-ms="5000">5s</button>
+        <button class="interval-btn active" data-ms="60000">1m</button>
+        <button class="interval-btn" data-ms="600000">10m</button>
+        <button class="interval-btn" data-ms="0">Off</button>
+      </div>
+
+      <!-- Countdown ring -->
+      <div class="countdown-wrap" id="countdownWrap" title="Next refresh">
+        <svg class="countdown-ring" viewBox="0 0 36 36">
+          <circle class="countdown-track" cx="18" cy="18" r="15.9"/>
+          <circle class="countdown-fill" id="countdownArc" cx="18" cy="18" r="15.9"
+                  stroke-dasharray="100 100" stroke-dashoffset="0"/>
+        </svg>
+        <span class="countdown-val" id="countdownVal">—</span>
+      </div>
+
+      <div class="sync-info">
+        <span class="sync-label">Last sync</span>
+        <span class="sync-time" id="lastSync">—</span>
+      </div>
+      <button class="refresh-btn" id="refreshBtn" title="Force refresh">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M13.65 2.35A7.958 7.958 0 0 0 8 0C3.58 0 0 3.58 0 8s3.58 8 8 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L9 7h7V0l-2.35 2.35z"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- ─── Main ─────────────────────────────────────────────────────────────────── -->
+<main class="main">
+
+  <!-- Stat cards -->
+  <section class="stats-grid">
+    <div class="stat-card card-primary" id="statTotal">
+      <div class="stat-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+          <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+        </svg>
+      </div>
+      <div class="stat-body">
+        <div class="stat-value" id="totalAgents">—</div>
+        <div class="stat-label">Total Agents</div>
+      </div>
+      <div class="stat-trend" id="totalTrend"></div>
+    </div>
+
+    <div class="stat-card card-green" id="statActive">
+      <div class="stat-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+        </svg>
+      </div>
+      <div class="stat-body">
+        <div class="stat-value" id="activeAgents">—</div>
+        <div class="stat-label">Active Agents</div>
+      </div>
+      <div class="stat-bar">
+        <div class="stat-bar-fill" id="activeBar" style="width:0%"></div>
+      </div>
+    </div>
+
+    <div class="stat-card card-amber" id="statFeedback">
+      <div class="stat-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+        </svg>
+      </div>
+      <div class="stat-body">
+        <div class="stat-value" id="totalFeedback">—</div>
+        <div class="stat-label">Total Feedback</div>
+      </div>
+    </div>
+
+    <div class="stat-card card-cyan" id="statScore">
+      <div class="stat-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+        </svg>
+      </div>
+      <div class="stat-body">
+        <div class="stat-value" id="avgScore">—</div>
+        <div class="stat-label">Avg Reputation Score</div>
+      </div>
+    </div>
+
+    <div class="stat-card card-indigo" id="statReachable">
+      <div class="stat-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M1 6s4-6 11-6 11 6 11 6-4 6-11 6-11-6-11-6z"/><circle cx="12" cy="6" r="2"/>
+        </svg>
+      </div>
+      <div class="stat-body">
+        <div class="stat-value" id="reachableAgents">—</div>
+        <div class="stat-label">Reachable Agents</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Charts row -->
+  <section class="charts-row">
+    <div class="chart-card chart-wide">
+      <div class="chart-header">
+        <h2 class="chart-title">Registry Growth</h2>
+        <span class="chart-sub">Total &amp; active agents over time</span>
+      </div>
+      <div class="chart-body">
+        <canvas id="historyChart"></canvas>
+      </div>
+    </div>
+
+    <div class="chart-card chart-narrow">
+      <div class="chart-header">
+        <h2 class="chart-title">Status Distribution</h2>
+        <span class="chart-sub">Active vs inactive</span>
+      </div>
+      <div class="chart-body chart-donut-wrap">
+        <canvas id="statusChart"></canvas>
+        <div class="donut-center" id="donutCenter">—</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Leaderboard + Agent table -->
+  <section class="bottom-row">
+
+    <div class="panel leaderboard-panel">
+      <div class="panel-header">
+        <h2 class="panel-title">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          Reputation Leaderboard
+        </h2>
+      </div>
+      <div class="leaderboard-list" id="leaderboard">
+        <div class="loading-row">Loading…</div>
+      </div>
+    </div>
+
+    <div class="panel agents-panel">
+      <div class="panel-header">
+        <h2 class="panel-title">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          All Agents
+        </h2>
+        <div class="panel-controls">
+          <div class="filter-group">
+            <button class="filter-btn active" data-filter="all">All</button>
+            <button class="filter-btn" data-filter="active">Active</button>
+            <button class="filter-btn" data-filter="inactive">Inactive</button>
+          </div>
+          <input class="search-input" id="agentSearch" type="text" placeholder="Search URI or ID…" />
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table class="agents-table">
+          <thead>
+            <tr>
+              <th class="sortable" data-col="agentId">ID <span class="sort-icon">↕</span></th>
+              <th>Status</th>
+              <th>Agent URI</th>
+              <th class="sortable" data-col="netScore">Score <span class="sort-icon">↕</span></th>
+              <th>Health</th>
+              <th class="sortable" data-col="createdAt">Created <span class="sort-icon">↕</span></th>
+            </tr>
+          </thead>
+          <tbody id="agentsTableBody">
+            <tr><td colspan="6" class="loading-cell">Loading agents…</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="pagination" id="pagination"></div>
+    </div>
+
+  </section>
+
+</main>
+
+<!-- ─── Agent detail modal ────────────────────────────────────────────────────── -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" id="agentModal">
+    <button class="modal-close" id="modalClose">✕</button>
+    <div id="modalContent"></div>
+  </div>
+</div>
+
+<!-- ─── Toast ─────────────────────────────────────────────────────────────────── -->
+<div class="toast" id="toast"></div>
+
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,68 @@
+{
+  "agentId": "sui:testnet:0xa7ab6d000862a7b30ed1b2e7d02baa131fa9530a9d4c67b39a1a1804b5b21193:0",
+  "name": "TestAgent3",
+  "version": "1.0.0",
+  "description": "A test AI agent registered on the SUI Agentic Registry for demo purposes.",
+  "url": "http://localhost:8080",
+  "documentationUrl": "http://localhost:8080/docs",
+  "provider": {
+    "organization": "Local Dev",
+    "url": "http://localhost:8080"
+  },
+  "iconUrl": "http://localhost:8080/icon.png",
+  "capabilities": {
+    "streaming": false,
+    "pushNotifications": false,
+    "stateTransitionHistory": false
+  },
+  "defaultInputModes": [
+    "text/plain"
+  ],
+  "defaultOutputModes": [
+    "text/plain"
+  ],
+  "skills": [
+    {
+      "id": "echo",
+      "name": "Echo",
+      "description": "Echoes back the user's input.",
+      "tags": [
+        "test",
+        "echo",
+        "demo"
+      ]
+    },
+    {
+      "id": "hello-world",
+      "name": "Hello World",
+      "description": "Returns a hello-world greeting.",
+      "tags": [
+        "test",
+        "demo"
+      ]
+    }
+  ],
+  "active": true,
+  "services": [
+    {
+      "name": "test-api",
+      "endpoint": "http://localhost:8080/a2a",
+      "version": "1.0.0",
+      "skills": [
+        "echo",
+        "hello-world"
+      ],
+      "domains": [
+        "testing",
+        "demo"
+      ]
+    }
+  ],
+  "registrations": [
+    {
+      "agentId": "sui:testnet:0xa7ab6d000862a7b30ed1b2e7d02baa131fa9530a9d4c67b39a1a1804b5b21193:0",
+      "agentRegistry": "sui:testnet:0xa7ab6d000862a7b30ed1b2e7d02baa131fa9530a9d4c67b39a1a1804b5b21193"
+    }
+  ],
+  "supportedTrust": []
+}

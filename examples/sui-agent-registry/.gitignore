@@ -1,0 +1,33 @@
+# Build outputs
+build/
+dist/
+*.mv
+*.mvd
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# TypeScript
+*.js.map
+*.d.ts
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Sui / Move
+.sui/
