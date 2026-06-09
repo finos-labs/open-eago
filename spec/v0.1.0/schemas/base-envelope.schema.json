@@ -3,11 +3,16 @@
   "$id": "https://finos-labs.github.io/open-eago/spec/v0.1.0/schemas/base-envelope.schema.json",
   "title": "OpenEAGO Base Envelope",
   "type": "object",
-  "required": ["message_id", "phase", "timestamp", "payload"],
+  "required": ["message_id", "spec_version", "phase", "timestamp", "payload"],
   "properties": {
     "message_id": {
       "type": "string",
       "minLength": 1
+    },
+    "spec_version": {
+      "type": "string",
+      "description": "OpenEAGO specification version this message targets. Implementations MUST reject messages targeting an unsupported version.",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
     },
     "phase": {
       "type": "string",

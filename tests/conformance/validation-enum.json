@@ -1,0 +1,176 @@
+{
+  "description": "Validation decision vocabulary is canonical: approved, rejected, modified",
+  "requirement_id": "OASF-VAL-ENUM-001",
+  "schema": "spec/v0.1.0/schemas/validation-compliance.schema.json",
+  "cases": [
+    {
+      "id": "enum-approved-approved",
+      "description": "validation_status=approved and hitl.decision=approved are both valid",
+      "valid": true,
+      "payload": {
+        "plan_id": "plan-001",
+        "validation_status": "approved",
+        "policy_checks": ["gdpr_data_residency"],
+        "hitl": {"required": true, "decision": "approved"},
+        "risk_assessment": {
+          "composite_risk_score": 0.20,
+          "risk_tier": "low",
+          "dimension_scores": {
+            "financial_risk": 0.20, "operational_risk": 0.20,
+            "compliance_risk": 0.25, "security_risk": 0.15
+          },
+          "dimension_weights": {
+            "financial_risk": 0.25, "operational_risk": 0.25,
+            "compliance_risk": 0.25, "security_risk": 0.25
+          },
+          "escalation_outcome": "approved"
+        }
+      }
+    },
+    {
+      "id": "enum-rejected-rejected",
+      "description": "validation_status=rejected and hitl.decision=rejected are both valid",
+      "valid": true,
+      "payload": {
+        "plan_id": "plan-002",
+        "validation_status": "rejected",
+        "policy_checks": ["aml_screening"],
+        "hitl": {"required": true, "decision": "rejected"},
+        "risk_assessment": {
+          "composite_risk_score": 0.85,
+          "risk_tier": "critical",
+          "dimension_scores": {
+            "financial_risk": 0.85, "operational_risk": 0.80,
+            "compliance_risk": 0.90, "security_risk": 0.85
+          },
+          "dimension_weights": {
+            "financial_risk": 0.25, "operational_risk": 0.25,
+            "compliance_risk": 0.25, "security_risk": 0.25
+          },
+          "escalation_outcome": "rejected"
+        }
+      }
+    },
+    {
+      "id": "enum-modified-modified",
+      "description": "validation_status=modified and hitl.decision=modified are both valid",
+      "valid": true,
+      "payload": {
+        "plan_id": "plan-003",
+        "validation_status": "modified",
+        "policy_checks": ["dora_ict_risk"],
+        "hitl": {"required": true, "decision": "modified"},
+        "risk_assessment": {
+          "composite_risk_score": 0.62,
+          "risk_tier": "high",
+          "dimension_scores": {
+            "financial_risk": 0.60, "operational_risk": 0.65,
+            "compliance_risk": 0.65, "security_risk": 0.58
+          },
+          "dimension_weights": {
+            "financial_risk": 0.25, "operational_risk": 0.25,
+            "compliance_risk": 0.25, "security_risk": 0.25
+          },
+          "escalation_outcome": "hitl_pending"
+        }
+      }
+    },
+    {
+      "id": "enum-validation-status-pending-rejected",
+      "description": "validation_status=pending is not in canonical vocabulary — MUST be rejected",
+      "valid": false,
+      "payload": {
+        "plan_id": "plan-004",
+        "validation_status": "pending",
+        "policy_checks": ["gdpr_data_residency"],
+        "hitl": {"required": true, "decision": "approved"},
+        "risk_assessment": {
+          "composite_risk_score": 0.20,
+          "risk_tier": "low",
+          "dimension_scores": {
+            "financial_risk": 0.20, "operational_risk": 0.20,
+            "compliance_risk": 0.25, "security_risk": 0.15
+          },
+          "dimension_weights": {
+            "financial_risk": 0.25, "operational_risk": 0.25,
+            "compliance_risk": 0.25, "security_risk": 0.25
+          },
+          "escalation_outcome": "approved"
+        }
+      }
+    },
+    {
+      "id": "enum-hitl-decision-deferred-rejected",
+      "description": "hitl.decision=deferred is not in canonical vocabulary — MUST be rejected",
+      "valid": false,
+      "payload": {
+        "plan_id": "plan-005",
+        "validation_status": "approved",
+        "policy_checks": ["gdpr_data_residency"],
+        "hitl": {"required": true, "decision": "deferred"},
+        "risk_assessment": {
+          "composite_risk_score": 0.30,
+          "risk_tier": "low",
+          "dimension_scores": {
+            "financial_risk": 0.30, "operational_risk": 0.25,
+            "compliance_risk": 0.35, "security_risk": 0.30
+          },
+          "dimension_weights": {
+            "financial_risk": 0.25, "operational_risk": 0.25,
+            "compliance_risk": 0.25, "security_risk": 0.25
+          },
+          "escalation_outcome": "approved"
+        }
+      }
+    },
+    {
+      "id": "enum-case-sensitive-rejected",
+      "description": "validation_status=Approved (capitalized) MUST be rejected — enum is case-sensitive",
+      "valid": false,
+      "payload": {
+        "plan_id": "plan-006",
+        "validation_status": "Approved",
+        "policy_checks": ["gdpr_data_residency"],
+        "hitl": {"required": true, "decision": "approved"},
+        "risk_assessment": {
+          "composite_risk_score": 0.20,
+          "risk_tier": "low",
+          "dimension_scores": {
+            "financial_risk": 0.20, "operational_risk": 0.20,
+            "compliance_risk": 0.25, "security_risk": 0.15
+          },
+          "dimension_weights": {
+            "financial_risk": 0.25, "operational_risk": 0.25,
+            "compliance_risk": 0.25, "security_risk": 0.25
+          },
+          "escalation_outcome": "approved"
+        }
+      }
+    },
+    {
+      "id": "enum-compliance-risk-weight-below-minimum-rejected",
+      "description": "compliance_risk weight below 0.25 MUST be rejected",
+      "valid": false,
+      "payload": {
+        "plan_id": "plan-007",
+        "validation_status": "approved",
+        "policy_checks": ["gdpr_data_residency"],
+        "hitl": {"required": true, "decision": "approved"},
+        "risk_assessment": {
+          "composite_risk_score": 0.20,
+          "risk_tier": "low",
+          "dimension_scores": {
+            "financial_risk": 0.20, "operational_risk": 0.20,
+            "compliance_risk": 0.20, "security_risk": 0.20
+          },
+          "dimension_weights": {
+            "financial_risk": 0.35, "operational_risk": 0.35,
+            "compliance_risk": 0.10,
+            "security_risk": 0.20
+          },
+          "escalation_outcome": "approved"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,107 @@
+{
+  "description": "Planning payload includes explicit negotiation sub-step with sla_slo check",
+  "requirement_id": "OASF-PLAN-NEG-001",
+  "schema": "spec/v0.1.0/schemas/planning-negotiation.schema.json",
+  "cases": [
+    {
+      "id": "planning-valid-accepted",
+      "description": "A fully valid plan with negotiation accepted and sla_slo check present",
+      "valid": true,
+      "payload": {
+        "plan_id": "plan-001",
+        "contract_id": "contract-001",
+        "selected_agents": ["agent-kyc-001", "agent-aml-002"],
+        "execution_pattern": "sequential",
+        "negotiation": {
+          "status": "accepted",
+          "checks": ["capability_fit", "policy_constraints", "sla_slo", "data_residency"],
+          "sla_feasibility_summary": {
+            "all_agents_feasible": true,
+            "agents_evaluated": 2,
+            "agents_at_sla_risk": 0,
+            "fallback_agents_verified": true
+          }
+        },
+        "sla_guarantees": {
+          "sla_id": "sla-001",
+          "latency": {"p99_ms": 800},
+          "availability": {"availability_pct": 0.9950},
+          "throughput": {"throughput_rps": 100},
+          "error_rate": {"error_rate_max": 0.01}
+        }
+      }
+    },
+    {
+      "id": "planning-valid-rejected-sla-infeasible",
+      "description": "A negotiation rejected due to SLA infeasibility is valid schema",
+      "valid": true,
+      "payload": {
+        "plan_id": "plan-002",
+        "contract_id": "contract-002",
+        "selected_agents": ["agent-credit-003"],
+        "negotiation": {
+          "status": "rejected",
+          "checks": ["capability_fit", "sla_slo"],
+          "sla_feasibility_summary": {
+            "all_agents_feasible": false,
+            "agents_evaluated": 1,
+            "agents_at_sla_risk": 1,
+            "fallback_agents_verified": false
+          }
+        }
+      }
+    },
+    {
+      "id": "planning-missing-negotiation-rejected",
+      "description": "A plan without a negotiation object MUST be rejected",
+      "valid": false,
+      "payload": {
+        "plan_id": "plan-003",
+        "contract_id": "contract-003",
+        "selected_agents": ["agent-kyc-001"]
+      }
+    },
+    {
+      "id": "planning-checks-missing-sla-slo-rejected",
+      "description": "A negotiation result without sla_slo in checks MUST be rejected",
+      "valid": false,
+      "payload": {
+        "plan_id": "plan-004",
+        "contract_id": "contract-004",
+        "selected_agents": ["agent-kyc-001"],
+        "negotiation": {
+          "status": "accepted",
+          "checks": ["capability_fit", "policy_constraints"]
+        }
+      }
+    },
+    {
+      "id": "planning-empty-agents-rejected",
+      "description": "A plan with no selected agents MUST be rejected",
+      "valid": false,
+      "payload": {
+        "plan_id": "plan-005",
+        "contract_id": "contract-005",
+        "selected_agents": [],
+        "negotiation": {
+          "status": "accepted",
+          "checks": ["sla_slo"]
+        }
+      }
+    },
+    {
+      "id": "planning-invalid-negotiation-status-rejected",
+      "description": "An unknown negotiation status value MUST be rejected",
+      "valid": false,
+      "payload": {
+        "plan_id": "plan-006",
+        "contract_id": "contract-006",
+        "selected_agents": ["agent-kyc-001"],
+        "negotiation": {
+          "status": "pending",
+          "checks": ["sla_slo"]
+        }
+      }
+    }
+  ]
+}

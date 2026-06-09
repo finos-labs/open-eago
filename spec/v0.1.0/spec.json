@@ -37,6 +37,7 @@
   "schema_catalog": {
     "version": "v0.1.0",
     "base": "schemas/base-envelope.schema.json",
+    "domain_vocabulary": "schemas/domain-vocabulary.schema.json",
     "phases": {
       "contract_management": "schemas/contract-management.schema.json",
       "planning_negotiation": "schemas/planning-negotiation.schema.json",

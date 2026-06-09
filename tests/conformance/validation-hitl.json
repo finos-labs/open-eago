@@ -1,0 +1,181 @@
+{
+  "description": "Validation payload includes a mandatory HITL decision object",
+  "requirement_id": "OASF-VAL-HITL-001",
+  "schema": "spec/v0.1.0/schemas/validation-compliance.schema.json",
+  "cases": [
+    {
+      "id": "validation-hitl-approved",
+      "description": "A fully valid validation result with HITL approved",
+      "valid": true,
+      "payload": {
+        "plan_id": "plan-001",
+        "validation_status": "approved",
+        "policy_checks": ["gdpr_data_residency", "aml_screening", "credit_risk_threshold"],
+        "compliance_profiles": ["GDPR", "EU-AI-ACT", "SR-11-7"],
+        "hitl": {
+          "required": true,
+          "reviewer_id": "compliance-officer-01",
+          "decision": "approved",
+          "decision_at": "2026-06-09T11:30:00Z"
+        },
+        "risk_assessment": {
+          "composite_risk_score": 0.45,
+          "risk_tier": "medium",
+          "dimension_scores": {
+            "financial_risk": 0.40,
+            "operational_risk": 0.35,
+            "compliance_risk": 0.55,
+            "security_risk": 0.50
+          },
+          "dimension_weights": {
+            "financial_risk": 0.25,
+            "operational_risk": 0.25,
+            "compliance_risk": 0.25,
+            "security_risk": 0.25
+          },
+          "escalation_outcome": "approved",
+          "hitl_required": true
+        }
+      }
+    },
+    {
+      "id": "validation-hitl-rejected",
+      "description": "A validation rejected by HITL reviewer with critical risk",
+      "valid": true,
+      "payload": {
+        "plan_id": "plan-002",
+        "validation_status": "rejected",
+        "policy_checks": ["cross_border_clearance"],
+        "hitl": {
+          "required": true,
+          "reviewer_id": "risk-officer-02",
+          "decision": "rejected",
+          "decision_at": "2026-06-09T14:00:00Z"
+        },
+        "risk_assessment": {
+          "composite_risk_score": 0.85,
+          "risk_tier": "critical",
+          "dimension_scores": {
+            "financial_risk": 0.90,
+            "operational_risk": 0.80,
+            "compliance_risk": 0.88,
+            "security_risk": 0.82
+          },
+          "dimension_weights": {
+            "financial_risk": 0.20,
+            "operational_risk": 0.20,
+            "compliance_risk": 0.40,
+            "security_risk": 0.20
+          },
+          "escalation_outcome": "rejected"
+        }
+      }
+    },
+    {
+      "id": "validation-hitl-modified",
+      "description": "A validation modified by HITL reviewer — scope reduced to comply",
+      "valid": true,
+      "payload": {
+        "plan_id": "plan-003",
+        "validation_status": "modified",
+        "policy_checks": ["pci_dss_scope", "gdpr_data_residency"],
+        "hitl": {
+          "required": true,
+          "reviewer_id": "compliance-officer-03",
+          "decision": "modified",
+          "decision_at": "2026-06-09T15:00:00Z"
+        },
+        "risk_assessment": {
+          "composite_risk_score": 0.62,
+          "risk_tier": "high",
+          "dimension_scores": {
+            "financial_risk": 0.55,
+            "operational_risk": 0.60,
+            "compliance_risk": 0.70,
+            "security_risk": 0.63
+          },
+          "dimension_weights": {
+            "financial_risk": 0.25,
+            "operational_risk": 0.20,
+            "compliance_risk": 0.30,
+            "security_risk": 0.25
+          },
+          "escalation_outcome": "hitl_pending",
+          "hitl_required": true
+        }
+      }
+    },
+    {
+      "id": "validation-missing-hitl-rejected",
+      "description": "A validation payload without hitl field MUST be rejected",
+      "valid": false,
+      "payload": {
+        "plan_id": "plan-004",
+        "validation_status": "approved",
+        "policy_checks": ["gdpr_data_residency"],
+        "risk_assessment": {
+          "composite_risk_score": 0.20,
+          "risk_tier": "low",
+          "dimension_scores": {
+            "financial_risk": 0.20,
+            "operational_risk": 0.20,
+            "compliance_risk": 0.20,
+            "security_risk": 0.20
+          },
+          "dimension_weights": {
+            "financial_risk": 0.25,
+            "operational_risk": 0.25,
+            "compliance_risk": 0.25,
+            "security_risk": 0.25
+          },
+          "escalation_outcome": "approved"
+        }
+      }
+    },
+    {
+      "id": "validation-hitl-required-false-rejected",
+      "description": "hitl.required MUST be true — false is not permitted",
+      "valid": false,
+      "payload": {
+        "plan_id": "plan-005",
+        "validation_status": "approved",
+        "policy_checks": ["gdpr_data_residency"],
+        "hitl": {
+          "required": false,
+          "decision": "approved"
+        },
+        "risk_assessment": {
+          "composite_risk_score": 0.20,
+          "risk_tier": "low",
+          "dimension_scores": {
+            "financial_risk": 0.20,
+            "operational_risk": 0.20,
+            "compliance_risk": 0.20,
+            "security_risk": 0.20
+          },
+          "dimension_weights": {
+            "financial_risk": 0.25,
+            "operational_risk": 0.25,
+            "compliance_risk": 0.25,
+            "security_risk": 0.25
+          },
+          "escalation_outcome": "approved"
+        }
+      }
+    },
+    {
+      "id": "validation-missing-risk-assessment-rejected",
+      "description": "A validation payload without risk_assessment MUST be rejected",
+      "valid": false,
+      "payload": {
+        "plan_id": "plan-006",
+        "validation_status": "approved",
+        "policy_checks": ["gdpr_data_residency"],
+        "hitl": {
+          "required": true,
+          "decision": "approved"
+        }
+      }
+    }
+  ]
+}

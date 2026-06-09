@@ -14,7 +14,26 @@
     "requested_capabilities": {
       "type": "array",
       "items": {
-        "type": "string"
+        "type": "string",
+        "description": "Canonical capability type from domain-vocabulary.schema.json. Extension capabilities MUST use the 'x-' prefix.",
+        "enum": [
+          "kyc_verification",
+          "aml_screening",
+          "credit_risk_assessment",
+          "legal_review",
+          "cross_border_clearance",
+          "sanctions_screening",
+          "fraud_detection",
+          "account_setup",
+          "product_setup",
+          "document_processing",
+          "onboarding_orchestration",
+          "compliance_validation",
+          "data_residency_check",
+          "audit_anchoring",
+          "identity_verification",
+          "risk_aggregation"
+        ]
       },
       "minItems": 1
     },
@@ -22,7 +41,16 @@
       "type": "object",
       "properties": {
         "regulatory_profile": {
-          "type": "string"
+          "type": "string",
+          "description": "Jurisdictional and regulatory context for this workflow. Canonical values from domain-vocabulary.schema.json.",
+          "enum": [
+            "financial_services_eu",
+            "financial_services_us",
+            "financial_services_global",
+            "financial_services_apac",
+            "healthcare_us",
+            "global_enterprise"
+          ]
         },
         "data_residency": {
           "type": "string"

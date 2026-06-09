@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://finos-labs.github.io/open-eago/spec/v0.1.0/schemas/domain-vocabulary.schema.json",
+  "title": "OpenEAGO Financial-Services Domain Vocabulary",
+  "$comment": "Canonical controlled vocabulary for regulated financial-services agentic workflows. All string-typed fields in OpenEAGO schemas that reference compliance frameworks, capability types, or regulatory profiles MUST use values defined here. This is the single source of truth for shared semantics — it is what makes two independent implementations interoperable at the meaning layer, not just the wire layer.",
+
+  "$defs": {
+
+    "compliance_profile": {
+      "title": "Compliance Profile",
+      "description": "A regulatory framework or standard that applies to a workflow or agent interaction. Values are the canonical short-form identifiers used by the specification.",
+      "type": "string",
+      "enum": [
+        "GDPR",
+        "DORA",
+        "EU-AI-ACT",
+        "SR-11-7",
+        "BCBS-239",
+        "PCI-DSS",
+        "HIPAA",
+        "CCPA",
+        "MiFID-II",
+        "EMIR"
+      ]
+    },
+
+    "capability_type": {
+      "title": "Regulated Capability Type",
+      "description": "A named, regulated operation that an agent can perform. These identifiers establish the shared ontology: two agents agree that 'kyc_verification' means the same thing because the spec defines it, not because they happened to use the same string. Extension capabilities outside this vocabulary MUST use the prefix 'x-' (e.g. 'x-trade_surveillance').",
+      "type": "string",
+      "enum": [
+        "kyc_verification",
+        "aml_screening",
+        "credit_risk_assessment",
+        "legal_review",
+        "cross_border_clearance",
+        "sanctions_screening",
+        "fraud_detection",
+        "account_setup",
+        "product_setup",
+        "document_processing",
+        "onboarding_orchestration",
+        "compliance_validation",
+        "data_residency_check",
+        "audit_anchoring",
+        "identity_verification",
+        "risk_aggregation"
+      ]
+    },
+
+    "regulatory_profile": {
+      "title": "Regulatory Profile",
+      "description": "The primary jurisdictional and regulatory context in which a workflow executes. Used during planning to scope data-residency, cross-border clearance, and compliance framework selection.",
+      "type": "string",
+      "enum": [
+        "financial_services_eu",
+        "financial_services_us",
+        "financial_services_global",
+        "financial_services_apac",
+        "healthcare_us",
+        "global_enterprise"
+      ]
+    },
+
+    "policy_check": {
+      "title": "Well-Known Policy Check",
+      "description": "Canonical identifiers for policy checks that implementations MAY record in the policy_checks array. The policy_checks field is not enum-constrained — organisations may use custom checks. These well-known values ensure that checks with cross-implementation significance use consistent identifiers.",
+      "type": "string",
+      "examples": [
+        "gdpr_data_residency",
+        "aml_screening",
+        "kyc_verification",
+        "cross_border_clearance",
+        "credit_risk_threshold",
+        "pci_dss_scope",
+        "dora_ict_risk",
+        "eu_ai_act_risk",
+        "sr_11_7_model_validation",
+        "bcbs_239_risk_data",
+        "sanctions_list_check",
+        "mifid_ii_suitability",
+        "data_minimisation",
+        "consent_verified",
+        "identity_attestation"
+      ]
+    }
+
+  },
+
+  "description": "This schema is a vocabulary reference document, not a payload schema. It does not validate message payloads directly. Individual phase schemas import vocabulary values from the $defs above. See SPECIFICATION.md §3B for the domain vocabulary normative requirements.",
+
+  "type": "object",
+  "properties": {
+    "compliance_profile": { "$ref": "#/$defs/compliance_profile" },
+    "capability_type": { "$ref": "#/$defs/capability_type" },
+    "regulatory_profile": { "$ref": "#/$defs/regulatory_profile" },
+    "policy_check": { "$ref": "#/$defs/policy_check" }
+  }
+}

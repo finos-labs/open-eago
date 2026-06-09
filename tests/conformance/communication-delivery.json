@@ -1,0 +1,125 @@
+{
+  "description": "Communication payload enforces delivery status and auth-level semantics",
+  "requirement_id": "OASF-COMM-001",
+  "schema": "spec/v0.1.0/schemas/communication-delivery.schema.json",
+  "cases": [
+    {
+      "id": "comm-delivered-level-3",
+      "description": "A delivered message with mTLS and auth_level 3 is valid",
+      "valid": true,
+      "payload": {
+        "message_id": "msg-001",
+        "sender": "agent-kyc-001",
+        "recipient": "agent-aml-002",
+        "method": "a2a",
+        "delivery_status": "delivered",
+        "security": {
+          "mtls": true,
+          "auth_level": 3
+        },
+        "audit_ref": "audit-001"
+      }
+    },
+    {
+      "id": "comm-queued-level-2",
+      "description": "A queued message at auth_level 2 is valid",
+      "valid": true,
+      "payload": {
+        "message_id": "msg-002",
+        "sender": "orchestrator-001",
+        "recipient": "agent-credit-003",
+        "delivery_status": "queued",
+        "security": {
+          "mtls": false,
+          "auth_level": 2
+        }
+      }
+    },
+    {
+      "id": "comm-failed-delivery",
+      "description": "A failed delivery status is valid",
+      "valid": true,
+      "payload": {
+        "message_id": "msg-003",
+        "sender": "agent-kyc-001",
+        "recipient": "agent-offline-004",
+        "delivery_status": "failed",
+        "security": {
+          "mtls": true,
+          "auth_level": 3
+        }
+      }
+    },
+    {
+      "id": "comm-expired-delivery",
+      "description": "An expired delivery status is valid",
+      "valid": true,
+      "payload": {
+        "message_id": "msg-004",
+        "sender": "agent-kyc-001",
+        "recipient": "agent-aml-002",
+        "delivery_status": "expired",
+        "security": {
+          "mtls": true,
+          "auth_level": 4
+        }
+      }
+    },
+    {
+      "id": "comm-missing-security-rejected",
+      "description": "A message without a security object MUST be rejected",
+      "valid": false,
+      "payload": {
+        "message_id": "msg-005",
+        "sender": "agent-kyc-001",
+        "recipient": "agent-aml-002",
+        "delivery_status": "delivered"
+      }
+    },
+    {
+      "id": "comm-invalid-delivery-status-rejected",
+      "description": "An unknown delivery_status value MUST be rejected",
+      "valid": false,
+      "payload": {
+        "message_id": "msg-006",
+        "sender": "agent-kyc-001",
+        "recipient": "agent-aml-002",
+        "delivery_status": "pending",
+        "security": {
+          "mtls": true,
+          "auth_level": 2
+        }
+      }
+    },
+    {
+      "id": "comm-auth-level-above-max-rejected",
+      "description": "auth_level 5 exceeds the maximum of 4 — MUST be rejected",
+      "valid": false,
+      "payload": {
+        "message_id": "msg-007",
+        "sender": "agent-kyc-001",
+        "recipient": "agent-aml-002",
+        "delivery_status": "delivered",
+        "security": {
+          "mtls": true,
+          "auth_level": 5
+        }
+      }
+    },
+    {
+      "id": "comm-auth-level-zero-rejected",
+      "description": "auth_level 0 is below the minimum of 1 — MUST be rejected",
+      "valid": false,
+      "payload": {
+        "message_id": "msg-008",
+        "sender": "agent-kyc-001",
+        "recipient": "agent-aml-002",
+        "delivery_status": "delivered",
+        "security": {
+          "mtls": false,
+          "auth_level": 0
+        }
+      }
+    }
+  ]
+}

@@ -42,7 +42,8 @@
               "data_residency"
             ]
           },
-          "minItems": 1
+          "minItems": 1,
+          "contains": {"const": "sla_slo"}
         },
         "sla_feasibility_summary": {
           "type": "object",

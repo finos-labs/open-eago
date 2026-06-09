@@ -21,8 +21,21 @@
     },
     "compliance_profiles": {
       "type": "array",
+      "description": "Regulatory frameworks applicable to this validation. Canonical values from domain-vocabulary.schema.json.",
       "items": {
-        "type": "string"
+        "type": "string",
+        "enum": [
+          "GDPR",
+          "DORA",
+          "EU-AI-ACT",
+          "SR-11-7",
+          "BCBS-239",
+          "PCI-DSS",
+          "HIPAA",
+          "CCPA",
+          "MiFID-II",
+          "EMIR"
+        ]
       }
     },
     "hitl": {

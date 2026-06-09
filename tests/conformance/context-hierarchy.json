@@ -1,0 +1,85 @@
+{
+  "description": "Context hierarchy supports the four canonical levels: session, conversation, agent, task",
+  "requirement_id": "OASF-CTX-001",
+  "schema": "spec/v0.1.0/schemas/context-state-management.schema.json",
+  "cases": [
+    {
+      "id": "context-session-level",
+      "description": "session is a valid context level",
+      "valid": true,
+      "payload": {
+        "context_id": "ctx-session-001",
+        "level": "session",
+        "state": {"user_id": "u-001", "jurisdiction": "EU", "risk_profile": "standard"},
+        "lineage": [],
+        "ttl_seconds": 3600
+      }
+    },
+    {
+      "id": "context-conversation-level",
+      "description": "conversation is a valid context level with parent lineage",
+      "valid": true,
+      "payload": {
+        "context_id": "ctx-conv-001",
+        "level": "conversation",
+        "state": {"topic": "kyc_verification", "language": "en"},
+        "lineage": ["ctx-session-001"],
+        "ttl_seconds": 1800
+      }
+    },
+    {
+      "id": "context-agent-level",
+      "description": "agent is a valid context level",
+      "valid": true,
+      "payload": {
+        "context_id": "ctx-agent-001",
+        "level": "agent",
+        "state": {"agent_id": "agent-kyc-001", "capabilities_active": ["kyc", "aml"]},
+        "lineage": ["ctx-session-001", "ctx-conv-001"]
+      }
+    },
+    {
+      "id": "context-task-level",
+      "description": "task is a valid context level with full lineage chain",
+      "valid": true,
+      "payload": {
+        "context_id": "ctx-task-001",
+        "level": "task",
+        "state": {"task_id": "task-001", "status": "executing", "retry_count": 0},
+        "lineage": ["ctx-session-001", "ctx-conv-001", "ctx-agent-001"],
+        "ttl_seconds": 300
+      }
+    },
+    {
+      "id": "context-invalid-level-rejected",
+      "description": "workflow is not a valid context level — MUST be rejected",
+      "valid": false,
+      "payload": {
+        "context_id": "ctx-workflow-001",
+        "level": "workflow",
+        "state": {},
+        "lineage": []
+      }
+    },
+    {
+      "id": "context-missing-level-rejected",
+      "description": "A context payload without level MUST be rejected",
+      "valid": false,
+      "payload": {
+        "context_id": "ctx-002",
+        "state": {"key": "value"},
+        "lineage": []
+      }
+    },
+    {
+      "id": "context-missing-lineage-rejected",
+      "description": "A context payload without lineage MUST be rejected",
+      "valid": false,
+      "payload": {
+        "context_id": "ctx-003",
+        "level": "task",
+        "state": {}
+      }
+    }
+  ]
+}

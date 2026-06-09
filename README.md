@@ -15,25 +15,27 @@
 
 ---
 
-**Enterprise Agent Governance & Orchestration (OpenEAGO)** is an open specification for secure, scalable, and compliant communication and orchestration among AI agents in enterprise environments.
+**Enterprise Agent Governance & Orchestration (OpenEAGO)** is an open specification for the **governance and compliance control plane** of regulated agentic systems — the layer that A2A, MCP, AGNTCY/OASF, and SPIFFE each explicitly decline to own.
 
 - Authors: Jan Rock (<jan.rock@citi.com>), Denis Urusov (<denis.urusov@citi.com>), Paul Groves (<paul.groves@citi.com>)
 - Date: 05/03/2026 - Version: 0.1
 
 ## Overview
 
-OpenEAGO addresses the critical gap in enterprise AI infrastructure by providing a universal standard for AI agent interoperability that operates within regulatory boundaries and enterprise security requirements.
+A2A handles agent-to-agent communication mechanics. MCP handles tool access. AGNTCY/OASF handles agent discovery and schema. SPIFFE handles workload identity. None of them does jurisdiction-aware policy enforcement, human-in-the-loop approval gates, cross-border data clearance, composite risk scoring, or audit anchoring for regulated workflows. OpenEAGO owns that gap — riding the winners on the wire, adding the control plane they don't provide.
+
+OpenEAGO is not a parallel protocol stack. It is a **profile and governance overlay** that runs on top of A2A transport and MCP tool invocation, delegating wire mechanics to those standards while adding the compliance machinery that regulated industries require.
 
 The specification enables:
 
-- **Framework-Agnostic Integration** - Support for LangChain, LangGraph, custom agents, and legacy system wrappers
-- **Enterprise-Grade Security** - Built-in authentication (OAuth2, SAML, mTLS), authorization (RBAC/ABAC), and encryption
-- **Regulatory Compliance** - Native support for GDPR, HIPAA, PCI-DSS, CCPA, and financial services regulations
-- **Resilient Orchestration** - Multi-agent workflow coordination with circuit breakers, fallback routing, and compensating transactions
-- **AI Governance** - Human-in-the-loop controls, explainability, and bias monitoring aligned with EU AI Act and NIST AI RMF
-- **Arbitrary Complex Orchestration** - Support for complex workflows involving multiple agents, tasks, and dependencies
-- **Cross-Border Data Governance** - Automated compliance with data sovereignty and localization requirements
-- **Agent Farms** - Dynamic agent discovery, registration (with mTLS), bi-directional communication, and reliability scoring
+- **Jurisdiction-Aware Policy Enforcement** - Real-time compliance checks against GDPR, DORA, EU AI Act, SR 11-7, BCBS 239, and PCI-DSS applied before and during execution
+- **Human-in-the-Loop Gates** - Mandatory HITL approval workflow for high-risk and regulated tasks, with structured audit artifacts
+- **Cross-Border Data Clearance** - Automated data residency validation and sovereignty enforcement during planning
+- **Composite Risk Scoring** - Four-dimension risk model (financial, operational, compliance, security) computed at Phase 3 with hard stop thresholds
+- **KYC/AML and Credit-Risk Negotiation** - Regulatory feasibility checks as a first-class phase in execution planning
+- **Audit Anchoring** - Traceable, tamper-evident records across all six phases, structured for regulator review
+- **SLA/SLO Enforcement** - Quantitative feasibility checks during planning with a breach state machine at runtime
+- **Framework-Agnostic Transport** - Delegates wire protocol to A2A; supports LangChain, LangGraph, custom agents, and legacy system wrappers
 
 ## Architecture
 
@@ -51,6 +53,19 @@ OpenEAGO orchestrates multi-agent workflows through a comprehensive architecture
 - **Execution & Resilience** - Runs tasks according to the plan with resilience controls, managing dependencies, fallbacks, and compensating actions.
 - **Context & State Management** - Captures and maintains hierarchical state across session, conversation, agent, and task layers.
 - **Communication & Delivery** - Delivers messages using standardized formats with routing integrity, security, and audit anchoring.
+
+### Capability Mapping — What OpenEAGO Adds vs. What It Delegates
+
+OpenEAGO is additive, not duplicative. This table shows exactly what each phase contributes versus what it delegates to the underlying standards.
+
+| Phase | Delegates to | Net-new OpenEAGO contribution |
+| --- | --- | --- |
+| **1 · Contract Management** | A2A (wire transport), MCP (tool interface) | Input validation against compliance profiles; traceable contract artifact with jurisdiction, regulatory scope, and capability classification metadata |
+| **2 · Planning & Negotiation** | AGNTCY/OASF (agent discovery and schema) | KYC/AML checks; cross-border data clearance; credit-risk scoring; SLA/SLO feasibility against all four SLO dimensions; ACU-based cost/risk thresholds — all before execution begins |
+| **3 · Validation & Compliance** | OPA/Rego (policy evaluation engine); SPIFFE (identity attestation) | Mandatory HITL approval gate; four-dimension composite risk score with hard-stop thresholds; regulatory profile enforcement (GDPR, DORA, EU AI Act, SR 11-7, BCBS 239); risk tier escalation rules |
+| **4 · Execution & Resilience** | A2A (agent-to-agent transport); MCP (tool invocation) | SLA breach state machine; circuit breaker triggered by multi-indicator runtime risk; compensating transactions; structured execution audit trail |
+| **5 · Context & State Management** | — | Hierarchical context propagation (`session → conversation → agent → task`); cross-agent lineage tracking; risk context forwarded across all phase transitions |
+| **6 · Communication & Delivery** | A2A (transport); SPIFFE/mTLS (mutual auth) | Jurisdiction-aware routing; audit-anchored delivery records; delivery status semantics structured for regulator review |
 
 ## Prerequisites
 
@@ -99,6 +114,12 @@ OpenEAGO is built on the principles of transparency, collaboration, and user emp
 
 <table align="center">
   <tr>
+    <td align="center">
+      <a href="https://google.github.io/A2A/">
+        <b>A2A</b><br>Agent2Agent Protocol
+      </a>
+    </td>
+    <td style="width: 36px;"></td>
     <td align="center">
       <a href="https://agntcy.org/">
         <img src="docs/images/agntcy.svg" alt="AGNTCY" height="80">

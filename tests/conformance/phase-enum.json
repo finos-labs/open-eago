@@ -1,0 +1,125 @@
+{
+  "description": "Six standardized phase identifiers are enforced in the base envelope",
+  "requirement_id": "OASF-PHASE-001",
+  "schema": "spec/v0.1.0/schemas/base-envelope.schema.json",
+  "cases": [
+    {
+      "id": "phase-contract-management",
+      "description": "contract_management is a valid phase",
+      "valid": true,
+      "payload": {
+        "message_id": "msg-001",
+        "spec_version": "0.1.0",
+        "phase": "contract_management",
+        "timestamp": "2026-06-09T10:00:00Z",
+        "payload": {}
+      }
+    },
+    {
+      "id": "phase-planning-negotiation",
+      "description": "planning_negotiation is a valid phase",
+      "valid": true,
+      "payload": {
+        "message_id": "msg-002",
+        "spec_version": "0.1.0",
+        "phase": "planning_negotiation",
+        "timestamp": "2026-06-09T10:01:00Z",
+        "payload": {}
+      }
+    },
+    {
+      "id": "phase-validation-compliance",
+      "description": "validation_compliance is a valid phase",
+      "valid": true,
+      "payload": {
+        "message_id": "msg-003",
+        "spec_version": "0.1.0",
+        "phase": "validation_compliance",
+        "timestamp": "2026-06-09T10:02:00Z",
+        "payload": {}
+      }
+    },
+    {
+      "id": "phase-execution-resilience",
+      "description": "execution_resilience is a valid phase",
+      "valid": true,
+      "payload": {
+        "message_id": "msg-004",
+        "spec_version": "0.1.0",
+        "phase": "execution_resilience",
+        "timestamp": "2026-06-09T10:03:00Z",
+        "payload": {}
+      }
+    },
+    {
+      "id": "phase-context-state-management",
+      "description": "context_state_management is a valid phase",
+      "valid": true,
+      "payload": {
+        "message_id": "msg-005",
+        "spec_version": "0.1.0",
+        "phase": "context_state_management",
+        "timestamp": "2026-06-09T10:04:00Z",
+        "payload": {}
+      }
+    },
+    {
+      "id": "phase-communication-delivery",
+      "description": "communication_delivery is a valid phase",
+      "valid": true,
+      "payload": {
+        "message_id": "msg-006",
+        "spec_version": "0.1.0",
+        "phase": "communication_delivery",
+        "timestamp": "2026-06-09T10:05:00Z",
+        "payload": {}
+      }
+    },
+    {
+      "id": "phase-unknown-rejected",
+      "description": "An unknown phase value MUST be rejected",
+      "valid": false,
+      "payload": {
+        "message_id": "msg-007",
+        "spec_version": "0.1.0",
+        "phase": "unknown_phase",
+        "timestamp": "2026-06-09T10:06:00Z",
+        "payload": {}
+      }
+    },
+    {
+      "id": "phase-missing-rejected",
+      "description": "A message with no phase field MUST be rejected",
+      "valid": false,
+      "payload": {
+        "message_id": "msg-008",
+        "spec_version": "0.1.0",
+        "timestamp": "2026-06-09T10:07:00Z",
+        "payload": {}
+      }
+    },
+    {
+      "id": "spec-version-missing-rejected",
+      "description": "A message with no spec_version MUST be rejected",
+      "valid": false,
+      "payload": {
+        "message_id": "msg-009",
+        "phase": "contract_management",
+        "timestamp": "2026-06-09T10:08:00Z",
+        "payload": {}
+      }
+    },
+    {
+      "id": "spec-version-invalid-format-rejected",
+      "description": "A non-semver spec_version MUST be rejected",
+      "valid": false,
+      "payload": {
+        "message_id": "msg-010",
+        "spec_version": "latest",
+        "phase": "contract_management",
+        "timestamp": "2026-06-09T10:09:00Z",
+        "payload": {}
+      }
+    }
+  ]
+}
