@@ -17,7 +17,7 @@
     <div class="container header-inner">
       <a href="#" class="logo">
         <img src="images/eago_gs.png" alt="OpenEAGO" class="logo-img" onerror="this.style.display='none'" />
-        <span class="logo-text">OpenEAGO</span>
+        <!-- <span class="logo-text">OpenEAGO</span> -->
       </a>
       <nav class="main-nav" aria-label="Main navigation">
         <a href="#features">Features</a>
@@ -88,19 +88,27 @@
             </div>
             <div class="hero-card-body">
               <div class="spec-block">
-                <p class="spec-block-title">Phase 2 — Planning &amp; Negotiation</p>
+                <p class="spec-block-title">Step 1 — Contract Management</p>
+                <p>Parse and validate the business request, apply security checks, detect task types, and enrich with OASF schema using the Generator → Evaluator → Optimizer pattern.</p>
+              </div>
+              <div class="spec-block">
+                <p class="spec-block-title">Step 2 — Planning &amp; Negotiation</p>
                 <p>Capability discovery, SLA/SLO feasibility checks (latency · availability · throughput · error_rate), KYC/AML, cross-border data clearance.</p>
               </div>
               <div class="spec-block">
-                <p class="spec-block-title">Phase 3 — Validation &amp; Compliance</p>
+                <p class="spec-block-title">Step 3 — Validation &amp; Compliance</p>
                 <p>Composite risk score across four dimensions (financial · operational · compliance · security) with hard-stop thresholds and mandatory HITL gates for high-risk workflows.</p>
               </div>
               <div class="spec-block">
-                <p class="spec-block-title">Phase 4 — Execution &amp; Resilience</p>
+                <p class="spec-block-title">Step 4 — Execution &amp; Resilience</p>
                 <p>Sequential/parallel/mixed task routing with circuit breakers, SLA breach state machine (8 states), and compensating transactions.</p>
               </div>
               <div class="spec-block">
-                <p class="spec-block-title">Phase 6 — Communication &amp; Delivery</p>
+                <p class="spec-block-title">Step 5 — Context &amp; State Management</p>
+                <p>Four-tier context hierarchy (session → conversation → agent → task) with CRDT-based concurrent state merging and lineage provenance at every transition.</p>
+              </div>
+              <div class="spec-block">
+                <p class="spec-block-title">Step 6 — Communication &amp; Delivery</p>
                 <p>Auth levels 1–4, jurisdiction-aware routing, and blockchain-anchored audit records for regulator review.</p>
               </div>
             </div>
