@@ -16,12 +16,13 @@
   <header class="site-header">
     <div class="container header-inner">
       <a href="#" class="logo">
-        <!-- <img src="https://raw.githubusercontent.com/finos-labs/open-eago/main/docs/images/eago_gs.png" alt="OpenEAGO" class="logo-img" onerror="this.style.display='none'" /> -->
+        <img src="images/eago_gs.png" alt="OpenEAGO" class="logo-img" onerror="this.style.display='none'" />
         <span class="logo-text">OpenEAGO</span>
       </a>
       <nav class="main-nav" aria-label="Main navigation">
         <a href="#features">Features</a>
         <a href="#architecture">Architecture</a>
+        <a href="#examples">Examples</a>
         <a href="#blog">Blog</a>
         <a href="#community">Community</a>
       </nav>
@@ -49,25 +50,29 @@
       <div class="container hero-inner">
         <div class="hero-content">
           <div class="badge">
-            Built by the open-source community · FINOS project
+            FINOS Labs project · Built at Citi
           </div>
-          <h1>Open Enterprise Specification<br />for <span class="gradient-text">AI Multi-agent</span><br />Orchestration</h1>
+          <h1>The Governance &amp; Compliance<br />Control Plane for <span class="gradient-text">Regulated</span><br />AI Agents</h1>
           <p class="hero-description">
-            OpenEAGO is an open standard for secure, scalable, and compliant multi-agent workflows in regulated enterprise environments. Designed for regulated industries with comprehensive governance, auditability, and cross-border compliance.
+            OpenEAGO is an open specification that adds jurisdiction-aware policy enforcement, mandatory HITL gates, composite risk scoring, and audit anchoring on top of A2A and MCP — the compliance layer those protocols explicitly don't own.
           </p>
           <div class="hero-actions">
-            <a href="https://github.com/finos-labs/open-eago" target="_blank" rel="noreferrer" class="btn btn-primary btn-lg">
-              Start building
+            <a href="https://github.com/finos-labs/open-eago/blob/main/SPECIFICATION.md" target="_blank" rel="noreferrer" class="btn btn-primary btn-lg">
+              Read the specification
               <svg class="icon icon-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M12 5l7 7-7 7"/></svg>
             </a>
-            <a href="https://github.com/finos-labs/open-eago/releases" target="_blank" rel="noreferrer" class="btn btn-outline btn-lg">
-              Read the release notes
+            <a href="https://github.com/finos-labs/open-eago" target="_blank" rel="noreferrer" class="btn btn-outline btn-lg">
+              View on GitHub
             </a>
           </div>
           <div class="hero-stats">
             <div class="stat">
               <span class="stat-value">0.1.0</span>
               <span class="stat-label">Version</span>
+            </div>
+            <div class="stat">
+              <span class="stat-value">6</span>
+              <span class="stat-label">Normative phases</span>
             </div>
             <div class="stat">
               <span class="stat-value">Apache 2.0</span>
@@ -83,20 +88,20 @@
             </div>
             <div class="hero-card-body">
               <div class="spec-block">
-                <p class="spec-block-title">Envelope</p>
-                <p>Signed payload + policy bundle + trace context + compliance metadata.</p>
+                <p class="spec-block-title">Phase 2 — Planning &amp; Negotiation</p>
+                <p>Capability discovery, SLA/SLO feasibility checks (latency · availability · throughput · error_rate), KYC/AML, cross-border data clearance.</p>
               </div>
               <div class="spec-block">
-                <p class="spec-block-title">Negotiation</p>
-                <p>Capability discovery, cost budgets, compliance validation, and policy enforcement.</p>
+                <p class="spec-block-title">Phase 3 — Validation &amp; Compliance</p>
+                <p>Composite risk score across four dimensions (financial · operational · compliance · security) with hard-stop thresholds and mandatory HITL gates for high-risk workflows.</p>
               </div>
               <div class="spec-block">
-                <p class="spec-block-title">Handoff</p>
-                <p>Deterministic routing with replayable state snapshots and audit trails.</p>
+                <p class="spec-block-title">Phase 4 — Execution &amp; Resilience</p>
+                <p>Sequential/parallel/mixed task routing with circuit breakers, SLA breach state machine (8 states), and compensating transactions.</p>
               </div>
               <div class="spec-block">
-                <p class="spec-block-title">Governance</p>
-                <p>Human-in-the-loop controls, explainability, and bias monitoring.</p>
+                <p class="spec-block-title">Phase 6 — Communication &amp; Delivery</p>
+                <p>Auth levels 1–4, jurisdiction-aware routing, and blockchain-anchored audit records for regulator review.</p>
               </div>
             </div>
           </div>
@@ -107,7 +112,7 @@
     <!-- COMMUNITY LOGOS -->
     <section class="logos-bar">
       <div class="container">
-        <p class="logos-label">Inspired by the best open-source communities</p>
+        <p class="logos-label">Delegates wire mechanics to — rides on top of</p>
         <div class="logos-row">
           <a href="https://agntcy.org/" target="_blank" rel="noreferrer" class="logo-link">
             <img src="images/agntcy.svg" alt="AGNTCY" onerror="this.style.display='none'" />
@@ -130,83 +135,83 @@
       <div class="container">
         <div class="section-header">
           <p class="section-label">Features</p>
-          <h2>Everything enterprise teams need to ship safely in regulated environments</h2>
+          <h2>The compliance machinery A2A and MCP don't provide</h2>
           <p class="section-description">
-            OpenEAGO addresses critical gaps in enterprise AI infrastructure by providing a universal standard for AI agent interoperability that operates within regulatory boundaries and enterprise security requirements.
+            OpenEAGO is additive, not a parallel protocol stack. It rides on top of A2A transport and MCP tool invocation, adding the normative governance layer that regulated industries require — jurisdiction enforcement, risk scoring, HITL gates, and audit anchoring.
           </p>
         </div>
         <div class="cards-grid cards-grid-3">
 
           <div class="card">
             <div class="card-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253M3 12a8.959 8.959 0 0 1 .284-2.253"/></svg>
-            </div>
-            <h3>Framework-Agnostic Integration</h3>
-            <p>Support for LangChain, LangGraph, custom agents, and legacy system wrappers with seamless interoperability across any AI framework.</p>
-          </div>
-
-          <div class="card">
-            <div class="card-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z"/></svg>
-            </div>
-            <h3>Enterprise-Grade Security</h3>
-            <p>Built-in authentication (OAuth2, SAML, mTLS), authorization (RBAC/ABAC), and end-to-end encryption for regulated enterprise environments.</p>
-          </div>
-
-          <div class="card">
-            <div class="card-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 0 1-2.25 2.25M16.5 7.5V18a2.25 2.25 0 0 0 2.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 0 0 2.25 2.25h13.5M6 7.5h3v3H6v-3Z"/></svg>
             </div>
-            <h3>Regulatory Compliance</h3>
-            <p>Native support for GDPR, HIPAA, PCI-DSS, CCPA, and financial services regulations with automated compliance validation and reporting.</p>
+            <h3>Jurisdiction-Aware Policy Enforcement</h3>
+            <p>Real-time compliance checks against GDPR, DORA, EU AI Act, SR 11-7, BCBS 239, PCI-DSS, MiFID-II, and EMIR — applied before and during execution, not as an afterthought.</p>
           </div>
 
           <div class="card">
             <div class="card-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z"/></svg>
             </div>
-            <h3>Resilient Orchestration</h3>
-            <p>Multi-agent workflow coordination with circuit breakers, retry policies, fallback routing, and compensating transactions for high availability.</p>
+            <h3>Composite Risk Scoring</h3>
+            <p>Four-dimension risk model — financial, operational, compliance, security — computed at Phase 3. Risk tiers (low / medium / high / critical) gate execution with hard stops at the critical threshold.</p>
           </div>
 
           <div class="card">
             <div class="card-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M20.893 13.393l-1.135-1.135a2.252 2.252 0 0 1-.421-.585l-1.08-2.16a.414.414 0 0 0-.663-.107.827.827 0 0 1-.812.21l-1.273-.363a.89.89 0 0 0-.738 1.595l.587.39c.59.395.674 1.23.172 1.732l-.2.2c-.212.212-.33.498-.33.796v.41c0 .409-.11.809-.32 1.158l-1.315 2.191a2.11 2.11 0 0 1-1.81 1.025 1.055 1.055 0 0 1-1.055-1.055v-1.172c0-.92-.56-1.747-1.414-2.089l-.655-.261a2.25 2.25 0 0 1-1.383-2.46l.007-.042a2.25 2.25 0 0 1 .29-.787l.09-.15a2.25 2.25 0 0 1 2.37-1.048l1.178.236a1.125 1.125 0 0 0 1.302-.795l.208-.73a1.125 1.125 0 0 0-.578-1.315l-.665-.332-.091.091a2.25 2.25 0 0 1-1.591.659h-.18c-.249 0-.487.1-.662.274a.931.931 0 0 1-1.458-1.137l1.279-2.132Z"/></svg>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25a3 3 0 0 1 3 3m3 0a6 6 0 0 1-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1 1 21.75 8.25Z"/></svg>
             </div>
-            <h3>Cross-Border Data Governance</h3>
-            <p>Automated compliance with data sovereignty and localization requirements across jurisdictions for global agent collaboration.</p>
+            <h3>Four-Level Agent Identity</h3>
+            <p>X.509 workload certificates via SPIRE/SPIFFE, with four authentication tiers from API-key + RBAC baseline up to hardware-backed identity with dual-control HITL for the most sensitive operations.</p>
           </div>
 
           <div class="card">
             <div class="card-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg>
             </div>
-            <h3>AI Governance</h3>
-            <p>Human-in-the-loop controls, explainability features, and bias monitoring aligned with leading regulatory requirements.</p>
+            <h3>Mandatory HITL Gates</h3>
+            <p>Human-in-the-loop approval is a normative requirement for high-risk workflows (risk_tier ≥ high). The spec defines structured decision artifacts — approved / rejected / modified — with full audit records.</p>
+          </div>
+
+          <div class="card">
+            <div class="card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M20.893 13.393l-1.135-1.135a2.252 2.252 0 0 1-.421-.585l-1.08-2.16a.414.414 0 0 0-.663-.107.827.827 0 0 1-.812.21l-1.273-.363a.89.89 0 0 0-.738 1.595l.587.39c.59.395.674 1.23.172 1.732l-.2.2c-.212.212-.33.498-.33.796v.41c0 .409-.11.809-.32 1.158l-1.315 2.191a2.11 2.11 0 0 1-1.81 1.025 1.055 1.055 0 0 1-1.055-1.055v-1.172c0-.92-.56-1.747-1.414-2.089l-.655-.261a2.25 2.25 0 0 1-1.383-2.46l.007-.042a2.25 2.25 0 0 1 .29-.787l.09-.15a2.25 2.25 0 0 1 2.37-1.048l1.178.236a1.125 1.125 0 0 0 1.302-.795l.208-.73a1.125 1.125 0 0 0-.578-1.315l-.665-.332-.091.091a2.25 2.25 0 0 1-1.591.659h-.18c-.249 0-.487.1-.662.274a.931.931 0 0 1-1.458-1.137l1.279-2.132Z"/></svg>
+            </div>
+            <h3>Cross-Border Data Clearance</h3>
+            <p>Automated data residency validation and sovereignty enforcement at Phase 2 Planning. Jurisdiction-aware routing at Phase 6 Communication ensures data never traverses a prohibited border.</p>
           </div>
 
           <div class="card">
             <div class="card-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244"/></svg>
             </div>
-            <h3>Agent Farms &amp; Registry</h3>
-            <p>Dynamic agent discovery, registration with mTLS, bi-directional communication, reliability scoring, and capability management.</p>
+            <h3>Distributed Agent Registry</h3>
+            <p>Phase 2 capability discovery with mTLS-authenticated registration. Filter by capability type (kyc_verification, aml_screening, credit_risk_assessment…), compliance profile, jurisdiction, SLA tier, and reliability score.</p>
           </div>
 
           <div class="card">
             <div class="card-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z"/></svg>
             </div>
-            <h3>Arbitrary Complex Orchestration</h3>
-            <p>Support for complex workflows involving multiple agents, tasks, and dependencies with deterministic handoffs and full audit trails.</p>
+            <h3>SLA/SLO Enforcement &amp; Breach State Machine</h3>
+            <p>Quantitative feasibility checks at Phase 2 across four SLO dimensions. Phase 4 tracks SLA health through 8 canonical states — active, at_risk, breached, pause_and_review, fallback_activated, escalated, completed, terminated.</p>
           </div>
 
           <div class="card">
             <div class="card-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z"/></svg>
             </div>
-            <h3>Context &amp; State Management</h3>
-            <p>Hierarchical state capture across session, conversation, agent, and task layers with CRDT-based synchronization and audit anchoring.</p>
+            <h3>CRDT Context &amp; Lineage Tracking</h3>
+            <p>Four-tier context hierarchy (session → conversation → agent → task) with CRDT-based concurrent state merging, auditable merge history, and lineage provenance for every context transition.</p>
+          </div>
+
+          <div class="card">
+            <div class="card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253M3 12a8.959 8.959 0 0 1 .284-2.253"/></svg>
+            </div>
+            <h3>Audit Anchoring &amp; Provenance</h3>
+            <p>ECDSA P-256 signed manifests for every AI agent invocation. Tamper-evident audit records across all six phases — structured for regulator review and blockchain-anchored via Phase 6 Communication &amp; Delivery.</p>
           </div>
 
         </div>
@@ -229,51 +234,51 @@
       <div class="container arch-inner">
         <div class="arch-content">
           <p class="section-label">Architecture</p>
-          <h2>A specification stack designed for regulated enterprise AI</h2>
+          <h2>Six normative phases for governed, regulated agent workflows</h2>
           <p class="section-description">
-            Agents exchange signed envelopes, negotiate capabilities, and synchronize state through a comprehensive layered architecture. Every step is observable, compliant, and replayable.
+            OpenEAGO defines a strict six-phase execution model. Each phase has normative requirements, canonical vocabularies, and conformance test cases — not guidelines.
           </p>
           <ol class="arch-steps">
             <li>
               <div class="step-number">1</div>
               <div>
-                <strong>Contract layer</strong>
-                <p>Standard message schema with signatures, policy bundles, and regulatory compliance metadata.</p>
+                <strong>Contract Management</strong>
+                <p>Parse and validate the business request, apply security checks and task detection, enrich with OASF schema. Generator → Evaluator → Optimizer pattern.</p>
               </div>
             </li>
             <li>
               <div class="step-number">2</div>
               <div>
-                <strong>Planning layer</strong>
-                <p>Dynamic capability discovery, cost budgeting, guardrail enforcement, and optimal agent selection.</p>
+                <strong>Planning &amp; Negotiation</strong>
+                <p>Discover agents by capability, compliance profile, and data residency. Run SLA/SLO feasibility, KYC/AML checks, cross-border data clearance, and cost/risk budgets before committing.</p>
               </div>
             </li>
             <li>
               <div class="step-number">3</div>
               <div>
-                <strong>Verification layer</strong>
-                <p>Plan validation with authorization, SLA/SLO agreements, policy compliance, and risk assessments.</p>
+                <strong>Validation &amp; Compliance</strong>
+                <p>Compute composite risk score (financial · operational · compliance · security). Enforce hard stops at critical tier. Require HITL decision artifact for high-risk workflows.</p>
               </div>
             </li>
             <li>
               <div class="step-number">4</div>
               <div>
-                <strong>Execution layer</strong>
-                <p>Executes tasks with deterministic routing, state snapshots, multi-region failover, and compliance monitoring.</p>
+                <strong>Execution &amp; Resilience</strong>
+                <p>Route tasks via sequential, parallel, or mixed orchestration. Monitor SLA health through the 8-state breach state machine. Trigger circuit breakers and compensating transactions as needed.</p>
               </div>
             </li>
             <li>
               <div class="step-number">5</div>
               <div>
-                <strong>Context layer</strong>
-                <p>Manages contextual information and state across sessions, conversations, and agent layers with audit trails.</p>
+                <strong>Context &amp; State Management</strong>
+                <p>Maintain four-tier context hierarchy (session → conversation → agent → task) with CRDT-based merging, lineage tracking, and audit anchoring at every transition.</p>
               </div>
             </li>
             <li>
               <div class="step-number">6</div>
               <div>
-                <strong>Communication layer</strong>
-                <p>Standardized agent communication specification ensuring interoperability and secure context sharing.</p>
+                <strong>Communication &amp; Delivery</strong>
+                <p>Deliver messages via auth levels 1–4, jurisdiction-aware routing, compliance monitoring, and blockchain-anchored audit records for tamper-evident regulatory reporting.</p>
               </div>
             </li>
           </ol>
@@ -281,38 +286,38 @@
         <div class="arch-code-wrap">
           <div class="code-card">
             <div class="code-card-header">
-              <span class="code-card-title">Developer experience</span>
-              <span class="code-card-sub">Readable, auditable, and designed for regulatory compliance.</span>
+              <span class="code-card-title">Base envelope (Phase 1)</span>
+              <span class="code-card-sub">Every OpenEAGO message is a signed, versioned, jurisdiction-tagged envelope.</span>
             </div>
             <div class="code-block">
-              <p class="code-filename">openeago.json</p>
+              <p class="code-filename">base-envelope.schema.json</p>
               <pre><code>{
-  "contract_id": "&lt;uuid-v4&gt;",
-  "version": "0.1.0",
-  "client_info": {
-    "agent_id": "...",
-    "identity": "spiffe://..."
+  "message_id": "msg-&lt;uuid-v4&gt;",
+  "spec_version": "0.1.0",
+  "phase": "planning_negotiation",
+  "timestamp": "2026-06-09T10:00:00Z",
+  "correlation_id": "contract-&lt;uuid-v4&gt;",
+  "sender": {
+    "agent_id": "aml-screening-agent-01",
+    "identity": "spiffe://corp/aml-agent"
   },
-  "business_requirements": {
-    "task": "...",
-    "sla": "...",
-    "compliance": [...]
+  "payload": {
+    "negotiation": {
+      "checks": {
+        "sla_slo": { "p99_ms": 800, "availability_pct": 99.5 },
+        "kyc_aml": { "required": true },
+        "cross_border": {
+          "jurisdiction": "EU",
+          "data_residency": "eu-west-1",
+          "compliance": ["GDPR", "DORA"]
+        }
+      }
+    }
   },
-  "workflow_tasks": [
-    { "id": "task-1", ... },
-    { "id": "task-2", ... }
-  ],
-  "execution_constraints": {
-    "timeout_ms": 30000,
-    "retry_policy": "exponential"
-  },
-  "regulatory_compliance": {
-    "gdpr": true,
-    "pci_dss": true
-  },
-  "data_governance": {
-    "jurisdiction": "EU",
-    "data_residency": "eu-west-1"
+  "metadata": {
+    "regulatory_profiles": ["financial_services_eu"],
+    "risk_tier": "high",
+    "hitl_required": true
   }
 }</code></pre>
             </div>
@@ -321,31 +326,101 @@
       </div>
     </section>
 
+    <!-- REFERENCE IMPLEMENTATIONS -->
+    <section id="examples" class="section bg-slate">
+      <div class="container">
+        <div class="section-header">
+          <p class="section-label">Reference implementations</p>
+          <h2>Conformance targets, not just examples</h2>
+          <p class="section-description">
+            Each implementation targets one or more normative phases of the specification and ships with conformance test cases.
+          </p>
+        </div>
+        <div class="cards-grid cards-grid-3" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
+
+          <div class="card">
+            <div class="card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M5.25 14.25h13.5m-13.5 0a3 3 0 0 1-3-3m3 3a3 3 0 1 0 6 0m-6 0H2.25m11.25 0a3 3 0 0 1-3-3m3 3a3 3 0 1 0 6 0m-6 0h-1.5m1.5 0h3.75m-8.25-3a3 3 0 0 1 3-3h1.5a3 3 0 0 1 3 3"/></svg>
+            </div>
+            <h3>Agent Template</h3>
+            <p>Reference MCP agent with full six-phase OpenEAGO alignment. Includes SPIRE mTLS, registry integration, and optional EAGO envelope mode. Configuration-driven via YAML — the canonical starting point for any compliant agent.</p>
+            <a href="https://github.com/finos-labs/open-eago/tree/main/examples/agent-template" target="_blank" rel="noreferrer" class="card-link">View example →</a>
+          </div>
+
+          <div class="card">
+            <div class="card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 15.803 7.5 7.5 0 0 0 15.803 15.803Z"/></svg>
+            </div>
+            <h3>Agent Registry (Phase 2)</h3>
+            <p>Distributed agent discovery over mTLS with SPIRE/SVID. Agents register capabilities and are discovered via rich filters: capability type, compliance profile, jurisdiction, SLA tier, and reliability score ≥ 0.95.</p>
+            <a href="https://github.com/finos-labs/open-eago/tree/main/examples/agent-registry" target="_blank" rel="noreferrer" class="card-link">View example →</a>
+          </div>
+
+          <div class="card">
+            <div class="card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z"/></svg>
+            </div>
+            <h3>Context Management (Phase 5)</h3>
+            <p>CRDT-backed concurrent state management for multi-agent workflows. Implements the four-tier hierarchy (session → conversation → agent → task) with auditable merge history and lineage provenance.</p>
+            <a href="https://github.com/finos-labs/open-eago/tree/main/examples/context-management" target="_blank" rel="noreferrer" class="card-link">View example →</a>
+          </div>
+
+          <div class="card">
+            <div class="card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25a3 3 0 0 1 3 3m3 0a6 6 0 0 1-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1 1 21.75 8.25Z"/></svg>
+            </div>
+            <h3>Provenance Manifest (Phase 4/6)</h3>
+            <p>ECDSA P-256 cryptographically signed audit records for every AI agent invocation. Produces tamper-evident manifests structured for regulator review — the audit anchoring primitive for Phase 6.</p>
+            <a href="https://github.com/finos-labs/open-eago/tree/main/examples/provenance_manifest" target="_blank" rel="noreferrer" class="card-link">View example →</a>
+          </div>
+
+          <div class="card">
+            <div class="card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244"/></svg>
+            </div>
+            <h3>Sui Agent Registry (R&amp;D)</h3>
+            <p>On-chain agent identity, reputation scoring, and discovery on the Sui blockchain (Move). Live on testnet. Three registries: Identity, Reputation, Validation — inspired by ERC-8004 and OpenEAGO identity concepts.</p>
+            <a href="https://github.com/finos-labs/open-eago/tree/main/examples/sui-agent-registry" target="_blank" rel="noreferrer" class="card-link">View example →</a>
+          </div>
+
+          <div class="card">
+            <div class="card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21"/></svg>
+            </div>
+            <h3>MCP-ERC8004 Enterprise (R&amp;D)</h3>
+            <p>Nine-layer authorization stack combining ERC-721 on-chain identity, MCP agent invocation, and Solidity oracle contracts. Models a cross-institutional bank onboarding workflow spanning UK, Singapore, and USA jurisdictions.</p>
+            <a href="https://github.com/finos-labs/open-eago/tree/main/examples/mcp-erc8004-enterprise" target="_blank" rel="noreferrer" class="card-link">View example →</a>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
     <!-- USE CASES -->
-    <section class="section bg-slate">
+    <section class="section">
       <div class="container usecases-inner">
         <div class="usecases-left">
           <p class="section-label">Use cases</p>
           <h2>Built for regulated, high-trust environments</h2>
           <p class="section-description">
-            From multinational banking to healthcare, OpenEAGO enables compliant agentic workflows that meet global regulatory requirements.
+            OpenEAGO was designed around a concrete scenario: a bank onboarding workflow spanning UK → Singapore → USA, where every data transfer requires jurisdiction-specific clearance, every agent invocation requires a signed manifest, and any high-risk step requires a HITL approval gate.
           </p>
           <div class="usecase-cards">
             <div class="usecase-card">
-              <strong>Regulated multi-agent finance operations</strong>
-              <p>Coordinate risk assessment, AML/KYC compliance, and analytics agents with deterministic handoffs and full audit trails.</p>
+              <strong>AML/KYC &amp; credit risk orchestration</strong>
+              <p>Chain kyc_verification, aml_screening, credit_risk_assessment, and sanctions_screening agents with deterministic handoffs — each step gated by composite risk score and signed audit manifests.</p>
             </div>
             <div class="usecase-card">
-              <strong>Cross-border banking workflows</strong>
-              <p>Enable secure agent collaboration across jurisdictions while maintaining data sovereignty and regulatory compliance.</p>
+              <strong>Cross-border banking (UK → SG → US)</strong>
+              <p>Cross-border data clearance at Phase 2 enforces GDPR, FATCA, and MAS-mandated residency rules before any data leaves a jurisdiction. Phase 6 routes messages to compliant endpoints only.</p>
             </div>
             <div class="usecase-card">
-              <strong>Healthcare data orchestration</strong>
-              <p>Connect patient data agents, diagnostic models, and clinical decision systems with HIPAA-compliant communication and consent management.</p>
+              <strong>Healthcare &amp; clinical decision systems</strong>
+              <p>HIPAA compliance profile enforces consent management and data residency across patient data agents. HITL gates are required for any diagnostic recommendation crossing a risk threshold.</p>
             </div>
             <div class="usecase-card">
-              <strong>Enterprise DevSecOps with governance</strong>
-              <p>Bridge security scanners, CI/CD agents, and incident responders with comprehensive policy enforcement and compliance validation.</p>
+              <strong>Regulated DevSecOps pipelines</strong>
+              <p>Security scanners, CI/CD agents, and incident responders communicate via signed envelopes. Every policy change is anchored to an immutable audit record before it is applied.</p>
             </div>
           </div>
         </div>
@@ -353,24 +428,24 @@
           <h3>Why teams adopt OpenEAGO</h3>
           <div class="why-items">
             <div class="why-item">
-              <strong>Regulatory confidence</strong>
-              <p>Deploy autonomous agents with consistent compliance checks, automated policy enforcement, and reversible actions across global jurisdictions.</p>
+              <strong>Additive, not a rewrite</strong>
+              <p>OpenEAGO is a profile and governance overlay. It delegates wire mechanics to A2A and tool invocation to MCP — adding only the compliance machinery those standards explicitly don't own.</p>
             </div>
             <div class="why-item">
-              <strong>Enterprise-grade security</strong>
-              <p>Comprehensive identity management, mTLS authentication, and zero-trust architecture with agent registry and capability validation.</p>
+              <strong>Normative, not advisory</strong>
+              <p>The specification ships with JSON schemas, a canonical domain vocabulary, and conformance test cases. Compliant implementations can be validated — "works with OpenEAGO" means something concrete.</p>
             </div>
             <div class="why-item">
-              <strong>Operational transparency</strong>
-              <p>Trace every decision with deterministic replay, compliance audit logs, and explainability features for regulatory reporting.</p>
+              <strong>Regulator-ready audit artifacts</strong>
+              <p>ECDSA-signed provenance manifests and blockchain-anchored Phase 6 records are structured for regulator review — not just internal logging.</p>
             </div>
             <div class="why-item">
-              <strong>Cross-border compliance</strong>
-              <p>Automated handling of data sovereignty, localization requirements, and jurisdiction-specific regulations for global agent collaboration.</p>
+              <strong>Designed for financial services</strong>
+              <p>Canonical compliance profiles for GDPR, DORA, EU AI Act, SR 11-7, BCBS 239, MiFID-II, EMIR, and PCI-DSS ship in the domain vocabulary — not bolted on.</p>
             </div>
             <div class="why-item">
-              <strong>Audit blockchain</strong>
-              <p>Immutable audit trails with cryptographic verification ensure tamper-proof compliance records and regulatory reporting across multi-agent workflows.</p>
+              <strong>SPIFFE/SPIRE workload identity</strong>
+              <p>X.509 workload certificates with ≤ 48 h TTL, four authentication tiers, and mTLS mutual authentication — consistent zero-trust identity from the wire up to the application layer.</p>
             </div>
           </div>
           <a href="https://github.com/finos-labs/open-eago/blob/main/SPECIFICATION.md" target="_blank" rel="noreferrer" class="btn btn-outline">
@@ -392,6 +467,36 @@
           </div>
         </div>
         <div class="cards-grid cards-grid-4">
+
+          <div class="blog-card">
+            <div class="blog-card-type">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
+              Testing
+            </div>
+            <h4>Conformance test suite — validate your OpenEAGO implementation</h4>
+            <p>A comprehensive conformance test suite covering communication delivery, context hierarchy, planning negotiation, HITL validation, and phase enumeration.</p>
+            <span class="blog-date">Jun 9, 2026</span>
+          </div>
+
+          <div class="blog-card">
+            <div class="blog-card-type">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244"/></svg>
+              Example
+            </div>
+            <h4>Sui Agent Registry — on-chain agent identity, reputation, and discovery</h4>
+            <p>A blockchain-based reference implementation on the Sui network providing immutable agent registration, capability indexing, reputation scoring, and real-time discovery.</p>
+            <span class="blog-date">May 13, 2026</span>
+          </div>
+
+          <div class="blog-card">
+            <div class="blog-card-type">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 15.803 7.5 7.5 0 0 0 15.803 15.803Z"/></svg>
+              Feature
+            </div>
+            <h4>Agent discovery with capability filtering in the agent registry</h4>
+            <p>The Rust agent registry now supports rich query filters — filter by capability, compliance tag, or reputation score to find the right agent for any regulated workflow.</p>
+            <span class="blog-date">Apr 19, 2026</span>
+          </div>
 
           <div class="blog-card">
             <div class="blog-card-type">
@@ -496,6 +601,7 @@
       <nav class="footer-nav" aria-label="Footer navigation">
         <a href="#features">Features</a>
         <a href="#architecture">Architecture</a>
+        <a href="#examples">Examples</a>
         <a href="#blog">Blog</a>
         <a href="#community">Community</a>
         <a href="https://github.com/finos-labs/open-eago" target="_blank" rel="noreferrer">GitHub</a>

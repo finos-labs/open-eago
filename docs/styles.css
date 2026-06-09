@@ -552,6 +552,19 @@ p { color: #475569; }
   color: #64748b;
 }
 
+.card-link {
+  display: inline-block;
+  margin-top: 1rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #2563eb;
+  text-decoration: none;
+}
+
+.card-link:hover {
+  text-decoration: underline;
+}
+
 /* ---------- Adopters Bar ---------- */
 .adopters-bar {
   background: #dbeafe;
