@@ -12,6 +12,7 @@ These examples directly implement normative behavior defined in the [OpenEAGO Sp
 | --- | --- | --- |
 | [agent-template](agent-template/) | All phases | Reference MCP agent with OpenEAGO phase alignment, SPIRE mTLS, and registry integration. Start here if you are building an agent. |
 | [agent-registry](agent-registry/) | Phase 2 — Planning | Distributed agent registry over mTLS (SPIRE). Agents register capabilities and discover peers. Implements the registry component relied on during Planning & Negotiation. |
+| [reference-implementation](reference-implementation/) | All phases | End-to-end demo wiring `agent-template` + `agent-registry` into a runnable six-phase pipeline (FastAPI + LangGraph orchestrator) with a real-time WebSocket dashboard — composite risk scoring, the mandatory HITL gate, and the SLA breach state machine are all interactively observable. Start here to see the spec actually run. |
 | [context-management](context-management/) | Phase 5 — Context | CRDT-based concurrent state management for multi-agent workflows with auditable merge history. Implements the hierarchical context model (`session → conversation → agent → task`). |
 | [provenance_manifest](provenance_manifest/) | Phase 4/6 — Execution, Communication | Cryptographically signed audit records for AI agent invocations. Produces self-verifying, ECDSA P-256 signed manifests suitable for regulatory audit. Implements the audit-anchoring requirement. |
 

@@ -1,0 +1,42 @@
+server:
+  host: "127.0.0.1"
+  port: 9004
+
+metadata:
+  name: "eago-execution-agent"
+  version: "0.1.0"
+  description: "OpenEAGO Phase 4 (Execution & Resilience) reference agent"
+  spec_version: "0.1.0"
+  eago_phases:
+    - execution_resilience
+  capabilities:
+    - execution_resilience
+  tags:
+    - "open-eago"
+    - "reference-implementation"
+    - "execution"
+
+agent:
+  instance_id: "execution-agent-1"
+  capability_codes:
+    - execution_resilience
+  version: "0.1.0"
+  jurisdiction: "GLOBAL"
+  data_center: "local-dev"
+  compliance: ["SOC2"]
+  reliability: 0.97
+  health_status: "healthy"
+  uptime_percentage: 99.2
+
+mcp:
+  protocol_version: "2024-11-05"
+  eago_envelope: true
+
+spire:
+  enabled: false
+
+bootstrap:
+  urls:
+    - "http://127.0.0.1:8443"
+  sync_interval: 20
+  status_interval: 10

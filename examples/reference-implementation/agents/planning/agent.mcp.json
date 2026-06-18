@@ -1,0 +1,38 @@
+{
+  "$schema": "https://modelcontextprotocol.io/schema/v1/server.json",
+  "name": "eago-planning-agent",
+  "version": "0.1.0",
+  "open_eago": {
+    "spec_version": "0.1.0",
+    "eago_phases": ["planning_negotiation"],
+    "base_envelope": {
+      "message_id": "required",
+      "spec_version": "required",
+      "phase": "required",
+      "timestamp": "required",
+      "payload": "required",
+      "metadata": "optional"
+    }
+  },
+  "tools": [
+    {
+      "name": "eago_health",
+      "description": "OpenEAGO liveness and phase capability check.",
+      "inputSchema": { "type": "object", "properties": {} }
+    },
+    {
+      "name": "planning.plan",
+      "description": "Discover downstream phase agents via the OpenEAGO Agent Registry and build an execution plan with SLA/SLO negotiation (spec/v0.1.0/schemas/planning-negotiation.schema.json).",
+      "inputSchema": {
+        "type": "object",
+        "required": ["contract"],
+        "properties": {
+          "contract": { "type": "object" },
+          "task_data": { "type": "object" }
+        }
+      }
+    }
+  ],
+  "resources": [],
+  "prompts": []
+}

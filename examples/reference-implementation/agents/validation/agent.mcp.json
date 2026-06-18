@@ -1,0 +1,39 @@
+{
+  "$schema": "https://modelcontextprotocol.io/schema/v1/server.json",
+  "name": "eago-validation-agent",
+  "version": "0.1.0",
+  "open_eago": {
+    "spec_version": "0.1.0",
+    "eago_phases": ["validation_compliance"],
+    "base_envelope": {
+      "message_id": "required",
+      "spec_version": "required",
+      "phase": "required",
+      "timestamp": "required",
+      "payload": "required",
+      "metadata": "optional"
+    }
+  },
+  "tools": [
+    {
+      "name": "eago_health",
+      "description": "OpenEAGO liveness and phase capability check.",
+      "inputSchema": { "type": "object", "properties": {} }
+    },
+    {
+      "name": "validation.assess",
+      "description": "Run policy checks and compute a four-dimension composite risk score with an escalation recommendation. Returns a draft assessment; the orchestrator applies the mandatory HITL gate and persists the final spec/v0.1.0/schemas/validation-compliance.schema.json document.",
+      "inputSchema": {
+        "type": "object",
+        "required": ["plan", "contract"],
+        "properties": {
+          "plan": { "type": "object" },
+          "contract": { "type": "object" },
+          "task_data": { "type": "object" }
+        }
+      }
+    }
+  ],
+  "resources": [],
+  "prompts": []
+}

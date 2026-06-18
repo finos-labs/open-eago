@@ -695,6 +695,106 @@ p { color: #475569; }
   white-space: pre;
 }
 
+/* ---------- Live Demo ---------- */
+.demo-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.75rem;
+}
+
+@media (min-width: 900px) {
+  .demo-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.demo-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+  transition: box-shadow 0.25s, transform 0.25s;
+}
+
+.demo-card:hover {
+  box-shadow: 0 16px 48px rgba(0,0,0,0.14);
+  transform: translateY(-4px);
+}
+
+.demo-card-frame {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.7rem 1rem;
+  background: #0f172a;
+}
+
+.demo-dot {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 50%;
+  background: #475569;
+  display: inline-block;
+}
+
+.demo-dot:nth-child(1) { background: #ef4444; }
+.demo-dot:nth-child(2) { background: #f59e0b; }
+.demo-dot:nth-child(3) { background: #22c55e; }
+
+.demo-badge {
+  margin-left: auto;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 0.25rem 0.65rem;
+  border-radius: 9999px;
+}
+
+.demo-badge-success { background: rgba(16, 185, 129, 0.18); color: #34d399; }
+.demo-badge-danger  { background: rgba(244, 63, 94, 0.18); color: #fb7185; }
+.demo-badge-warning { background: rgba(245, 158, 11, 0.18); color: #fbbf24; }
+.demo-badge-orange  { background: rgba(249, 115, 22, 0.18); color: #fb923c; }
+
+.demo-card img {
+  display: block;
+  width: 100%;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.demo-card-body {
+  padding: 1.25rem 1.5rem;
+}
+
+.demo-card-body h3 {
+  color: #0f172a;
+  margin-bottom: 0.4rem;
+  font-size: 1rem;
+}
+
+.demo-card-body p {
+  font-size: 0.875rem;
+  color: #64748b;
+  margin: 0;
+}
+
+.demo-card-body code {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 0.8em;
+  background: #f1f5f9;
+  padding: 0.1rem 0.35rem;
+  border-radius: 0.25rem;
+  color: #334155;
+}
+
+.demo-cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 2.5rem;
+}
+
 /* ---------- Use Cases ---------- */
 .usecases-inner {
   display: grid;

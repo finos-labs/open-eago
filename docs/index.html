@@ -22,6 +22,7 @@
       <nav class="main-nav" aria-label="Main navigation">
         <a href="#features">Features</a>
         <a href="#architecture">Architecture</a>
+        <a href="#demo">Live Demo</a>
         <a href="#examples">Examples</a>
         <a href="#blog">Blog</a>
         <a href="#community">Community</a>
@@ -334,6 +335,81 @@
       </div>
     </section>
 
+    <!-- LIVE DEMO -->
+    <section id="demo" class="section">
+      <div class="container">
+        <div class="section-header">
+          <p class="section-label">Live demo</p>
+          <h2>Watch the six phases run — live</h2>
+          <p class="section-description">
+            The <a href="https://github.com/finos-labs/open-eago/tree/main/examples/reference-implementation" target="_blank" rel="noreferrer" style="color:#2563eb;text-decoration:underline;">reference implementation</a> wires <code style="background:#f1f5f9;padding:0.1rem 0.4rem;border-radius:0.25rem;font-size:0.9em;">agent-template</code> and <code style="background:#f1f5f9;padding:0.1rem 0.4rem;border-radius:0.25rem;font-size:0.9em;">agent-registry</code> into a runnable six-phase pipeline with a real-time WebSocket dashboard. Composite risk scoring, the mandatory HITL gate, and the SLA breach state machine aren't just described on paper — click a scenario and watch them happen.
+          </p>
+        </div>
+
+        <div class="demo-grid">
+
+          <div class="demo-card">
+            <div class="demo-card-frame">
+              <span class="demo-dot"></span><span class="demo-dot"></span><span class="demo-dot"></span>
+              <span class="demo-badge demo-badge-success">Approved</span>
+            </div>
+            <img src="images/reference-implementation/scenario-approved.png" alt="Dashboard showing the approved scenario: all six phases complete, low composite risk score, SLA met" loading="lazy" />
+            <div class="demo-card-body">
+              <h3>Low risk → auto-approved golden path</h3>
+              <p>All six phases complete in real time. Composite risk score 0.131 (low tier), SLA target met, HITL auto-decided.</p>
+            </div>
+          </div>
+
+          <div class="demo-card">
+            <div class="demo-card-frame">
+              <span class="demo-dot"></span><span class="demo-dot"></span><span class="demo-dot"></span>
+              <span class="demo-badge demo-badge-danger">Blocked</span>
+            </div>
+            <img src="images/reference-implementation/scenario-blocked.png" alt="Dashboard showing the blocked scenario: validation rejected, execution and context phases skipped" loading="lazy" />
+            <div class="demo-card-body">
+              <h3>Policy violation → auto-rejected</h3>
+              <p>Validation rejects the request and the pipeline short-circuits straight to Communication — Execution and Context are genuinely skipped, not just hidden.</p>
+            </div>
+          </div>
+
+          <div class="demo-card">
+            <div class="demo-card-frame">
+              <span class="demo-dot"></span><span class="demo-dot"></span><span class="demo-dot"></span>
+              <span class="demo-badge demo-badge-orange">SLA Breach</span>
+            </div>
+            <img src="images/reference-implementation/scenario-sla-breach.png" alt="Dashboard showing the SLA breach scenario: breach state machine in fallback_activated, overall SLA status breached" loading="lazy" />
+            <div class="demo-card-body">
+              <h3>Latency breach trips the state machine</h3>
+              <p>Execution completes, but observed p99 latency (5000ms) blows past the negotiated SLA (800ms) — the breach state machine lands on <code>fallback_activated</code>.</p>
+            </div>
+          </div>
+
+          <div class="demo-card">
+            <div class="demo-card-frame">
+              <span class="demo-dot"></span><span class="demo-dot"></span><span class="demo-dot"></span>
+              <span class="demo-badge demo-badge-warning">HITL Required</span>
+            </div>
+            <img src="images/reference-implementation/scenario-hitl-required.png" alt="Dashboard showing the HITL required scenario: pipeline paused awaiting human approval, high risk tier" loading="lazy" />
+            <div class="demo-card-body">
+              <h3>High risk → pauses for a human</h3>
+              <p>Composite risk score 0.575 (high tier) pauses the pipeline at Validation. The item lands in the HITL Approval Queue for a real Approve/Reject decision before continuing.</p>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="demo-cta">
+          <a href="https://github.com/finos-labs/open-eago/tree/main/examples/reference-implementation" target="_blank" rel="noreferrer" class="btn btn-primary btn-lg">
+            Run it yourself
+            <svg class="icon icon-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+          <a href="https://github.com/finos-labs/open-eago/blob/main/examples/reference-implementation/README.md" target="_blank" rel="noreferrer" class="btn btn-outline btn-lg">
+            Read the walkthrough
+          </a>
+        </div>
+      </div>
+    </section>
+
     <!-- REFERENCE IMPLEMENTATIONS -->
     <section id="examples" class="section bg-slate">
       <div class="container">
@@ -345,6 +421,15 @@
           </p>
         </div>
         <div class="cards-grid cards-grid-3" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
+
+          <div class="card">
+            <div class="card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z"/></svg>
+            </div>
+            <h3>Reference Implementation (All Phases)</h3>
+            <p>End-to-end demo wiring agent-template + agent-registry into a runnable six-phase pipeline with a real-time WebSocket dashboard. Composite risk scoring, the mandatory HITL gate, and the SLA breach state machine are all interactively observable. <a href="#demo" style="color:#2563eb;text-decoration:underline;">See screenshots ↑</a></p>
+            <a href="https://github.com/finos-labs/open-eago/tree/main/examples/reference-implementation" target="_blank" rel="noreferrer" class="card-link">View example →</a>
+          </div>
 
           <div class="card">
             <div class="card-icon">
@@ -609,6 +694,7 @@
       <nav class="footer-nav" aria-label="Footer navigation">
         <a href="#features">Features</a>
         <a href="#architecture">Architecture</a>
+        <a href="#demo">Live Demo</a>
         <a href="#examples">Examples</a>
         <a href="#blog">Blog</a>
         <a href="#community">Community</a>

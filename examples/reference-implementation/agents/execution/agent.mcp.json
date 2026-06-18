@@ -1,0 +1,40 @@
+{
+  "$schema": "https://modelcontextprotocol.io/schema/v1/server.json",
+  "name": "eago-execution-agent",
+  "version": "0.1.0",
+  "open_eago": {
+    "spec_version": "0.1.0",
+    "eago_phases": ["execution_resilience"],
+    "base_envelope": {
+      "message_id": "required",
+      "spec_version": "required",
+      "phase": "required",
+      "timestamp": "required",
+      "payload": "required",
+      "metadata": "optional"
+    }
+  },
+  "tools": [
+    {
+      "name": "eago_health",
+      "description": "OpenEAGO liveness and phase capability check.",
+      "inputSchema": { "type": "object", "properties": {} }
+    },
+    {
+      "name": "execution.run",
+      "description": "Execute the approved plan with resilience controls and an SLA breach state machine (spec/v0.1.0/schemas/execution-resilience.schema.json).",
+      "inputSchema": {
+        "type": "object",
+        "required": ["plan", "validation", "contract"],
+        "properties": {
+          "plan": { "type": "object" },
+          "validation": { "type": "object" },
+          "contract": { "type": "object" },
+          "task_data": { "type": "object" }
+        }
+      }
+    }
+  ],
+  "resources": [],
+  "prompts": []
+}

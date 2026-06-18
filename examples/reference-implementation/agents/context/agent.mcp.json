@@ -1,0 +1,42 @@
+{
+  "$schema": "https://modelcontextprotocol.io/schema/v1/server.json",
+  "name": "eago-context-agent",
+  "version": "0.1.0",
+  "open_eago": {
+    "spec_version": "0.1.0",
+    "eago_phases": ["context_state_management"],
+    "base_envelope": {
+      "message_id": "required",
+      "spec_version": "required",
+      "phase": "required",
+      "timestamp": "required",
+      "payload": "required",
+      "metadata": "optional"
+    }
+  },
+  "tools": [
+    {
+      "name": "eago_health",
+      "description": "OpenEAGO liveness and phase capability check.",
+      "inputSchema": { "type": "object", "properties": {} }
+    },
+    {
+      "name": "context.persist",
+      "description": "Consolidate prior-phase outputs into a hierarchical session context record with full lineage (spec/v0.1.0/schemas/context-state-management.schema.json).",
+      "inputSchema": {
+        "type": "object",
+        "required": ["session_id", "lineage"],
+        "properties": {
+          "session_id": { "type": "string" },
+          "lineage": { "type": "array", "items": { "type": "string" } },
+          "contract": { "type": "object" },
+          "plan": { "type": "object" },
+          "validation": { "type": "object" },
+          "execution": { "type": "object" }
+        }
+      }
+    }
+  ],
+  "resources": [],
+  "prompts": []
+}

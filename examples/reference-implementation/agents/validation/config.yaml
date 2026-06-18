@@ -1,0 +1,42 @@
+server:
+  host: "127.0.0.1"
+  port: 9003
+
+metadata:
+  name: "eago-validation-agent"
+  version: "0.1.0"
+  description: "OpenEAGO Phase 3 (Validation & Compliance) reference agent"
+  spec_version: "0.1.0"
+  eago_phases:
+    - validation_compliance
+  capabilities:
+    - validation_compliance
+  tags:
+    - "open-eago"
+    - "reference-implementation"
+    - "validation"
+
+agent:
+  instance_id: "validation-agent-1"
+  capability_codes:
+    - validation_compliance
+  version: "0.1.0"
+  jurisdiction: "GLOBAL"
+  data_center: "local-dev"
+  compliance: ["SOC2", "GDPR"]
+  reliability: 0.985
+  health_status: "healthy"
+  uptime_percentage: 99.6
+
+mcp:
+  protocol_version: "2024-11-05"
+  eago_envelope: true
+
+spire:
+  enabled: false
+
+bootstrap:
+  urls:
+    - "http://127.0.0.1:8443"
+  sync_interval: 20
+  status_interval: 10

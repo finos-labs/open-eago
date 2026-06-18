@@ -1,0 +1,40 @@
+{
+  "$schema": "https://modelcontextprotocol.io/schema/v1/server.json",
+  "name": "eago-contract-agent",
+  "version": "0.1.0",
+  "open_eago": {
+    "spec_version": "0.1.0",
+    "eago_phases": ["contract_management"],
+    "base_envelope": {
+      "message_id": "required",
+      "spec_version": "required",
+      "phase": "required",
+      "timestamp": "required",
+      "payload": "required",
+      "metadata": "optional"
+    }
+  },
+  "tools": [
+    {
+      "name": "eago_health",
+      "description": "OpenEAGO liveness and phase capability check.",
+      "inputSchema": { "type": "object", "properties": {} }
+    },
+    {
+      "name": "contract.process",
+      "description": "Validate a task request and enrich it into an OASF-aligned OpenEAGO contract (spec/v0.1.0/schemas/contract-management.schema.json).",
+      "inputSchema": {
+        "type": "object",
+        "required": ["objective", "task_data", "source_context"],
+        "properties": {
+          "objective": { "type": "string" },
+          "task_data": { "type": "object" },
+          "source_context": { "type": "object" },
+          "constraints": { "type": "object" }
+        }
+      }
+    }
+  ],
+  "resources": [],
+  "prompts": []
+}
