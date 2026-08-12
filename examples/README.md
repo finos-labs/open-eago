@@ -27,6 +27,7 @@ These examples explore how OpenEAGO governance concepts can be extended into adj
 | [mcp-erc8004-enterprise](mcp-erc8004-enterprise/) | On-chain agent governance | Nine-layer authorization stack combining ERC-721 on-chain identity (ERC-8004), MCP agent invocation, and Solidity oracle contracts. Models a cross-institutional bank onboarding workflow with on-chain phase bitmask tracking. Self-described as an R&D development project. |
 | [prompt_registry](prompt_registry/) | Prompt governance | Implements Layer 4 of the nine-layer stack from `mcp-erc8004-enterprise`: binds LangSmith prompt versions to on-chain keccak256 hashes, closing the gap between on-chain governance and LLM prompt integrity. |
 | [sui-agent-registry](sui-agent-registry/) | SUI blockchain registry | On-chain agent registration, discovery, and reputation scoring on the SUI blockchain (Move language). Live on SUI testnet. Inspired by ERC-8004 and OpenEAGO identity concepts. |
+| [cross-border-data-router](cross-border-data-router/) | ADK compliance routing recipe | Multi-agent ADK sample that routes regulated data-processing requests to region-specific agents using declared residency/jurisdiction metadata, with hard compliance filtering before preference scoring. |
 
 ---
 

@@ -1,0 +1,4 @@
+.env
+.pytest_cache/
+.venv/
+app/.adk/
