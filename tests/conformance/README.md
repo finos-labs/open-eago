@@ -48,6 +48,9 @@ Each `.json` file in this directory follows this structure:
 | `validation-enum.json` | OASF-VAL-ENUM-001 | `validation_status` and `hitl.decision` must use the canonical vocabulary (`approved`, `rejected`, `modified`); `compliance_risk` weight must not fall below 0.25 |
 | `context-hierarchy.json` | OASF-CTX-001 | Context `level` must be one of `session`, `conversation`, `agent`, `task`; `lineage` must be present |
 | `communication-delivery.json` | OASF-COMM-001 | `delivery_status` must be canonical; `security` must be present with `auth_level` in [1, 4] |
+| `validation-attestation.json` | OEAGO-VAL-ATTEST-001 | Decision-record `attestation` is optional and backward-compatible; when present, `status` is required and `referenced`/`attested` states require their supporting fields |
+
+`OEAGO-`-prefixed requirement IDs are OpenEAGO-native requirements with no OASF-mapped equivalent, as opposed to the `OASF-`-prefixed IDs above. See [SPECIFICATION.md §3A.5](../../SPECIFICATION.md#3a5-oasf-traceability-matrix).
 
 ## Adding new fixtures
 

@@ -87,8 +87,9 @@ This matrix links specification requirements to OASF requirement IDs, machine sc
 | Validation decision vocabulary is canonical (`approved`, `rejected`, `modified`) | OASF-VAL-ENUM-001 | `spec/v0.1.0/schemas/validation-compliance.schema.json`, `spec/v0.1.0/spec.json` | `tests/conformance/validation-enum.json` |
 | Context hierarchy supports `session`→`conversation`→`agent`→`task` | OASF-CTX-001 | `spec/v0.1.0/schemas/context-state-management.schema.json` | `tests/conformance/context-hierarchy.json` |
 | Communication payload enforces delivery status and auth-level semantics | OASF-COMM-001 | `spec/v0.1.0/schemas/communication-delivery.schema.json` | `tests/conformance/communication-delivery.json` |
+| Decision records MAY carry attestation/audit-anchoring evidence, with an explicit `status` distinguishing "not attested" from "not populated" | N/A — OpenEAGO-native (OEAGO-VAL-ATTEST-001) | `spec/v0.1.0/schemas/validation-compliance.schema.json`, `spec/v0.1.0/schemas/execution-resilience.schema.json` | `tests/conformance/validation-attestation.json` |
 
-`OASF requirement ID` values MUST be replaced with canonical IDs from the adopted OASF release and updated on each standards refresh.
+`OASF requirement ID` values MUST be replaced with canonical IDs from the adopted OASF release and updated on each standards refresh. Rows marked `N/A — OpenEAGO-native` have no OASF-mapped equivalent and use an `OEAGO-` prefixed requirement ID instead.
 
 ## 4. Architecture and Phases
 
@@ -333,3 +334,5 @@ Implementations MUST include a `risk_context` object in all phase transition pay
 **E.6 Audit Retention**:
 
 In regulated financial profiles, `risk_context` data and all `risk_event` records MUST be retained for a minimum of **7 years** and MUST be anchored to the blockchain audit trail in Phase 6.
+
+Implementations SHOULD record this anchoring evidence in the `attestation` object (`status: "referenced"` or `"attested"`, with `evidence_ref` pointing to the audit-trail location) defined in `validation-compliance.schema.json` and `execution-resilience.schema.json`.

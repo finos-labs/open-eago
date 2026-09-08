@@ -118,6 +118,7 @@ This is the **authoritative checkpoint** for all four risk dimensions.
 - All outputs in regulated profiles MUST include a `risk_summary` object containing: final `risk_tier`, `composite_risk_score`, number of `risk_events` during execution, and circuit-breaker trip count.
 - High and critical risk events MUST trigger stakeholder notifications per the communication routing rules.
 - Risk audit records MUST be anchored to the blockchain audit trail.
+- Implementations SHOULD record this anchoring in the `attestation` object (see `validation-compliance.schema.json`, `execution-resilience.schema.json`).
 
 ## Risk Escalation Process
 
