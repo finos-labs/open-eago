@@ -1,0 +1,277 @@
+{
+  "description": "Decision-record attestation is optional but well-formed when present, and 'not attested' is an explicit stated fact rather than a silent gap",
+  "requirement_id": "OEAGO-VAL-ATTEST-001",
+  "schema": "spec/v0.1.0/schemas/validation-compliance.schema.json",
+  "cases": [
+    {
+      "id": "no-attestation-backward-compat",
+      "description": "A payload with no attestation object anywhere remains valid — existing v0.1.0 producers are unaffected",
+      "valid": true,
+      "payload": {
+        "plan_id": "plan-001",
+        "validation_status": "approved",
+        "policy_checks": ["gdpr_data_residency"],
+        "hitl": {
+          "required": true,
+          "decision": "approved"
+        },
+        "risk_assessment": {
+          "composite_risk_score": 0.2,
+          "risk_tier": "low",
+          "dimension_scores": {
+            "financial_risk": 0.1,
+            "operational_risk": 0.1,
+            "compliance_risk": 0.1,
+            "security_risk": 0.1
+          },
+          "dimension_weights": {
+            "financial_risk": 0.25,
+            "operational_risk": 0.25,
+            "compliance_risk": 0.25,
+            "security_risk": 0.25
+          },
+          "escalation_outcome": "approved"
+        }
+      }
+    },
+    {
+      "id": "attestation-status-none",
+      "description": "status: none on hitl records the explicit absence of attestation as a stated fact",
+      "valid": true,
+      "payload": {
+        "plan_id": "plan-002",
+        "validation_status": "approved",
+        "policy_checks": ["kyc_verification"],
+        "hitl": {
+          "required": true,
+          "decision": "approved",
+          "attestation": { "status": "none" }
+        },
+        "risk_assessment": {
+          "composite_risk_score": 0.2,
+          "risk_tier": "low",
+          "dimension_scores": {
+            "financial_risk": 0.1,
+            "operational_risk": 0.1,
+            "compliance_risk": 0.1,
+            "security_risk": 0.1
+          },
+          "dimension_weights": {
+            "financial_risk": 0.25,
+            "operational_risk": 0.25,
+            "compliance_risk": 0.25,
+            "security_risk": 0.25
+          },
+          "escalation_outcome": "approved"
+        }
+      }
+    },
+    {
+      "id": "attestation-status-referenced",
+      "description": "status: referenced with an evidence_ref pointer on risk_assessment is valid",
+      "valid": true,
+      "payload": {
+        "plan_id": "plan-003",
+        "validation_status": "approved",
+        "policy_checks": ["aml_screening"],
+        "hitl": {
+          "required": true,
+          "decision": "approved"
+        },
+        "risk_assessment": {
+          "composite_risk_score": 0.4,
+          "risk_tier": "medium",
+          "dimension_scores": {
+            "financial_risk": 0.3,
+            "operational_risk": 0.3,
+            "compliance_risk": 0.3,
+            "security_risk": 0.3
+          },
+          "dimension_weights": {
+            "financial_risk": 0.25,
+            "operational_risk": 0.25,
+            "compliance_risk": 0.25,
+            "security_risk": 0.25
+          },
+          "escalation_outcome": "approved",
+          "attestation": {
+            "status": "referenced",
+            "attester": "internal-audit-log",
+            "evidence_ref": "https://audit.example.com/records/plan-003"
+          }
+        }
+      }
+    },
+    {
+      "id": "attestation-status-attested",
+      "description": "status: attested with attester, digest, algorithm, signature, and attested_at on risk_context is valid",
+      "valid": true,
+      "payload": {
+        "plan_id": "plan-004",
+        "validation_status": "approved",
+        "policy_checks": ["credit_risk_threshold"],
+        "hitl": {
+          "required": true,
+          "decision": "approved"
+        },
+        "risk_assessment": {
+          "composite_risk_score": 0.4,
+          "risk_tier": "medium",
+          "dimension_scores": {
+            "financial_risk": 0.3,
+            "operational_risk": 0.3,
+            "compliance_risk": 0.3,
+            "security_risk": 0.3
+          },
+          "dimension_weights": {
+            "financial_risk": 0.25,
+            "operational_risk": 0.25,
+            "compliance_risk": 0.25,
+            "security_risk": 0.25
+          },
+          "escalation_outcome": "approved"
+        },
+        "risk_context": {
+          "composite_risk_score": 0.4,
+          "risk_tier": "medium",
+          "attestation": {
+            "status": "attested",
+            "attester": "compliance-verifier-service",
+            "digest": "sha256:9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08",
+            "algorithm": "ECDSA-P256-SHA256",
+            "signature": "MEYCIQDx7k3v",
+            "attested_at": "2026-09-08T10:30:00Z"
+          }
+        }
+      }
+    },
+    {
+      "id": "attestation-referenced-missing-evidence-ref",
+      "description": "status: referenced without evidence_ref must be rejected",
+      "valid": false,
+      "payload": {
+        "plan_id": "plan-005",
+        "validation_status": "approved",
+        "policy_checks": ["gdpr_data_residency"],
+        "hitl": {
+          "required": true,
+          "decision": "approved",
+          "attestation": { "status": "referenced" }
+        },
+        "risk_assessment": {
+          "composite_risk_score": 0.2,
+          "risk_tier": "low",
+          "dimension_scores": {
+            "financial_risk": 0.1,
+            "operational_risk": 0.1,
+            "compliance_risk": 0.1,
+            "security_risk": 0.1
+          },
+          "dimension_weights": {
+            "financial_risk": 0.25,
+            "operational_risk": 0.25,
+            "compliance_risk": 0.25,
+            "security_risk": 0.25
+          },
+          "escalation_outcome": "approved"
+        }
+      }
+    },
+    {
+      "id": "attestation-attested-missing-attester-and-digest",
+      "description": "status: attested without attester or digest must be rejected",
+      "valid": false,
+      "payload": {
+        "plan_id": "plan-006",
+        "validation_status": "approved",
+        "policy_checks": ["gdpr_data_residency"],
+        "hitl": {
+          "required": true,
+          "decision": "approved"
+        },
+        "risk_assessment": {
+          "composite_risk_score": 0.2,
+          "risk_tier": "low",
+          "dimension_scores": {
+            "financial_risk": 0.1,
+            "operational_risk": 0.1,
+            "compliance_risk": 0.1,
+            "security_risk": 0.1
+          },
+          "dimension_weights": {
+            "financial_risk": 0.25,
+            "operational_risk": 0.25,
+            "compliance_risk": 0.25,
+            "security_risk": 0.25
+          },
+          "escalation_outcome": "approved",
+          "attestation": { "status": "attested" }
+        }
+      }
+    },
+    {
+      "id": "attestation-bogus-status-value",
+      "description": "An unrecognized status value must be rejected",
+      "valid": false,
+      "payload": {
+        "plan_id": "plan-007",
+        "validation_status": "approved",
+        "policy_checks": ["gdpr_data_residency"],
+        "hitl": {
+          "required": true,
+          "decision": "approved",
+          "attestation": { "status": "verified" }
+        },
+        "risk_assessment": {
+          "composite_risk_score": 0.2,
+          "risk_tier": "low",
+          "dimension_scores": {
+            "financial_risk": 0.1,
+            "operational_risk": 0.1,
+            "compliance_risk": 0.1,
+            "security_risk": 0.1
+          },
+          "dimension_weights": {
+            "financial_risk": 0.25,
+            "operational_risk": 0.25,
+            "compliance_risk": 0.25,
+            "security_risk": 0.25
+          },
+          "escalation_outcome": "approved"
+        }
+      }
+    },
+    {
+      "id": "attestation-unknown-property-rejected",
+      "description": "The attestation object is closed — an unrecognized field must be rejected",
+      "valid": false,
+      "payload": {
+        "plan_id": "plan-008",
+        "validation_status": "approved",
+        "policy_checks": ["gdpr_data_residency"],
+        "hitl": {
+          "required": true,
+          "decision": "approved",
+          "attestation": { "status": "none", "verified_by_vendor": "invinoveritas" }
+        },
+        "risk_assessment": {
+          "composite_risk_score": 0.2,
+          "risk_tier": "low",
+          "dimension_scores": {
+            "financial_risk": 0.1,
+            "operational_risk": 0.1,
+            "compliance_risk": 0.1,
+            "security_risk": 0.1
+          },
+          "dimension_weights": {
+            "financial_risk": 0.25,
+            "operational_risk": 0.25,
+            "compliance_risk": 0.25,
+            "security_risk": 0.25
+          },
+          "escalation_outcome": "approved"
+        }
+      }
+    }
+  ]
+}

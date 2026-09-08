@@ -2,6 +2,55 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://finos-labs.github.io/open-eago/spec/v0.1.0/schemas/validation-compliance.schema.json",
   "title": "OpenEAGO Validation and Compliance",
+  "$defs": {
+    "attestation": {
+      "title": "Attestation",
+      "description": "Optional attestation or audit-anchoring evidence for this decision record. Absence means no attestation was captured; when present, 'status' makes 'not attested' an explicit recorded fact rather than an implicit gap. Corresponds to the domain-vocabulary 'audit_anchoring' and 'identity_verification' capability_type values firing for this record — see SPECIFICATION.md Appendix E.6.",
+      "type": "object",
+      "required": ["status"],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["none", "referenced", "attested"],
+          "description": "'none': explicitly no attestation was performed. 'referenced': evidence_ref points to evidence held outside this record (audit-anchor transaction, signed provenance manifest, external log). 'attested': attester and digest are embedded directly here."
+        },
+        "attester": {
+          "type": "string",
+          "description": "Identifier of the party, service, or system that produced this attestation. MUST identify a party distinct from the agent/service that produced this decision record — a value equal to the record producer's own identity does not constitute independent attestation. This distinctness cannot be schema-enforced; it is a normative requirement."
+        },
+        "digest": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9_-]+:[a-fA-F0-9]+$",
+          "description": "Content digest of the canonical decision-record payload this attestation covers, '<algorithm>:<hex>' (e.g. 'sha256:...'), matching the convention in examples/provenance_manifest (collector.py hash_content())."
+        },
+        "algorithm": {
+          "type": "string",
+          "description": "Signature algorithm used for 'signature', if present (e.g. 'ECDSA-P256-SHA256')."
+        },
+        "signature": {
+          "type": "string",
+          "description": "Signature over the canonical payload, implementation-defined encoding (e.g. base64url DER, matching examples/provenance_manifest's ManifestSignature.value)."
+        },
+        "evidence_ref": {
+          "type": "string",
+          "format": "uri",
+          "description": "Locator for externally-held attestation/audit-anchoring evidence. Transport-agnostic: MAY reference a blockchain transaction, an internal audit log entry, or any dereferenceable evidence locator. MUST NOT be assumed to require a blockchain."
+        },
+        "attested_at": { "type": "string", "format": "date-time" }
+      },
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": { "properties": { "status": { "const": "referenced" } }, "required": ["status"] },
+          "then": { "required": ["evidence_ref"] }
+        },
+        {
+          "if": { "properties": { "status": { "const": "attested" } }, "required": ["status"] },
+          "then": { "required": ["attester", "digest"] }
+        }
+      ]
+    }
+  },
   "type": "object",
   "required": ["plan_id", "validation_status", "policy_checks", "hitl", "risk_assessment"],
   "properties": {
@@ -56,7 +105,8 @@
         "decision_at": {
           "type": "string",
           "format": "date-time"
-        }
+        },
+        "attestation": { "$ref": "#/$defs/attestation" }
       },
       "additionalProperties": false
     },
@@ -109,7 +159,8 @@
         "override_ref": {
           "type": "string",
           "description": "board_approval_ref or legal_review_ref required for critical tier overrides"
-        }
+        },
+        "attestation": { "$ref": "#/$defs/attestation" }
       },
       "additionalProperties": false
     },
@@ -121,10 +172,17 @@
         "composite_risk_score": { "type": "number", "minimum": 0, "maximum": 1 },
         "risk_tier": { "type": "string", "enum": ["low", "medium", "high", "critical"] },
         "risk_flags": { "type": "array", "items": { "type": "string" } },
-        "risk_events": { "type": "array", "items": { "type": "object" } },
+        "risk_events": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": { "attestation": { "$ref": "#/$defs/attestation" } }
+          }
+        },
         "circuit_breaker_trips": { "type": "integer", "minimum": 0 },
         "assessment_timestamp": { "type": "string", "format": "date-time" },
-        "assessed_by": { "type": "string" }
+        "assessed_by": { "type": "string" },
+        "attestation": { "$ref": "#/$defs/attestation" }
       }
     }
   },

@@ -26,7 +26,7 @@
 
     "capability_type": {
       "title": "Regulated Capability Type",
-      "description": "A named, regulated operation that an agent can perform. These identifiers establish the shared ontology: two agents agree that 'kyc_verification' means the same thing because the spec defines it, not because they happened to use the same string. Extension capabilities outside this vocabulary MUST use the prefix 'x-' (e.g. 'x-trade_surveillance').",
+      "description": "A named, regulated operation that an agent can perform. These identifiers establish the shared ontology: two agents agree that 'kyc_verification' means the same thing because the spec defines it, not because they happened to use the same string. Extension capabilities outside this vocabulary MUST use the prefix 'x-' (e.g. 'x-trade_surveillance'). When 'audit_anchoring' or 'identity_verification' fires for a given decision, record it via that decision record's own 'attestation' object (see validation-compliance.schema.json and execution-resilience.schema.json), not via this enum.",
       "type": "string",
       "enum": [
         "kyc_verification",
