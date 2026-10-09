@@ -1,0 +1,5 @@
+# Copyright 2026 Sankalp Gilda
+# SPDX-License-Identifier: Apache-2.0
+# Conformance harness, pinned by version and wheel hash (PyPI JSON for 0.17.4).
+agent-evidence-vectors==0.17.4 \
+    --hash=sha256:78123d540d94d24789c9fa2a7f6b1e28cc53f0f6abe833afc5f0c52d0ec4106a

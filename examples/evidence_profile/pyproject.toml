@@ -1,0 +1,22 @@
+# Copyright 2026 Sankalp Gilda
+# SPDX-License-Identifier: Apache-2.0
+[project]
+name = "openEAGO-evidence-profile"
+version = "0.1.0"
+description = "Evidence profile example for OpenEAGO: one signed DSSE in-toto Statement per orchestration message"
+requires-python = ">=3.11"
+dependencies = [
+    "cryptography>=42.0",
+]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["evidence_profile*"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]

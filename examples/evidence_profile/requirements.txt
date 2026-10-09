@@ -1,0 +1,3 @@
+# Copyright 2026 Sankalp Gilda
+# SPDX-License-Identifier: Apache-2.0
+cryptography>=42.0

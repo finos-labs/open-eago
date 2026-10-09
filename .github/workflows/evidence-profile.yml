@@ -1,0 +1,52 @@
+# Copyright 2026 Sankalp Gilda
+# SPDX-License-Identifier: Apache-2.0
+name: evidence-profile
+
+on:
+  push:
+    paths:
+      - "examples/evidence_profile/**"
+      - "spec/v0.1.0/schemas/**"
+      - ".github/workflows/evidence-profile.yml"
+  pull_request:
+    paths:
+      - "examples/evidence_profile/**"
+      - "spec/v0.1.0/schemas/**"
+      - ".github/workflows/evidence-profile.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: examples/evidence_profile
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install
+        run: |
+          python -m pip install -r requirements-dev.txt
+          python -m pip install --require-hashes --no-deps -r requirements-conformance.txt
+      - name: Unit tests
+        run: python -m pytest -v
+      - name: Emit and verify the example run
+        run: |
+          python -m evidence_profile emit fixtures/run.json out
+          python -m evidence_profile verify fixtures/run.json out
+      - name: Replay the DSSE envelope conformance suite
+        run: |
+          python conformance/build_suite.py build
+          EVIDENCE_PROFILE_KEYS=build/keys.json agent-evidence-vectors \
+            --vectors build/suite --verifier "python3 verify_adapter.py" \
+            --report build/conformance-report.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: conformance-report
+          path: examples/evidence_profile/build/conformance-report.json

@@ -1,0 +1,5 @@
+# Copyright 2026 Sankalp Gilda
+# SPDX-License-Identifier: Apache-2.0
+-r requirements.txt
+pytest>=8
+jsonschema>=4.18

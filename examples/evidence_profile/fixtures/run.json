@@ -1,0 +1,127 @@
+[
+  {
+    "message_id": "msg-001",
+    "spec_version": "0.1.0",
+    "phase": "contract_management",
+    "correlation_id": "run-onboarding-7f3a",
+    "timestamp": "2026-10-01T09:00:00Z",
+    "payload": {
+      "contract_id": "ctr-2026-0042",
+      "requester": "bank-onboarding-orchestrator",
+      "requested_capabilities": ["kyc_verification", "aml_screening", "audit_anchoring"],
+      "constraints": {
+        "regulatory_profile": "financial_services_eu",
+        "data_residency": "EU",
+        "acu_budget": 120
+      },
+      "risk_tier": "high"
+    }
+  },
+  {
+    "message_id": "msg-002",
+    "spec_version": "0.1.0",
+    "phase": "planning_negotiation",
+    "correlation_id": "run-onboarding-7f3a",
+    "timestamp": "2026-10-01T09:00:04Z",
+    "payload": {
+      "plan_id": "plan-0042-a",
+      "contract_id": "ctr-2026-0042",
+      "selected_agents": ["bank-kyc-agent", "bank-aml-agent"],
+      "execution_pattern": "sequential",
+      "negotiation": {
+        "status": "accepted",
+        "checks": ["capability_fit", "policy_constraints", "sla_slo", "data_residency"]
+      },
+      "sla_guarantees": {
+        "latency": {"p99_ms": 2500},
+        "availability": {"availability_pct": 0.995},
+        "throughput": {"throughput_rps": 5},
+        "error_rate": {"error_rate_max": 0.01}
+      }
+    }
+  },
+  {
+    "message_id": "msg-003",
+    "spec_version": "0.1.0",
+    "phase": "validation_compliance",
+    "correlation_id": "run-onboarding-7f3a",
+    "timestamp": "2026-10-01T09:00:09Z",
+    "payload": {
+      "plan_id": "plan-0042-a",
+      "validation_status": "approved",
+      "policy_checks": ["gdpr_data_minimisation", "sanctions_list_current"],
+      "compliance_profiles": ["GDPR", "DORA"],
+      "hitl": {
+        "required": true,
+        "reviewer_id": "reviewer-17",
+        "decision": "approved",
+        "decision_at": "2026-10-01T09:00:08Z"
+      },
+      "risk_assessment": {
+        "composite_risk_score": 0.42,
+        "risk_tier": "medium",
+        "dimension_scores": {
+          "financial_risk": 0.3,
+          "operational_risk": 0.4,
+          "compliance_risk": 0.55,
+          "security_risk": 0.35
+        },
+        "dimension_weights": {
+          "financial_risk": 0.25,
+          "operational_risk": 0.2,
+          "compliance_risk": 0.35,
+          "security_risk": 0.2
+        },
+        "escalation_outcome": "approved"
+      }
+    }
+  },
+  {
+    "message_id": "msg-004",
+    "spec_version": "0.1.0",
+    "phase": "execution_resilience",
+    "correlation_id": "run-onboarding-7f3a",
+    "timestamp": "2026-10-01T09:01:30Z",
+    "payload": {
+      "execution_id": "exec-0042-1",
+      "plan_id": "plan-0042-a",
+      "status": "completed",
+      "tasks": [
+        {"task_id": "kyc", "status": "completed"},
+        {"task_id": "aml", "status": "completed"}
+      ],
+      "resilience": {"circuit_breaker": false, "fallback_used": false, "compensation_applied": false},
+      "sla_compliance_status": {"breach_state": "completed", "overall_sla_status": "met"}
+    }
+  },
+  {
+    "message_id": "msg-005",
+    "spec_version": "0.1.0",
+    "phase": "context_state_management",
+    "correlation_id": "run-onboarding-7f3a",
+    "timestamp": "2026-10-01T09:01:31Z",
+    "payload": {
+      "context_id": "ctx-0042",
+      "level": "task",
+      "state": {"kyc_result": "pass", "aml_result": "clear"},
+      "lineage": ["msg-001", "msg-002", "msg-003", "msg-004"],
+      "ttl_seconds": 86400
+    }
+  },
+  {
+    "message_id": "msg-006",
+    "spec_version": "0.1.0",
+    "phase": "communication_delivery",
+    "correlation_id": "run-onboarding-7f3a",
+    "timestamp": "2026-10-01T09:01:32Z",
+    "payload": {
+      "message_id": "msg-006",
+      "sender": "bank-onboarding-orchestrator",
+      "recipient": "hf-legal-agent",
+      "method": "a2a",
+      "delivery_status": "delivered",
+      "security": {"mtls": true, "auth_level": 3},
+      "audit_ref": "audit-0042"
+    }
+  }
+]
